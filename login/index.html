@@ -527,9 +527,13 @@ body.dark .confirm-delete{background:#dc2626}
 }
 .login-error.err{background:rgba(248,113,113,0.1);border:0.5px solid rgba(248,113,113,0.3);color:#f87171}
 .login-error.ok{background:rgba(74,222,128,0.1);border:0.5px solid rgba(74,222,128,0.3);color:#4ade80}
-.login-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
-.login-divider hr{flex:1;border:none;border-top:0.5px solid rgba(255,255,255,0.08)}
-.login-divider span{font-size:11px;color:#4b5563}
+.login-divider{display:flex;align-items:center;gap:12px;margin:16px 0}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.login-divider span{font-size:12px;color:var(--sub);white-space:nowrap}
+.google-login-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,border-color .2s;font-family:inherit}
+.google-login-btn:hover{background:var(--accent-dim);border-color:var(--accent)}
+.cal-btn{background:transparent;border:none;cursor:pointer;font-size:14px;opacity:0.4;transition:opacity .2s;padding:2px 4px;line-height:1}
+.cal-btn:hover{opacity:1}
 /* PIN SCREENS */
 #pinScreen,#pinSetupScreen{
   position:fixed;inset:0;flex-direction:column;align-items:center;justify-content:center;
@@ -1320,6 +1324,11 @@ body.dark .theme-pill-dark{color:#fff}
       </div>
       <div class="login-forgot" id="forgotRow"><a onclick="showReset()" id="loginForgotLink">Esqueci minha senha</a></div>
       <button class="login-btn" id="authBtn" onclick="handleAuth()">Entrar</button>
+      <div class="login-divider"><span>ou / or</span></div>
+      <button class="google-login-btn" onclick="loginWithGoogle()">
+        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <span id="googleLoginText">Entrar com Google</span>
+      </button>
       <div style="text-align:center;margin-top:14px">
         <a onclick="showHome()" style="font-size:11px;color:#6b7280;cursor:pointer" id="loginBackLink">← Voltar</a>
       </div>
@@ -2595,6 +2604,8 @@ function applyLang(){
   if(lsl) lsl.textContent=_authMode==='signup'?t('login_signin'):t('login_signup');
   const lbl=document.getElementById('loginBackLink');
   if(lbl) lbl.textContent=lang==='en'?'← Back':'← Voltar';
+  const glt=document.getElementById('googleLoginText');
+  if(glt) glt.textContent=lang==='en'?'Sign in with Google':'Entrar com Google';
 
   // ── Reset screen ──
   const rsub=document.getElementById('resetSubtitle');
@@ -3356,6 +3367,7 @@ function makeRendaRow(r){
       }
     </div>
     <div class="row-act">
+      <button class="cal-btn" onclick="addToGoogleCal('${r.name.replace(/'/g,&quot;\\\'&quot;)}',${r.val},${r.type==='once'?r.day:r.day||1},${r.type==='once'?r.month+1:0},${r.type==='once'?r.year:0})" title="Google Calendar">📅</button>
       ${!r.locked?`<button class="icon-btn" onclick="openDayEditModal('renda','${r.id}')" title="${lang==='en'?'Edit schedule':'Editar frequência/tipo'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
       <button class="icon-btn${r.locked?' lock-on':''}" onclick="toggleRendaLock('${r.id}')" title="${r.locked?'Desbloquear':'Bloquear'}">${r.locked?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`}</button>
       ${!r.locked?`<button class="icon-btn del" onclick="removeRenda('${r.id}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
@@ -3465,6 +3477,7 @@ function makeBillRow(b){
       }
     </div>
     <div class="row-act">
+      <button class="cal-btn" onclick="addToGoogleCal('${b.name.replace(/'/g,&quot;\\\'&quot;)}',${b.val},${b.day||1},${b.month!=null?b.month+1:0},${b.year||0})" title="Google Calendar">📅</button>
       ${!b.locked?`<button class="icon-btn" onclick="openDayEditModal('bill','${b.id}')" title="${lang==='en'?'Edit schedule':'Editar frequência/categoria'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>`:''}
       <button class="icon-btn${b.locked?' lock-on':''}" onclick="toggleLock('${b.id}')" title="${b.locked?'Desbloquear':'Bloquear'}">${b.locked?`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`}</button>
       ${!b.locked?`<button class="icon-btn del" onclick="removeBill('${b.id}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>`:''}
@@ -4937,6 +4950,37 @@ document.addEventListener('keydown',e=>{
     else if(e.key==='Backspace') pinSetupKey('del');
   }
 });
+
+// ── GOOGLE LOGIN ─────────────────────────────────────────────────
+async function loginWithGoogle(){
+  const {error}=await _supa.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:'https://tryfreed.com/login/'}
+  });
+  if(error){
+    console.error('Google login error:',error);
+    showToast(lang==='en'?'Google login failed':'Erro ao entrar com Google','error');
+  }
+}
+
+// ── GOOGLE CALENDAR ───────────────────────────────────────────────
+function addToGoogleCal(name,val,day,month,year){
+  const now=new Date();
+  const y=year||now.getFullYear();
+  const m=(month||now.getMonth()+1)-1;
+  const d=day||1;
+  const date=new Date(y,m,d);
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt2=dt=>`${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}T${pad(dt.getHours())}${pad(dt.getMinutes())}${pad(dt.getSeconds())}Z`;
+  const end=new Date(date.getTime()+3600000);
+  const title=encodeURIComponent(name+' $'+Number(val).toFixed(2));
+  const details=encodeURIComponent(lang==='en'?'Payment reminder from TryFreed':'Lembrete de pagamento do TryFreed');
+  const url='https://www.google.com/calendar/render?action=TEMPLATE'
+    +'&text='+title
+    +'&dates='+fmt2(date)+'/'+fmt2(end)
+    +'&details='+details;
+  window.open(url,'_blank');
+}
 
 // ── EXPORT EXCEL ─────────────────────────────────────────────────
 function exportExcel(){
