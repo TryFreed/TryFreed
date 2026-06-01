@@ -4394,16 +4394,19 @@ function setUserUI(user){
 let _booted = false;
 let _appRunning = false;
 
-// Listen for auth state changes (login/logout only)
+// Listen for auth state changes (login/logout, and OAuth redirect SIGNED_IN)
 _supa.auth.onAuthStateChange(async (event, session)=>{
-  if(!_booted) return; // ignore initial fire, handled by bootApp
-  if(session?.user) _user=session.user; // always keep _user fresh (token refresh, updateUser, etc.)
+  // Block non-SIGNED_IN events during boot (bootApp handles initial session).
+  // Allow SIGNED_IN through even before _booted so OAuth redirects are caught.
+  if(!_booted && event!=='SIGNED_IN') return;
+  if(session?.user) _user=session.user; // keep _user fresh (token refresh, OAuth, updateUser)
   if(event==='SIGNED_IN'){
-    if(_appRunning) return; // app already running — don't reload, just keep _user fresh above
+    if(_appRunning) return; // app already running — just keep _user fresh above
+    _booted=true; // mark booted so bootApp skips redundant init
     setUserUI(_user);
     if(obIsFirstTime()){
-      obStart();          // show slides immediately, no waiting for network
-      loadFromSupabase(); // fire-and-forget: loads empty data for new user
+      obStart();
+      loadFromSupabase();
       _appRunning=true;
       return;
     }
@@ -4420,9 +4423,11 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
 });
 
 async function bootApp(){
+  if(_appRunning) return; // onAuthStateChange (OAuth redirect) already initialised the app
   const {data:{session}}=await _supa.auth.getSession();
   _booted=true;
   if(session?.user){
+    if(_appRunning) return; // double-check after async gap
     _user=session.user;
     if(session.user.user_metadata?.pin){
       showPinScreen();
@@ -4953,13 +4958,17 @@ document.addEventListener('keydown',e=>{
 
 // ── GOOGLE LOGIN ─────────────────────────────────────────────────
 async function loginWithGoogle(){
-  const {error}=await _supa.auth.signInWithOAuth({
+  console.log('[Google OAuth] Starting login...');
+  const redirectTo=window.location.origin+'/login/';
+  console.log('[Google OAuth] redirectTo:', redirectTo);
+  const {data,error}=await _supa.auth.signInWithOAuth({
     provider:'google',
-    options:{redirectTo:'https://tryfreed.com/login/'}
+    options:{redirectTo}
   });
+  console.log('[Google OAuth] result:', data, error);
   if(error){
-    console.error('Google login error:',error);
-    showToast(lang==='en'?'Google login failed':'Erro ao entrar com Google','error');
+    console.error('[Google OAuth] error:', error);
+    showToast(lang==='en'?'Google login failed: '+error.message:'Erro ao entrar com Google: '+error.message);
   }
 }
 
