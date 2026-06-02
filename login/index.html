@@ -600,6 +600,46 @@ body.dark .confirm-delete{background:#dc2626}
 .logout-btn{font-size:11px;padding:3px 10px;border-radius:6px;border:0.5px solid var(--border);background:transparent;cursor:pointer;color:var(--sub)}
 .logout-btn:hover{background:var(--cal-exp-bg);color:var(--red)}
 
+/* ── PAYWALL ─────────────────────────────────────────────────── */
+#paywallScreen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:1100;padding:1.5rem 1rem;
+  background:#080808;
+  background-image:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(124,58,237,.15) 0%,transparent 65%);
+}
+.pw-card{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:.4rem;text-align:center}
+.pw-logo{font-size:26px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.15rem}
+.pw-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:.15rem}
+.pw-sub{font-size:13px;color:#9ca3af;margin-bottom:1.1rem}
+.pw-plans{display:flex;gap:.85rem;width:100%}
+.pw-plan{
+  flex:1;background:rgba(18,18,18,.95);
+  border:0.5px solid rgba(255,255,255,.1);border-radius:16px;
+  padding:1.25rem 1rem;display:flex;flex-direction:column;align-items:center;gap:.45rem;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.pw-plan-featured{border-color:rgba(124,58,237,.5);box-shadow:0 8px 32px rgba(124,58,237,.2)}
+.pw-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:.3px;padding:3px 10px;border-radius:20px}
+.pw-plan-name{font-size:11px;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.pw-plan-price{display:flex;align-items:baseline;gap:2px}
+.pw-price{font-size:30px;font-weight:800;color:#fff}
+.pw-per{font-size:13px;color:#9ca3af;font-weight:500}
+.pw-save{font-size:11px;color:#b47bff;font-weight:500}
+.pw-btn{
+  display:block;width:100%;padding:9px;border-radius:10px;border:none;
+  background:var(--accent);color:#fff;font-size:13px;font-weight:700;
+  cursor:pointer;text-decoration:none;text-align:center;
+  box-shadow:0 4px 14px rgba(124,58,237,.3);transition:background .15s,transform .1s;
+  margin-top:.3rem;
+}
+.pw-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.pw-logout-btn{
+  margin-top:1.25rem;background:none;border:none;color:#6b7280;
+  font-size:12px;cursor:pointer;text-decoration:underline;padding:4px 8px;transition:color .15s;
+}
+.pw-logout-btn:hover{color:#9ca3af}
+@media(max-width:360px){.pw-plans{flex-direction:column}}
+
   /* ── CURVED BOTTOM NAV ────────────────────────────────────────── */
   .bottom-nav {
     position: fixed;
@@ -2136,6 +2176,36 @@ body.dark .theme-pill-dark{color:#fff}
   </div>
 </div>
 
+<!-- PAYWALL SCREEN -->
+<div id="paywallScreen" style="display:none">
+  <div class="pw-card">
+    <div class="pw-logo">TryFreed</div>
+    <div class="pw-title" id="pwTitle">Assine para continuar</div>
+    <div class="pw-sub" id="pwSub">Escolha seu plano</div>
+    <div class="pw-plans">
+      <div class="pw-plan">
+        <div class="pw-plan-name" id="pwMonthLabel">Mensal</div>
+        <div class="pw-plan-price">
+          <span class="pw-price">$9.99</span>
+          <span class="pw-per" id="pwMonthPer">/mês</span>
+        </div>
+        <a href="https://buy.stripe.com/7sY5kD1xS9pT0c9bEe83C00" target="_blank" class="pw-btn" id="pwMonthBtn">Começar</a>
+      </div>
+      <div class="pw-plan pw-plan-featured">
+        <div class="pw-badge" id="pwBadge">Mais popular</div>
+        <div class="pw-plan-name" id="pwAnnualLabel">Anual</div>
+        <div class="pw-plan-price">
+          <span class="pw-price">$99.99</span>
+          <span class="pw-per" id="pwAnnualPer">/ano</span>
+        </div>
+        <div class="pw-save" id="pwAnnualSave">Economize 17%</div>
+        <a href="https://buy.stripe.com/aFabJ1gsM7hL5wtcIi83C01" target="_blank" class="pw-btn" id="pwAnnualBtn">Começar</a>
+      </div>
+    </div>
+    <button class="pw-logout-btn" id="pwLogoutBtn" onclick="_supa.auth.signOut()">Sair</button>
+  </div>
+</div>
+
 <!-- CONFIRM MODAL -->
 <div id="confirmModal">
   <div class="confirm-card">
@@ -2361,6 +2431,12 @@ const TRANSLATIONS = {
     ai_consent_accept:'Aceitar',
     drawer_footer_privacy:'Privacidade',
     drawer_footer_terms:'Termos',
+    // Paywall
+    pw_title:'Assine para continuar', pw_sub:'Escolha seu plano',
+    pw_monthly:'Mensal', pw_monthly_per:'/mês',
+    pw_annual:'Anual', pw_annual_per:'/ano',
+    pw_annual_save:'Economize 17% — como 2 meses grátis',
+    pw_badge:'Mais popular', pw_btn:'Começar', pw_logout:'Sair',
   },
   en: {
     tab_renda:'Income', tab_bills:'Expenses', tab_semana:'Week',
@@ -2544,6 +2620,12 @@ const TRANSLATIONS = {
     ai_consent_accept:'Accept',
     drawer_footer_privacy:'Privacy',
     drawer_footer_terms:'Terms',
+    // Paywall
+    pw_title:'Subscribe to continue', pw_sub:'Choose your plan',
+    pw_monthly:'Monthly', pw_monthly_per:'/month',
+    pw_annual:'Annual', pw_annual_per:'/year',
+    pw_annual_save:'Save 17% — like 2 months free',
+    pw_badge:'Most popular', pw_btn:'Get started', pw_logout:'Log out',
   }
 };
 function t(key){ return TRANSLATIONS[lang][key] ?? TRANSLATIONS['pt'][key] ?? key; }
@@ -2700,6 +2782,11 @@ function applyLang(){
   const acr=document.getElementById('aiConsentRefuse');if(acr)acr.textContent=t('ai_consent_refuse');
   const aca=document.getElementById('aiConsentAccept');if(aca)aca.textContent=t('ai_consent_accept');
   _updateQuickTagLabels();
+  // Paywall
+  const _pw={pwTitle:'pw_title',pwSub:'pw_sub',pwMonthLabel:'pw_monthly',pwMonthPer:'pw_monthly_per',
+    pwAnnualLabel:'pw_annual',pwAnnualPer:'pw_annual_per',pwAnnualSave:'pw_annual_save',
+    pwBadge:'pw_badge',pwMonthBtn:'pw_btn',pwAnnualBtn:'pw_btn',pwLogoutBtn:'pw_logout'};
+  Object.entries(_pw).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=t(key);});
 }
 function _qry(sel,attr,val){const el=document.querySelector(sel);if(el)el[attr]=val;}
 
@@ -4388,10 +4475,55 @@ function setUserUI(user){
   document.getElementById('userEmail').textContent=user.email;
   const de=document.getElementById('drawerEmail');
   if(de) de.textContent=user.email;
-  ['homeScreen','loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen']
+  ['homeScreen','loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen']
     .forEach(id=>document.getElementById(id).style.display='none');
   updateDrawerPinSection();
 }
+
+// ── SUBSCRIPTION / PAYWALL ────────────────────────────────────────
+async function fetchProfile(userId){
+  try {
+    const {data,error}=await _supa.from('profiles').select('subscribed').eq('user_id',userId).single();
+    if(error){
+      if(error.code==='PGRST116'){
+        // No profile yet — create one with subscribed=false
+        await _supa.from('profiles').insert({user_id:userId,subscribed:false});
+      }
+      return false;
+    }
+    return data?.subscribed===true; // null treated as false
+  } catch(e){
+    return false;
+  }
+}
+
+function showPaywall(){
+  ['homeScreen','loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  applyLang(); // update paywall text for current language
+  document.getElementById('paywallScreen').style.display='flex';
+}
+
+// checkSubAndLaunch: fetches profile, shows paywall or proceeds to app
+// skipOnboarding=true for PIN users who already completed onboarding
+async function checkSubAndLaunch(skipOnboarding=false){
+  const subscribed=await fetchProfile(_user.id);
+  if(!subscribed){showPaywall();return;}
+  if(!skipOnboarding&&obIsFirstTime()){
+    obStart();loadFromSupabase();_appRunning=true;return;
+  }
+  await loadFromSupabase();initApp();_appRunning=true;
+}
+
+// Manual activation command — run in browser console after webhook marks subscribed=true
+window.activateSub=async()=>{
+  if(!_user){console.warn('Not logged in');return;}
+  const {error}=await _supa.from('profiles').update({subscribed:true}).eq('user_id',_user.id);
+  if(error){console.error('activateSub error:',error);return;}
+  console.log('subscribed=true set. Reloading app...');
+  document.getElementById('paywallScreen').style.display='none';
+  setUserUI(_user);await loadFromSupabase();initApp();_appRunning=true;
+};
 
 let _booted = false;
 let _appRunning = false;
@@ -4406,16 +4538,8 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
     if(_appRunning) return; // app already running — just keep _user fresh above
     _booted=true; // mark booted so bootApp skips redundant init
     setUserUI(_user);
-    if(obIsFirstTime()){
-      obStart();
-      loadFromSupabase();
-      _appRunning=true;
-      return;
-    }
-    await loadFromSupabase();
-    initApp();
-    _appRunning=true;
-    if(!_user.user_metadata?.pin) setTimeout(showPinOffer,800);
+    await checkSubAndLaunch(false);
+    if(_appRunning&&!_user.user_metadata?.pin) setTimeout(showPinOffer,800);
   } else if(event==='SIGNED_OUT'){
     _appRunning=false;
     _user=null;
@@ -4435,15 +4559,7 @@ async function bootApp(){
       showPinScreen();
     } else {
       setUserUI(_user);
-      if(obIsFirstTime()){
-        obStart();
-        loadFromSupabase();
-        _appRunning=true;
-        return;
-      }
-      await loadFromSupabase();
-      initApp();
-      _appRunning=true;
+      await checkSubAndLaunch(false);
     }
   } else {
     showHome();
@@ -4787,9 +4903,7 @@ async function pinSubmit(){
   if(entered===stored){
     document.getElementById('pinScreen').style.display='none';
     setUserUI(_user);
-    await loadFromSupabase();
-    initApp();
-    _appRunning=true;
+    await checkSubAndLaunch(true); // PIN users already completed onboarding
   } else {
     const dots=document.getElementById('pinDots');
     pinUpdateDots('pd',4,true);
