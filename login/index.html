@@ -2989,13 +2989,20 @@ async function handleLogout(){
 async function loadFromSupabase(){
   if(!_user) return;
   const uid = _user.id;
-  const [r,b,m,dv,prof] = await Promise.all([
-    _supa.from('rendas').select('*').eq('user_id',uid),
-    _supa.from('bills').select('*').eq('user_id',uid),
-    _supa.from('metas').select('*').eq('user_id',uid),
-    _supa.from('dividas').select('*').eq('user_id',uid),
-    _supa.from('profiles').select('initial_balance,start_date').eq('user_id',uid).maybeSingle(),
-  ]);
+  let r,b,m,dv,prof;
+  try {
+    [r,b,m,dv,prof] = await Promise.all([
+      _supa.from('rendas').select('*').eq('user_id',uid),
+      _supa.from('bills').select('*').eq('user_id',uid),
+      _supa.from('metas').select('*').eq('user_id',uid),
+      _supa.from('dividas').select('*').eq('user_id',uid),
+      _supa.from('profiles').select('initial_balance,start_date').eq('user_id',uid).maybeSingle(),
+    ]);
+  } catch(e) {
+    console.error('[load] network error:',e);
+    _showToast('Erro de rede ao carregar dados.');
+    return;
+  }
   if(r.error||b.error||m.error||dv.error){
     const errs=[r.error,b.error,m.error,dv.error].filter(Boolean);
     console.error('[load] ERROS nas queries:',errs);
@@ -3120,6 +3127,7 @@ let overviewPeriod={renda:'weekly',desp:'monthly',margem:'monthly',semrenda:'wee
 let charts={};
 
 function fmt(v){if(v==null||isNaN(v))return '$0';const n=Math.round(v);return(n<0?'-$':'$')+Math.abs(n).toLocaleString('pt-BR')}
+function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function weeklyIncome(){
   const weekly=rendas.filter(r=>r.type==='weekly').reduce((s,r)=>s+r.val,0);
   const biweekly=rendas.filter(r=>r.type==='biweekly').reduce((s,r)=>s+r.val*2/4.33,0);
@@ -3252,7 +3260,7 @@ function buildNotifBanner(){
     const dayLabel=x.daysFromNow===0?(isEN?'today':'hoje'):x.daysFromNow===1?(isEN?'tomorrow':'amanhã'):(isEN?`in ${x.daysFromNow}d`:`em ${x.daysFromNow}d`);
     const paidMark=x.paid?` <span style="color:var(--green);font-size:10px">${isEN?'✓ paid':'✓ pago'}</span>`:'';
     return `<div class="notif-item"${x.paid?' style="opacity:.55"':''}>
-      <span class="notif-item-name">${cat.icon} ${x.name}<span class="notif-item-day">(${dayLabel})</span>${paidMark}</span>
+      <span class="notif-item-name">${cat.icon} ${esc(x.name)}<span class="notif-item-day">(${dayLabel})</span>${paidMark}</span>
       <span class="notif-item-val" style="color:${x.paid?'var(--green)':'var(--red)'}">-${fmt(x.val)}</span>
     </div>`;
   }).join('');
@@ -3453,7 +3461,7 @@ function makeRendaRow(r){
   const _cn=r.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   row.innerHTML=`
     <div>
-      <div class="rname" onclick="startInlineEdit(this,'renda','${r.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer">${r.name} <span class="badge ${bc}">${bl}</span></div>
+      <div class="rname" onclick="startInlineEdit(this,'renda','${r.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer">${esc(r.name)} <span class="badge ${bc}">${bl}</span></div>
       <div class="rsub">${(!r.locked&&r.type!=='once')?`<span class="rsub-edit" onclick="openDayEditModal('renda','${r.id}')">${dl}</span>`:dl}</div>
     </div>
     <div class="rval" onclick="startInlineEditVal(this,'renda','${r.id}')" title="${lang==='en'?'Click to edit value':'Clique para editar o valor'}">${fmt(r.val)}</div>
@@ -3573,7 +3581,7 @@ function makeBillRow(b){
   const _cn=b.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   row.innerHTML=`
     <div>
-      <div class="rname" onclick="startInlineEdit(this,'bill','${b.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer">${b.name} <span class="badge ${bc}">${bl}</span></div>
+      <div class="rname" onclick="startInlineEdit(this,'bill','${b.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer">${esc(b.name)} <span class="badge ${bc}">${bl}</span></div>
       <div class="rsub">${(!b.locked&&b.type!=='once')?`<span class="rsub-edit" onclick="openDayEditModal('bill','${b.id}')">${dl}</span>`:dl} · ${cat.label}</div>
     </div>
     <div class="rval" onclick="startInlineEditVal(this,'bill','${b.id}')" title="${lang==='en'?'Click to edit value':'Clique para editar o valor'}">${fmt(b.val)}</div>
@@ -3782,7 +3790,7 @@ function buildWeek(){
     billsHtml=`<div class="week-bills"><h4>${t('week_bills_title')}</h4>`;
     weekBillsList.forEach(b=>{
       const cat=CATS[b.cat||'outros'];
-      billsHtml+=`<div class="wb-row"><span>${cat.icon} ${b.name}</span><span style="color:var(--red);font-weight:500">-${fmt(b.val)}</span></div>`;
+      billsHtml+=`<div class="wb-row"><span>${cat.icon} ${esc(b.name)}</span><span style="color:var(--red);font-weight:500">-${fmt(b.val)}</span></div>`;
     });
     billsHtml+='</div>';
   }
@@ -3893,7 +3901,7 @@ function buildMetas(){
     const balAtTarget=dayEntry?dayEntry.bal:0;
     const saved=Math.max(0,balAtTarget);
     const falta=Math.max(0,meta.val-saved);
-    const pctDone=Math.min(100,Math.round((saved/meta.val)*100));
+    const pctDone=meta.val>0?Math.min(100,Math.round((saved/meta.val)*100)):0;
     // Use stored needPerWeek from creation, or recalculate
     const needPerWeek=meta.needPerWeek||( falta>0?Math.ceil(falta/weeksLeft):0 );
     const barColor=meta.done?'#185FA5':pctDone>=100?'#1D9E75':pctDone>=60?'#EF9F27':'#E24B4A';
@@ -3905,9 +3913,11 @@ function buildMetas(){
     else if(needPerWeek<=sobraSem){status=t('meta_ok');sc='gs-ok';alertMsg=t('meta_warn_ok_msg')(fmt(sobraSem),fmt(needPerWeek));}
     else if(needPerWeek<=sobraSem*1.3){status=t('meta_warn');sc='gs-warn';alertMsg=t('meta_warn_tight_msg')(fmt(sobraSem),fmt(needPerWeek),fmt(needPerWeek-sobraSem));}
     else{status=t('meta_risk');sc='gs-risk';
-      const altWeeks=Math.ceil(falta/sobraSem);
-      const altDate=new Date(today);altDate.setDate(altDate.getDate()+altWeeks*7);
-      alertMsg=t('meta_warn_risk_msg')(fmt(sobraSem),MN(altDate.getMonth()),altDate.getFullYear(),fmt(Math.round(sobraSem*weeksLeft)));
+      if(sobraSem>0){
+        const altWeeks=Math.ceil(falta/sobraSem);
+        const altDate=new Date(today);altDate.setDate(altDate.getDate()+altWeeks*7);
+        alertMsg=t('meta_warn_risk_msg')(fmt(sobraSem),MN(altDate.getMonth()),altDate.getFullYear(),fmt(Math.round(sobraSem*weeksLeft)));
+      }
     }
 
     const card=document.createElement('div');
@@ -3915,8 +3925,8 @@ function buildMetas(){
     card.innerHTML=`
       <div class="goal-header">
         <div>
-          <div style="font-size:15px;font-weight:500">${meta.name}</div>
-          ${meta.desc?`<div style="font-size:11px;color:var(--sub);margin-top:1px">${meta.desc}</div>`:''}
+          <div style="font-size:15px;font-weight:500">${esc(meta.name)}</div>
+          ${meta.desc?`<div style="font-size:11px;color:var(--sub);margin-top:1px">${esc(meta.desc)}</div>`:''}
           <div style="font-size:11px;color:var(--sub);margin-top:3px">${meta.month+1}/${meta.day}/${meta.year}</div>
         </div>
         <div style="text-align:right">
@@ -4099,7 +4109,7 @@ function buildRelatorio(){
         <div class="card"><div class="card-label">${t('bills_paid_total')}</div><div class="card-val" style="color:var(--green)">-${fmt(paidTotal)}</div></div>
         <div class="card"><div class="card-label">${t('bills_unpaid')}</div><div class="card-val" style="color:var(--red)">-${fmt(unpaidTotal)}</div></div>
       </div>
-      ${paidThisMonth.length?`<div style="font-size:11px;color:var(--sub)">${paidThisMonth.map(b=>`<span style="display:inline-flex;align-items:center;gap:3px;margin:2px 4px 2px 0;background:var(--cal-inc-bg);padding:2px 7px;border-radius:4px;color:var(--green)">✓ ${b.name}</span>`).join('')}</div>`:''}
+      ${paidThisMonth.length?`<div style="font-size:11px;color:var(--sub)">${paidThisMonth.map(b=>`<span style="display:inline-flex;align-items:center;gap:3px;margin:2px 4px 2px 0;background:var(--cal-inc-bg);padding:2px 7px;border-radius:4px;color:var(--green)">✓ ${esc(b.name)}</span>`).join('')}</div>`:''}
     </div>
     <div class="report-section">
       <h3>${t('rep_summary_title')}</h3>
@@ -4567,18 +4577,24 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
 
 async function bootApp(){
   if(_appRunning) return; // onAuthStateChange (OAuth redirect) already initialised the app
-  const {data:{session}}=await _supa.auth.getSession();
-  _booted=true;
-  if(session?.user){
-    if(_appRunning) return; // double-check after async gap
-    _user=session.user;
-    if(session.user.user_metadata?.pin){
-      showPinScreen();
+  try {
+    const {data:{session}}=await _supa.auth.getSession();
+    _booted=true;
+    if(session?.user){
+      if(_appRunning) return; // double-check after async gap
+      _user=session.user;
+      if(session.user.user_metadata?.pin){
+        showPinScreen();
+      } else {
+        setUserUI(_user);
+        await checkSubAndLaunch(false);
+      }
     } else {
-      setUserUI(_user);
-      await checkSubAndLaunch(false);
+      showHome();
     }
-  } else {
+  } catch(e) {
+    console.error('[bootApp] error:',e);
+    _booted=true;
     showHome();
   }
 }
@@ -5671,7 +5687,7 @@ function buildDividas(){
   list.innerHTML='';
   dividas.forEach(d=>{
     const paidTotal=d.total-d.remaining;
-    const pct=Math.min(100,Math.round((paidTotal/d.total)*100));
+    const pct=d.total>0?Math.min(100,Math.round((paidTotal/d.total)*100)):0;
     const freq=d.frequencia||'monthly';
     const periodDays=freq==='weekly'?7:freq==='biweekly'?14:30;
     const monthlyR=(d.juros||0)/100;
@@ -5699,7 +5715,7 @@ function buildDividas(){
     card.innerHTML=`
       <div class="debt-header">
         <div>
-          <div class="debt-name">${d.name} <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--accent-dim);color:var(--accent);font-weight:500;margin-left:4px">${freqLabel}</span></div>
+          <div class="debt-name">${esc(d.name)} <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--accent-dim);color:var(--accent);font-weight:500;margin-left:4px">${freqLabel}</span></div>
           <div class="debt-remaining">${fmt(d.remaining)}</div>
         </div>
         <div style="text-align:right">
