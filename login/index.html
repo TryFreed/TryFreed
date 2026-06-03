@@ -2455,6 +2455,25 @@ const TRANSLATIONS = {
     pw_annual:'Anual', pw_annual_per:'/ano',
     pw_annual_save:'Economize 17% — como 2 meses grátis',
     pw_badge:'Mais popular', pw_btn:'Começar', pw_logout:'Sair',
+    // Day edit modal
+    dayedit_title:'Editar agenda', dayedit_save:'Confirmar', dayedit_freq:'Frequência',
+    dayedit_cat:'Categoria', dayedit_dow:'Dia da semana', dayedit_dom:'Dia do mês (1–31)',
+    dayedit_pay1:'1º pagamento', dayedit_pay2:'2º pagamento', dayedit_date:'Data',
+    // Notif banner
+    notif_banner_title:(n)=>`Contas nos próximos 7 dias (${n})`,
+    notif_banner_total:'Total da semana:', notif_banner_today:'hoje',
+    notif_banner_tomorrow:'amanhã', notif_banner_in_days:(n)=>`em ${n}d`,
+    notif_banner_paid:'✓ pago',
+    // PIN offer / drawer
+    pin_offer_title:'Criar um PIN de acesso rápido?',
+    pin_offer_sub:'Nas próximas visitas, acesse sem digitar email e senha.',
+    pin_offer_create:'Criar PIN', pin_offer_later:'Agora não',
+    drawer_pin_label:'PIN de acesso rápido', drawer_pin_remove:'Remover PIN',
+    // Confirm remove
+    confirm_remove_title:(name)=>`Remover "${name}"?`,
+    confirm_remove_sub:'Essa ação não pode ser desfeita.', confirm_remove_ok:'Remover',
+    // Toasts
+    save_start_date_ok:'✓ Data de início salva!',
   },
   en: {
     tab_renda:'Income', tab_bills:'Expenses', tab_semana:'Week',
@@ -2644,6 +2663,25 @@ const TRANSLATIONS = {
     pw_annual:'Annual', pw_annual_per:'/year',
     pw_annual_save:'Save 17% — like 2 months free',
     pw_badge:'Most popular', pw_btn:'Get started', pw_logout:'Log out',
+    // Day edit modal
+    dayedit_title:'Edit schedule', dayedit_save:'Save', dayedit_freq:'Frequency',
+    dayedit_cat:'Category', dayedit_dow:'Day of week', dayedit_dom:'Day of month (1–31)',
+    dayedit_pay1:'1st payment', dayedit_pay2:'2nd payment', dayedit_date:'Date',
+    // Notif banner
+    notif_banner_title:(n)=>`Bills in the next 7 days (${n})`,
+    notif_banner_total:'Week total:', notif_banner_today:'today',
+    notif_banner_tomorrow:'tomorrow', notif_banner_in_days:(n)=>`in ${n}d`,
+    notif_banner_paid:'✓ paid',
+    // PIN offer / drawer
+    pin_offer_title:'Set up a quick access PIN?',
+    pin_offer_sub:'On future visits, open the app without typing your email and password.',
+    pin_offer_create:'Create PIN', pin_offer_later:'Not now',
+    drawer_pin_label:'Quick Access PIN', drawer_pin_remove:'Remove PIN',
+    // Confirm remove
+    confirm_remove_title:(name)=>`Remove "${name}"?`,
+    confirm_remove_sub:"This action can't be undone.", confirm_remove_ok:'Remove',
+    // Toasts
+    save_start_date_ok:'✓ Start date saved!',
   }
 };
 function t(key){ return TRANSLATIONS[lang][key] ?? TRANSLATIONS['pt'][key] ?? key; }
@@ -2950,7 +2988,7 @@ async function handleAuth(){
   btn.textContent=_authMode==='login'?t('login_btn'):t('login_create');
   if(error){
     errEl.className='login-error err';
-    errEl.textContent=error.message;
+    errEl.textContent=translateSupabaseError(error.message);
     errEl.style.display='block';return;
   }
   if(_authMode==='signup'){
@@ -3046,6 +3084,7 @@ async function loadFromSupabase(){
   } else {
     START=new Date(2026,0,1);
   }
+  _computeFullDirty=true;
 }
 
 function _showToast(msg,color){
@@ -3125,9 +3164,21 @@ let calYear=_today.getFullYear(), calMonth=_today.getMonth();
 let weekStart=sunOf(START);
 let overviewPeriod={renda:'weekly',desp:'monthly',margem:'monthly',semrenda:'weekly'};
 let charts={};
+let _computeFullCache=null, _computeFullDirty=true;
 
 function fmt(v){if(v==null||isNaN(v))return '$0';const n=Math.round(v);return(n<0?'-$':'$')+Math.abs(n).toLocaleString('pt-BR')}
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function translateSupabaseError(msg){
+  if(!msg) return msg;
+  const isEN=lang==='en';
+  const map={
+    'Invalid login credentials':isEN?'Invalid email or password':'Email ou senha incorretos',
+    'Email not confirmed':isEN?'Email not confirmed. Check your inbox.':'Email não confirmado. Verifique sua caixa de entrada.',
+    'User already registered':isEN?'User already registered':'Usuário já cadastrado',
+  };
+  for(const [k,v] of Object.entries(map)){if(msg.includes(k))return v;}
+  return msg;
+}
 function weeklyIncome(){
   const weekly=rendas.filter(r=>r.type==='weekly').reduce((s,r)=>s+r.val,0);
   const biweekly=rendas.filter(r=>r.type==='biweekly').reduce((s,r)=>s+r.val*2/4.33,0);
@@ -3175,6 +3226,7 @@ function getEventsForDate(date,isFirstWeek){
 }
 
 function computeFull(){
+  if(!_computeFullDirty&&_computeFullCache) return _computeFullCache;
   let bal=initialBalance,totalIn=0,totalOut=0;
   const daily=[],monthly={};
   let cur=new Date(START),pFS=false,pFM=false;
@@ -3193,7 +3245,9 @@ function computeFull(){
     evs.forEach(e=>monthly[mk].evs.push({...e,date:new Date(cur)}));
     cur.setDate(cur.getDate()+1);
   }
-  return{bal,totalIn,totalOut,daily,monthly};
+  _computeFullCache={bal,totalIn,totalOut,daily,monthly};
+  _computeFullDirty=false;
+  return _computeFullCache;
 }
 
 // OVERVIEW
@@ -3251,14 +3305,13 @@ function buildNotifBanner(){
   const total=items.reduce((s,x)=>s+x.val,0);
   const isEN=lang==='en';
   const days=isEN?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  document.getElementById('notifTitle').textContent=
-    isEN?`Bills in the next 7 days (${items.length})`:`Contas nos próximos 7 dias (${items.length})`;
-  document.getElementById('notifTotalLabel').textContent=isEN?'Week total:':'Total da semana:';
+  document.getElementById('notifTitle').textContent=t('notif_banner_title')(items.length);
+  document.getElementById('notifTotalLabel').textContent=t('notif_banner_total');
   document.getElementById('notifTotalVal').textContent='-'+fmt(total);
   document.getElementById('notifItems').innerHTML=items.map(x=>{
     const cat=CATS[x.cat];
-    const dayLabel=x.daysFromNow===0?(isEN?'today':'hoje'):x.daysFromNow===1?(isEN?'tomorrow':'amanhã'):(isEN?`in ${x.daysFromNow}d`:`em ${x.daysFromNow}d`);
-    const paidMark=x.paid?` <span style="color:var(--green);font-size:10px">${isEN?'✓ paid':'✓ pago'}</span>`:'';
+    const dayLabel=x.daysFromNow===0?t('notif_banner_today'):x.daysFromNow===1?t('notif_banner_tomorrow'):t('notif_banner_in_days')(x.daysFromNow);
+    const paidMark=x.paid?` <span style="color:var(--green);font-size:10px">${t('notif_banner_paid')}</span>`:'';
     return `<div class="notif-item"${x.paid?' style="opacity:.55"':''}>
       <span class="notif-item-name">${cat.icon} ${esc(x.name)}<span class="notif-item-day">(${dayLabel})</span>${paidMark}</span>
       <span class="notif-item-val" style="color:${x.paid?'var(--green)':'var(--red)'}">-${fmt(x.val)}</span>
@@ -3609,17 +3662,17 @@ function openDayEditModal(itemType,id){
   if(!item||item.locked)return;
   _dayEdit={itemType,id,type:item.type};
   const isEN=lang==='en';
-  document.getElementById('dayEditTitle').textContent=isEN?'Edit schedule':'Editar agenda';
+  document.getElementById('dayEditTitle').textContent=t('dayedit_title');
   const _saveBtn=document.getElementById('dayEditSaveBtn');
-  if(_saveBtn)_saveBtn.textContent=isEN?'Save':'Confirmar';
+  if(_saveBtn)_saveBtn.textContent=t('dayedit_save');
   const typeOpts=itemType==='renda'
     ?[['monthly',t('type_monthly')],['biweekly',t('type_biweekly')],['weekly',t('type_weekly')],['once',t('type_once')]]
     :[['monthly',t('type_monthly')],['weekly',t('type_weekly')],['extra',t('type_extra')],['once',t('type_once')]];
-  const typeRow=`<div style="margin-bottom:14px"><label>${isEN?'Frequency':'Frequência'}</label>
+  const typeRow=`<div style="margin-bottom:14px"><label>${t('dayedit_freq')}</label>
     <select id="dei-type" onchange="onDayEditTypeChange('${itemType}','${id}',this.value)">
       ${typeOpts.map(([v,l])=>`<option value="${v}"${item.type===v?' selected':''}>${l}</option>`).join('')}
     </select></div>`;
-  const catRow=itemType==='bill'?`<div style="margin-bottom:14px"><label>${isEN?'Category':'Categoria'}</label>
+  const catRow=itemType==='bill'?`<div style="margin-bottom:14px"><label>${t('dayedit_cat')}</label>
     <select id="dei-cat">
       ${Object.entries(CATS).map(([k,c])=>`<option value="${k}"${(item.cat||'outros')===k?' selected':''}>${c.icon} ${c.label}</option>`).join('')}
     </select></div>`:'';
@@ -3633,21 +3686,21 @@ function _renderDayArea(type,item,isEN,itemType){
   if(type==='weekly'){
     const days=t('days_long');
     const field=itemType==='renda'?Number(item.dow||0):Number(item.day||0);
-    area.innerHTML=`<label>${isEN?'Day of week':'Dia da semana'}</label>
+    area.innerHTML=`<label>${t('dayedit_dow')}</label>
       <select id="dei0">${days.map((d,i)=>`<option value="${i}"${field===i?' selected':''}>${d}</option>`).join('')}</select>`;
   } else if(type==='monthly'||type==='extra'){
-    area.innerHTML=`<label>${isEN?'Day of month (1–31)':'Dia do mês (1–31)'}</label>
+    area.innerHTML=`<label>${t('dayedit_dom')}</label>
       <input id="dei0" type="number" min="1" max="31" value="${item.day||1}" inputmode="numeric">`;
   } else if(type==='biweekly'){
     area.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div><label>${isEN?'1st payment':'1º pagamento'}</label><input id="dei0" type="number" min="1" max="31" value="${item.day||1}" inputmode="numeric"></div>
-      <div><label>${isEN?'2nd payment':'2º pagamento'}</label><input id="dei1" type="number" min="1" max="31" value="${item.day2||''}" inputmode="numeric"></div>
+      <div><label>${t('dayedit_pay1')}</label><input id="dei0" type="number" min="1" max="31" value="${item.day||1}" inputmode="numeric"></div>
+      <div><label>${t('dayedit_pay2')}</label><input id="dei1" type="number" min="1" max="31" value="${item.day2||''}" inputmode="numeric"></div>
     </div>`;
   } else if(type==='once'){
     const mo=String((item.month!=null?item.month+1:new Date().getMonth()+1)).padStart(2,'0');
     const dy=String(item.day||1).padStart(2,'0');
     const yr=item.year||new Date().getFullYear();
-    area.innerHTML=`<label>${isEN?'Date':'Data'}</label>
+    area.innerHTML=`<label>${t('dayedit_date')}</label>
       <input id="dei0" type="date" value="${yr}-${mo}-${dy}">`;
   }
 }
@@ -4036,9 +4089,9 @@ function openConfirm(itemName, callback){
   const title=document.getElementById('confirmTitle');
   const sub=document.getElementById('confirmSub');
   const okBtn=document.getElementById('confirmOkBtn');
-  title.textContent= lang==='en' ? `Remove "${itemName}"?` : `Remover "${itemName}"?`;
-  sub.textContent  = lang==='en' ? "This action can't be undone." : 'Essa ação não pode ser desfeita.';
-  okBtn.textContent= lang==='en' ? 'Remove' : 'Remover';
+  title.textContent=t('confirm_remove_title')(itemName);
+  sub.textContent  =t('confirm_remove_sub');
+  okBtn.textContent=t('confirm_remove_ok');
   modal.classList.add('open');
 }
 function closeConfirm(){ document.getElementById('confirmModal').classList.remove('open'); _confirmCallback=null; }
@@ -4206,7 +4259,7 @@ function buildRelatorio(){
   document.getElementById('extratoList').innerHTML=exHtml||`<div style="color:#888;padding:8px">${t('rep_empty')}</div>`;
 }
 
-function rebuild(){buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();}
+function rebuild(){_computeFullDirty=true;buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();}
 
 // ── NOTIFICATIONS ────────────────────────────────────────────────
 let _swReg = null;
@@ -4512,9 +4565,6 @@ function setUserUI(user){
 async function fetchProfile(userId){
   try {
     const {data,error}=await _supa.from('profiles').select('subscribed').eq('user_id',userId).single();
-    const profileExists=!error;
-    const subscribed=!error&&data?.subscribed===true;
-    console.log('[SUB CHECK]',{userId,subscribed,profileExists,errorCode:error?.code??null});
     if(error){
       if(error.code==='PGRST116'){
         // No profile yet — create one with subscribed=false
@@ -4670,6 +4720,7 @@ function obReset(){
 function _dateToStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 async function _saveStartDate(d){
   START=d;
+  _computeFullDirty=true;
   if(_user) _supa.from('profiles').upsert({user_id:_user.id,start_date:_dateToStr(d)},{onConflict:'user_id'});
 }
 function obPickStart(mode){
@@ -4704,7 +4755,7 @@ async function saveDrawerStartDate(){
   if(isNaN(d.getTime())) return;
   await _saveStartDate(d);
   const isEN=lang==='en';
-  _showToast(isEN?'✓ Start date saved!':'✓ Data de início salva!','#10b981');
+  _showToast(t('save_start_date_ok'),'#10b981');
   closeDrawer();
   rebuild();
 }
@@ -4990,10 +5041,10 @@ async function submitChangePass(){
 
 function showPinOffer(){
   const isEN=lang==='en';
-  document.getElementById('pinOfferTitle').textContent=isEN?'Set up a quick access PIN?':'Criar um PIN de acesso rápido?';
-  document.getElementById('pinOfferSub').textContent=isEN?'On future visits, open the app without typing your email and password.':'Nas próximas visitas, acesse sem digitar email e senha.';
-  document.getElementById('pinOfferCreateBtn').textContent=isEN?'Create PIN':'Criar PIN';
-  document.getElementById('pinOfferLaterBtn').textContent=isEN?'Not now':'Agora não';
+  document.getElementById('pinOfferTitle').textContent=t('pin_offer_title');
+  document.getElementById('pinOfferSub').textContent=t('pin_offer_sub');
+  document.getElementById('pinOfferCreateBtn').textContent=t('pin_offer_create');
+  document.getElementById('pinOfferLaterBtn').textContent=t('pin_offer_later');
   document.getElementById('pinOfferModal').classList.add('open');
 }
 
@@ -5068,7 +5119,7 @@ function updateDrawerPinSection(){
   const sec=document.getElementById('drawerPinSection');
   if(!sec) return;
   const hasPin=!!getStoredPin(), isEN=lang==='en';
-  const pinLabel=isEN?'Quick Access PIN':'PIN de acesso rápido';
+  const pinLabel=t('drawer_pin_label');
   const lockSVG=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
   const chevSVG=`<svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
   const trashSVG=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`;
@@ -5082,7 +5133,7 @@ function updateDrawerPinSection(){
       <div class="dr-sep"></div>
       <div class="dr-item" onclick="removePIN()">
         <div class="dr-icon">${trashSVG}</div>
-        <span class="dr-label" style="color:#ef4444">${isEN?'Remove PIN':'Remover PIN'}</span>
+        <span class="dr-label" style="color:#ef4444">${t('drawer_pin_remove')}</span>
       </div>`;
   } else {
     sec.innerHTML=`
@@ -5107,17 +5158,13 @@ document.addEventListener('keydown',e=>{
 
 // ── GOOGLE LOGIN ─────────────────────────────────────────────────
 async function loginWithGoogle(){
-  console.log('[Google OAuth] Starting login...');
   const redirectTo=window.location.origin+'/login/';
-  console.log('[Google OAuth] redirectTo:', redirectTo);
   const {data,error}=await _supa.auth.signInWithOAuth({
     provider:'google',
     options:{redirectTo}
   });
-  console.log('[Google OAuth] result:', data, error);
   if(error){
-    console.error('[Google OAuth] error:', error);
-    showToast(lang==='en'?'Google login failed: '+error.message:'Erro ao entrar com Google: '+error.message);
+    _showToast(lang==='en'?'Google login failed: '+translateSupabaseError(error.message):'Erro ao entrar com Google: '+translateSupabaseError(error.message));
   }
 }
 
@@ -5627,7 +5674,7 @@ function buildMetaCheckinsHTML(meta){
   return `<div style="margin-top:10px;border-top:0.5px solid var(--border);padding-top:10px">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
       <span style="font-size:11px;color:var(--sub)">${summary}</span>
-      <button class="checkin-toggle" id="checkin-toggle-${meta.id}" onclick="toggleCheckinBody('${meta.id}')">${isEN?'See weeks ▼':'Ver semanas ▼'}</button>
+      <button class="checkin-toggle" id="checkin-toggle-${meta.id}" onclick="toggleCheckinBody('${meta.id}')">${t('meta_checkin_toggle')} ▼</button>
     </div>
     <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:var(--accent)"></div></div>
     <div class="checkin-body" id="checkin-body-${meta.id}">
@@ -5640,7 +5687,7 @@ function toggleCheckinBody(metaId){
   const btn=document.getElementById('checkin-toggle-'+metaId);
   if(!el) return;
   const open=el.classList.toggle('open');
-  if(btn){const isEN=lang==='en';btn.textContent=open?(isEN?'Hide ▲':'Ocultar ▲'):(isEN?'See weeks ▼':'Ver semanas ▼');}
+  if(btn){btn.textContent=open?t('meta_checkin_hide')+' ▲':t('meta_checkin_toggle')+' ▼';}
 }
 function toggleMetaCheckin(metaId,weekIdx){
   const meta=metas.find(x=>x.id===metaId);
