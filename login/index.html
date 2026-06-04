@@ -1816,20 +1816,30 @@ body.dark .theme-pill-dark{color:#fff}
       <input class="ob-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()">
       <div class="ob-section-label" id="ob-s5-civil-label">Estado civil</div>
       <div class="ob-civil-btns">
-        <button class="ob-civil-btn" id="obSolteiro" onclick="obSetEstadoCivil('solteiro')">💙 Solteiro(a)</button>
-        <button class="ob-civil-btn" id="obCasado" onclick="obSetEstadoCivil('casado')">💑 Casado(a)</button>
+        <button class="ob-civil-btn" id="obSolteiro" onclick="obSetEstadoCivil('solteiro')">Solteiro(a)</button>
+        <button class="ob-civil-btn" id="obCasado" onclick="obSetEstadoCivil('casado')">Casado(a) / Parceiro(a)</button>
       </div>
-      <div id="obConjugeRow" style="display:none;width:100%;max-width:320px">
-        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge">
+      <div id="obConjugeRow" style="display:none;width:100%;max-width:320px;flex-direction:column;align-items:center">
+        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" style="margin-top:.5rem">
+        <div class="ob-section-label" id="ob-s5-sexo-user-label" style="margin-top:.5rem">Seu sexo</div>
+        <div class="ob-civil-btns">
+          <button class="ob-civil-btn" id="obSexoUser_M" onclick="obSetSexo('user','M')">Masculino</button>
+          <button class="ob-civil-btn" id="obSexoUser_F" onclick="obSetSexo('user','F')">Feminino</button>
+        </div>
+        <div class="ob-section-label" id="ob-s5-sexo-conjuge-label" style="margin-top:.5rem">Sexo do(a) parceiro(a)</div>
+        <div class="ob-civil-btns">
+          <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')">Masculino</button>
+          <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')">Feminino</button>
+        </div>
       </div>
       <div class="ob-section-label" id="ob-s5-obj-label">Objetivo financeiro</div>
       <div class="ob-obj-grid">
-        <button class="ob-obj-btn" id="obObj_dividas" onclick="obSetObjetivo('dividas')">💳 Sair das dívidas</button>
-        <button class="ob-obj-btn" id="obObj_reserva" onclick="obSetObjetivo('reserva')">🛡️ Reserva de emergência</button>
-        <button class="ob-obj-btn" id="obObj_imovel" onclick="obSetObjetivo('imovel')">🏠 Comprar imóvel</button>
-        <button class="ob-obj-btn" id="obObj_viajar" onclick="obSetObjetivo('viajar')">✈️ Viajar</button>
-        <button class="ob-obj-btn" id="obObj_investir" onclick="obSetObjetivo('investir')">📈 Investir</button>
-        <button class="ob-obj-btn" id="obObj_outro" onclick="obSetObjetivo('outro')">✏️ Outro</button>
+        <button class="ob-obj-btn" id="obObj_dividas" onclick="obSetObjetivo('dividas')">Sair das dívidas</button>
+        <button class="ob-obj-btn" id="obObj_reserva" onclick="obSetObjetivo('reserva')">Reserva de emergência</button>
+        <button class="ob-obj-btn" id="obObj_imovel" onclick="obSetObjetivo('imovel')">Comprar imóvel</button>
+        <button class="ob-obj-btn" id="obObj_viajar" onclick="obSetObjetivo('viajar')">Viajar</button>
+        <button class="ob-obj-btn" id="obObj_investir" onclick="obSetObjetivo('investir')">Investir</button>
+        <button class="ob-obj-btn" id="obObj_outro" onclick="obSetObjetivo('outro')">Outro</button>
       </div>
       <div id="obOutroRow" style="display:none;width:100%;max-width:320px">
         <input class="ob-input" id="obOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo">
@@ -2492,20 +2502,30 @@ body.dark .theme-pill-dark{color:#fff}
       <input class="ob-input" id="peDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="peUpdateAvatar()" style="margin-bottom:.75rem">
       <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peCivil-label">Estado civil</div>
       <div class="ob-civil-btns" style="margin-bottom:.75rem">
-        <button class="ob-civil-btn" id="peSolteiro" onclick="peSetCivil('solteiro')">💙 Solteiro(a)</button>
-        <button class="ob-civil-btn" id="peCasado" onclick="peSetCivil('casado')">💑 Casado(a)</button>
+        <button class="ob-civil-btn" id="peSolteiro" onclick="peSetCivil('solteiro')">Solteiro(a)</button>
+        <button class="ob-civil-btn" id="peCasado" onclick="peSetCivil('casado')">Casado(a) / Parceiro(a)</button>
       </div>
-      <div id="peConjugeRow" style="display:none;width:100%">
+      <div id="peConjugeRow" style="display:none;width:100%;flex-direction:column;align-items:center">
         <input class="ob-input" id="peConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" style="margin-bottom:.75rem">
+        <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peSexoUser-label">Seu sexo</div>
+        <div class="ob-civil-btns" style="margin-bottom:.75rem">
+          <button class="ob-civil-btn" id="peSexoUser_M" onclick="peSetSexo('user','M')">Masculino</button>
+          <button class="ob-civil-btn" id="peSexoUser_F" onclick="peSetSexo('user','F')">Feminino</button>
+        </div>
+        <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peSexoConjuge-label">Sexo do(a) parceiro(a)</div>
+        <div class="ob-civil-btns" style="margin-bottom:.75rem">
+          <button class="ob-civil-btn" id="peSexoConjuge_M" onclick="peSetSexo('conjuge','M')">Masculino</button>
+          <button class="ob-civil-btn" id="peSexoConjuge_F" onclick="peSetSexo('conjuge','F')">Feminino</button>
+        </div>
       </div>
       <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peObj-label">Objetivo financeiro</div>
       <div class="ob-obj-grid" style="margin-bottom:.75rem">
-        <button class="ob-obj-btn" id="peObj_dividas" onclick="peSetObjetivo('dividas')">💳 Sair das dívidas</button>
-        <button class="ob-obj-btn" id="peObj_reserva" onclick="peSetObjetivo('reserva')">🛡️ Reserva de emergência</button>
-        <button class="ob-obj-btn" id="peObj_imovel" onclick="peSetObjetivo('imovel')">🏠 Comprar imóvel</button>
-        <button class="ob-obj-btn" id="peObj_viajar" onclick="peSetObjetivo('viajar')">✈️ Viajar</button>
-        <button class="ob-obj-btn" id="peObj_investir" onclick="peSetObjetivo('investir')">📈 Investir</button>
-        <button class="ob-obj-btn" id="peObj_outro" onclick="peSetObjetivo('outro')">✏️ Outro</button>
+        <button class="ob-obj-btn" id="peObj_dividas" onclick="peSetObjetivo('dividas')">Sair das dívidas</button>
+        <button class="ob-obj-btn" id="peObj_reserva" onclick="peSetObjetivo('reserva')">Reserva de emergência</button>
+        <button class="ob-obj-btn" id="peObj_imovel" onclick="peSetObjetivo('imovel')">Comprar imóvel</button>
+        <button class="ob-obj-btn" id="peObj_viajar" onclick="peSetObjetivo('viajar')">Viajar</button>
+        <button class="ob-obj-btn" id="peObj_investir" onclick="peSetObjetivo('investir')">Investir</button>
+        <button class="ob-obj-btn" id="peObj_outro" onclick="peSetObjetivo('outro')">Outro</button>
       </div>
       <div id="peOutroRow" style="display:none;width:100%">
         <input class="ob-input" id="peOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo" style="margin-bottom:.75rem">
@@ -3436,7 +3456,7 @@ async function loadFromSupabase(){
       _supa.from('bills').select('*').eq('user_id',uid),
       _supa.from('metas').select('*').eq('user_id',uid),
       _supa.from('dividas').select('*').eq('user_id',uid),
-      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro').eq('user_id',uid).maybeSingle(),
+      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge').eq('user_id',uid).maybeSingle(),
     ]);
   } catch(e) {
     console.error('[load] network error:',e);
@@ -5123,16 +5143,22 @@ function obApplyLang(){
   if(el('ob-s5-name-label')) el('ob-s5-name-label').textContent='Your name';
   if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
   if(el('ob-s5-civil-label')) el('ob-s5-civil-label').textContent='Relationship status';
-  if(el('obSolteiro')) el('obSolteiro').textContent='💙 Single';
-  if(el('obCasado')) el('obCasado').textContent='💑 Married';
+  if(el('obSolteiro')) el('obSolteiro').textContent='Single';
+  if(el('obCasado')) el('obCasado').textContent='Married / Partner';
   if(el('obConjugeNome')) el('obConjugeNome').placeholder='Partner name';
+  if(el('ob-s5-sexo-user-label')) el('ob-s5-sexo-user-label').textContent='Your gender';
+  if(el('obSexoUser_M')) el('obSexoUser_M').textContent='Male';
+  if(el('obSexoUser_F')) el('obSexoUser_F').textContent='Female';
+  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent="Partner's gender";
+  if(el('obSexoConjuge_M')) el('obSexoConjuge_M').textContent='Male';
+  if(el('obSexoConjuge_F')) el('obSexoConjuge_F').textContent='Female';
   if(el('ob-s5-obj-label')) el('ob-s5-obj-label').textContent='Financial goal';
-  if(el('obObj_dividas')) el('obObj_dividas').textContent='💳 Pay off debt';
-  if(el('obObj_reserva')) el('obObj_reserva').textContent='🛡️ Emergency fund';
-  if(el('obObj_imovel')) el('obObj_imovel').textContent='🏠 Buy property';
-  if(el('obObj_viajar')) el('obObj_viajar').textContent='✈️ Travel';
-  if(el('obObj_investir')) el('obObj_investir').textContent='📈 Invest';
-  if(el('obObj_outro')) el('obObj_outro').textContent='✏️ Other';
+  if(el('obObj_dividas')) el('obObj_dividas').textContent='Pay off debt';
+  if(el('obObj_reserva')) el('obObj_reserva').textContent='Emergency fund';
+  if(el('obObj_imovel')) el('obObj_imovel').textContent='Buy property';
+  if(el('obObj_viajar')) el('obObj_viajar').textContent='Travel';
+  if(el('obObj_investir')) el('obObj_investir').textContent='Invest';
+  if(el('obObj_outro')) el('obObj_outro').textContent='Other';
   if(el('obOutroTexto')) el('obOutroTexto').placeholder='Describe your goal';
   if(el('ob-s5-back')) el('ob-s5-back').textContent='← Back';
   if(el('ob-s5-next')) el('ob-s5-next').textContent='Next →';
@@ -5158,16 +5184,28 @@ function obSetEstadoCivil(v){
   const bc=document.getElementById('obCasado');
   if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
   if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
-  const r=document.getElementById('obConjugeRow');if(r)r.style.display=v==='casado'?'block':'none';
+  const r=document.getElementById('obConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
 }
 
 function obSetObjetivo(v){
-  window._obObjetivo=v;
+  if(!window._obObjetivos) window._obObjetivos=[];
+  const idx=window._obObjetivos.indexOf(v);
+  if(idx>=0) window._obObjetivos.splice(idx,1); else window._obObjetivos.push(v);
   ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
+    const on=window._obObjetivos.includes(k);
     const b=document.getElementById('obObj_'+k);
-    if(b){b.style.background=v===k?'#7c3aed':'transparent';b.style.color=v===k?'#fff':'#9ca3af';b.classList.toggle('active',v===k);}
+    if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
   });
-  const r=document.getElementById('obOutroRow');if(r)r.style.display=v==='outro'?'block':'none';
+  const r=document.getElementById('obOutroRow');if(r)r.style.display=window._obObjetivos.includes('outro')?'block':'none';
+}
+
+function obSetSexo(who,v){
+  window['_obSexo_'+who]=v;
+  ['M','F'].forEach(s=>{
+    const key='obSexo'+who.charAt(0).toUpperCase()+who.slice(1)+'_'+s;
+    const b=document.getElementById(key);
+    if(b){b.style.background=v===s?'#7c3aed':'transparent';b.style.color=v===s?'#fff':'#9ca3af';b.style.borderColor=v===s?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',v===s);}
+  });
 }
 
 function obUpdateAvatar(){
@@ -5189,27 +5227,33 @@ function buildProfileCard(){
   const conjuge=esc(p.conjuge_nome||'');
   const isEN=lang==='en';
   const objetivoMap={
-    dividas:{pt:'💳 Sair das dívidas',en:'💳 Pay off debt'},
-    reserva:{pt:'🛡️ Reserva de emergência',en:'🛡️ Emergency fund'},
-    imovel:{pt:'🏠 Comprar imóvel',en:'🏠 Buy property'},
-    viajar:{pt:'✈️ Viajar',en:'✈️ Travel'},
-    investir:{pt:'📈 Investir',en:'📈 Invest'},
-    outro:{pt:'✏️ '+esc(p.objetivo_outro||'Outro'),en:'✏️ '+esc(p.objetivo_outro||'Other')}
+    dividas:{pt:'Sair das dívidas',en:'Pay off debt'},
+    reserva:{pt:'Reserva de emergência',en:'Emergency fund'},
+    imovel:{pt:'Comprar imóvel',en:'Buy property'},
+    viajar:{pt:'Viajar',en:'Travel'},
+    investir:{pt:'Investir',en:'Invest'},
+    outro:{pt:esc(p.objetivo_outro||'Outro'),en:esc(p.objetivo_outro||'Other')}
   };
-  const objLabel=p.objetivo&&objetivoMap[p.objetivo]?(isEN?objetivoMap[p.objetivo].en:objetivoMap[p.objetivo].pt):'';
-  const estadoLabel=estadoCivil==='casado'
-    ?(isEN?'💑 Married'+(conjuge?' · '+conjuge:''):'💑 Casado(a)'+(conjuge?' · '+conjuge:''))
-    :estadoCivil==='solteiro'
-      ?(isEN?'💙 Single':'💙 Solteiro(a)')
-      :'';
+  const objKeys=(p.objetivo||'').split(',').filter(Boolean);
+  const objBadges=objKeys.map(k=>objetivoMap[k]?(isEN?objetivoMap[k].en:objetivoMap[k].pt):'').filter(Boolean);
+  const sexoUser=p.sexo_user||'';
+  const sexoConjuge=p.sexo_conjuge||'';
+  const sexoUserLabel=sexoUser?(isEN?(sexoUser==='M'?'Male':'Female'):(sexoUser==='M'?'Masculino':'Feminino')):'';
+  const sexoConjugeLabel=sexoConjuge?(isEN?(sexoConjuge==='M'?'Male partner':'Female partner'):(sexoConjuge==='M'?'Parceiro M':'Parceira F')):'';
+  let estadoLabel='';
+  if(estadoCivil==='casado'){
+    estadoLabel=(isEN?'Married / Partner':'Casado(a) / Parceiro(a)')+(conjuge?' · '+conjuge:'')+(sexoUserLabel?' · '+sexoUserLabel:'')+(sexoConjugeLabel?' · '+sexoConjugeLabel:'');
+  } else if(estadoCivil==='solteiro'){
+    estadoLabel=isEN?'Single':'Solteiro(a)';
+  }
   const nameFallback=isEN?'Add your name':'Adicione seu nome';
   wrap.innerHTML=`<div class="profile-card" onclick="showProfileEdit()">
     <div class="profile-card-avatar">${initials}</div>
     <div class="profile-card-info">
       <div class="profile-card-name">${name||nameFallback}</div>
       <div class="profile-card-meta">
-        ${estadoLabel?`<span>${estadoLabel}</span>`:''}
-        ${objLabel?`<span class="profile-card-obj">${objLabel}</span>`:''}
+        ${estadoLabel?`<span>${esc(estadoLabel)}</span>`:''}
+        ${objBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
       </div>
     </div>
     <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
@@ -5218,7 +5262,7 @@ function buildProfileCard(){
 
 // ── PROFILE EDIT MODAL ────────────────────────────────────────
 let _peEstadoCivil='solteiro';
-let _peObjetivo='';
+let _peObjetivos=[];
 
 function showProfileEdit(){
   const p=window._profile||{};
@@ -5229,7 +5273,7 @@ function showProfileEdit(){
   const nameEl=document.getElementById('peDisplayName');
   if(nameEl) nameEl.value=p.display_name||'';
   _peEstadoCivil=p.estado_civil||'solteiro';
-  _peObjetivo=p.objetivo||'';
+  _peObjetivos=(p.objetivo||'').split(',').filter(Boolean);
   // populate modal labels if EN
   if(isEN){
     const pt=document.getElementById('peTitle');if(pt)pt.textContent='Edit profile';
@@ -5240,15 +5284,24 @@ function showProfileEdit(){
     const cnEl=document.getElementById('peConjugeNome');if(cnEl)cnEl.placeholder='Partner name';
     const otEl=document.getElementById('peOutroTexto');if(otEl)otEl.placeholder='Describe your goal';
     const sv=document.getElementById('peSaveBtn');if(sv)sv.textContent='Save';
-    const ps=document.getElementById('peSolteiro');if(ps)ps.textContent='💙 Single';
-    const pca=document.getElementById('peCasado');if(pca)pca.textContent='💑 Married';
-    const objBtns={dividas:'💳 Pay off debt',reserva:'🛡️ Emergency fund',imovel:'🏠 Buy property',viajar:'✈️ Travel',investir:'📈 Invest',outro:'✏️ Other'};
+    const ps=document.getElementById('peSolteiro');if(ps)ps.textContent='Single';
+    const pca=document.getElementById('peCasado');if(pca)pca.textContent='Married / Partner';
+    const objBtns={dividas:'Pay off debt',reserva:'Emergency fund',imovel:'Buy property',viajar:'Travel',investir:'Invest',outro:'Other'};
     Object.entries(objBtns).forEach(([k,v])=>{const b=document.getElementById('peObj_'+k);if(b)b.textContent=v;});
+    const suu=document.getElementById('peSexoUser-label');if(suu)suu.textContent='Your gender';
+    const scu=document.getElementById('peSexoConjuge-label');if(scu)scu.textContent="Partner's gender";
+    ['peSexoUser_M','peSexoConjuge_M'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Male';});
+    ['peSexoUser_F','peSexoConjuge_F'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Female';});
   }
   peSetCivil(_peEstadoCivil);
   const cnjEl=document.getElementById('peConjugeNome');
   if(cnjEl) cnjEl.value=p.conjuge_nome||'';
-  peSetObjetivo(_peObjetivo);
+  // restore sexo buttons
+  if(p.sexo_user) peSetSexo('user',p.sexo_user);
+  if(p.sexo_conjuge) peSetSexo('conjuge',p.sexo_conjuge);
+  // restore objetivo toggles
+  _peObjetivos.forEach(k=>_peToggleObjBtn(k,true));
+  const r=document.getElementById('peOutroRow');if(r)r.style.display=_peObjetivos.includes('outro')?'block':'none';
   const otEl=document.getElementById('peOutroTexto');
   if(otEl) otEl.value=p.objetivo_outro||'';
   peUpdateAvatar();
@@ -5273,16 +5326,29 @@ function peSetCivil(v){
   const bc=document.getElementById('peCasado');
   if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
   if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
-  const r=document.getElementById('peConjugeRow');if(r)r.style.display=v==='casado'?'block':'none';
+  const r=document.getElementById('peConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
+}
+
+function _peToggleObjBtn(k,forceOn){
+  const on=forceOn!=null?forceOn:_peObjetivos.includes(k);
+  const b=document.getElementById('peObj_'+k);
+  if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
 }
 
 function peSetObjetivo(v){
-  _peObjetivo=v;
-  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
-    const b=document.getElementById('peObj_'+k);
-    if(b){b.style.background=v===k?'#7c3aed':'transparent';b.style.color=v===k?'#fff':'#9ca3af';b.classList.toggle('active',v===k);}
+  const idx=_peObjetivos.indexOf(v);
+  if(idx>=0) _peObjetivos.splice(idx,1); else _peObjetivos.push(v);
+  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>_peToggleObjBtn(k));
+  const r=document.getElementById('peOutroRow');if(r)r.style.display=_peObjetivos.includes('outro')?'block':'none';
+}
+
+function peSetSexo(who,v){
+  window['_peSexo_'+who]=v;
+  ['M','F'].forEach(s=>{
+    const key='peSexo'+who.charAt(0).toUpperCase()+who.slice(1)+'_'+s;
+    const b=document.getElementById(key);
+    if(b){b.style.background=v===s?'#7c3aed':'transparent';b.style.color=v===s?'#fff':'#9ca3af';b.style.borderColor=v===s?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',v===s);}
   });
-  const r=document.getElementById('peOutroRow');if(r)r.style.display=v==='outro'?'block':'none';
 }
 
 async function saveProfileEdit(){
@@ -5290,14 +5356,16 @@ async function saveProfileEdit(){
   const displayName=(document.getElementById('peDisplayName')||{value:''}).value.trim();
   const estadoCivil=_peEstadoCivil||'solteiro';
   const conjugeNome=(document.getElementById('peConjugeNome')||{value:''}).value.trim();
-  const objetivo=_peObjetivo||'';
+  const objetivo=_peObjetivos.join(',');
   const objetivoOutro=(document.getElementById('peOutroTexto')||{value:''}).value.trim();
   const profileData={
     display_name:displayName||null,
     estado_civil:estadoCivil,
     conjuge_nome:estadoCivil==='casado'?conjugeNome:null,
     objetivo:objetivo||null,
-    objetivo_outro:objetivo==='outro'?objetivoOutro:null
+    objetivo_outro:_peObjetivos.includes('outro')?objetivoOutro:null,
+    sexo_user:window._peSexo_user||null,
+    sexo_conjuge:estadoCivil==='casado'?(window._peSexo_conjuge||null):null
   };
   const btn=document.getElementById('peSaveBtn');
   if(btn){btn.disabled=true;btn.textContent='...';}
@@ -5358,15 +5426,17 @@ function obFinish(){
   const displayName=(document.getElementById('obDisplayName')||{value:''}).value.trim();
   const estadoCivil=window._obEstadoCivil||'solteiro';
   const conjugeNome=(document.getElementById('obConjugeNome')||{value:''}).value.trim();
-  const objetivo=window._obObjetivo||'';
+  const objetivos=(window._obObjetivos||[]).join(',');
   const objetivoOutro=(document.getElementById('obOutroTexto')||{value:''}).value.trim();
   if(_user){
     const profileData={
       display_name:displayName||null,
       estado_civil:estadoCivil,
       conjuge_nome:estadoCivil==='casado'?conjugeNome:null,
-      objetivo:objetivo||null,
-      objetivo_outro:objetivo==='outro'?objetivoOutro:null
+      objetivo:objetivos||null,
+      objetivo_outro:(window._obObjetivos||[]).includes('outro')?objetivoOutro:null,
+      sexo_user:window._obSexo_user||null,
+      sexo_conjuge:estadoCivil==='casado'?(window._obSexo_conjuge||null):null
     };
     _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
     window._profile=Object.assign(window._profile||{},profileData);
