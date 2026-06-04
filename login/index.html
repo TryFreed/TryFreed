@@ -567,9 +567,9 @@ body.dark .confirm-delete{background:#dc2626}
   z-index:2;
 }
 .dp-signup-container{
-  left:0;
+  left:50%;
   opacity:0;
-  transform:translateX(-100%);
+  transform:translateX(100%);
   z-index:1;
   pointer-events:none;
 }
@@ -581,6 +581,7 @@ body.dark .confirm-delete{background:#dc2626}
   pointer-events:none;
 }
 .dp-container.dp-right-active .dp-signup-container{
+  left:50%;
   opacity:1;
   transform:translateX(0);
   z-index:2;
@@ -2893,12 +2894,17 @@ function applyLang(){
   if(glt) glt.textContent=lang==='en'?'Sign in with Google':'Entrar com Google';
 
   // ── DP panel elements ──
+  const _dpEN=lang==='en';
   const dpSiTitle=document.getElementById('signinTitle');
-  if(dpSiTitle) dpSiTitle.textContent=lang==='en'?'Sign In':'Entrar';
+  if(dpSiTitle) dpSiTitle.textContent=_dpEN?'Sign In':'Entrar';
   const dpAbtn=document.getElementById('authBtn');
-  if(dpAbtn) dpAbtn.textContent=lang==='en'?'Sign In':'Entrar';
+  if(dpAbtn) dpAbtn.textContent=_dpEN?'Sign In':'Entrar';
   const dpFgt=document.getElementById('loginForgotLink');
-  if(dpFgt) dpFgt.textContent=lang==='en'?'Forgot password?':'Esqueci minha senha';
+  if(dpFgt) dpFgt.textContent=_dpEN?'Forgot password?':'Esqueci minha senha';
+  const dpLpl2=document.getElementById('loginPwdLabel');
+  if(dpLpl2) dpLpl2.textContent=_dpEN?'PASSWORD':'SENHA';
+  const dpLel=document.getElementById('loginEmailLabel');
+  if(dpLel) dpLel.textContent='EMAIL';
   const dpSuTitle=document.getElementById('signupTitle');
   if(dpSuTitle) dpSuTitle.textContent=lang==='en'?'Create Account':'Criar Conta';
   const dpSnl=document.getElementById('signupNameLabel');
@@ -3062,15 +3068,16 @@ function showLogin(){
   document.getElementById('loginScreen').style.display='flex';
   dpSwitchTo('signin');
   _authMode='login';
-  document.getElementById('authBtn').textContent=t('login_btn');
+  const _isEN=lang==='en';
+  document.getElementById('authBtn').textContent=_isEN?'Sign In':'Entrar';
+  document.getElementById('forgotRow').style.display='block';
+  document.getElementById('loginError').style.display='none';
+  document.getElementById('loginPwdLabel').textContent=_isEN?'PASSWORD':'SENHA';
+  document.getElementById('loginForgotLink').textContent=_isEN?'Forgot password?':'Esqueci minha senha';
+  document.getElementById('loginOrLabel').textContent=t('login_or');
   document.getElementById('loginSubtitle').textContent=t('login_subtitle');
   document.getElementById('loginSwitchText').textContent=t('login_no_account');
   document.getElementById('loginSwitchLink').textContent=t('login_signup');
-  document.getElementById('forgotRow').style.display='block';
-  document.getElementById('loginError').style.display='none';
-  document.getElementById('loginPwdLabel').textContent=t('login_pwd_label');
-  document.getElementById('loginForgotLink').textContent=t('login_forgot');
-  document.getElementById('loginOrLabel').textContent=t('login_or');
   // Sync lang toggles
   const isEN=(localStorage.getItem('lang')||'pt')==='en';
   const ptBtn=document.getElementById('dpLangPT');
