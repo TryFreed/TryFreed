@@ -1985,6 +1985,10 @@ body.dark .theme-pill-dark{color:#fff}
         <span id="themeLabel">Light</span>
         <div class="toggle-track"><div class="toggle-dot"></div></div>
       </div>
+      <div style="display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:2px">
+        <button onclick="setLang('pt')" id="headerLangPT" style="padding:3px 10px;border-radius:50px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;transition:all .2s">PT</button>
+        <button onclick="setLang('en')" id="headerLangEN" style="padding:3px 10px;border-radius:50px;border:none;cursor:pointer;font-size:11px;background:transparent;color:#6b7280;transition:all .2s">EN</button>
+      </div>
       <button class="hamburger" onclick="openDrawer()">☰</button>
     </div>
   </div>
@@ -2342,6 +2346,10 @@ body.dark .theme-pill-dark{color:#fff}
 
 <!-- PAYWALL SCREEN -->
 <div id="paywallScreen" style="display:none">
+  <div style="position:absolute;top:16px;right:16px;display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:2px;z-index:10">
+    <button onclick="setLang('pt')" id="pwLangPT" style="padding:3px 10px;border-radius:50px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;transition:all .2s">PT</button>
+    <button onclick="setLang('en')" id="pwLangEN" style="padding:3px 10px;border-radius:50px;border:none;cursor:pointer;font-size:11px;background:transparent;color:#6b7280;transition:all .2s">EN</button>
+  </div>
   <div class="pw-card">
     <div class="pw-logo">TryFreed</div>
     <div class="pw-title" id="pwTitle">Assine para continuar</div>
@@ -2851,19 +2859,19 @@ function applyLang(){
   const homeEnter=document.getElementById('homeEnterLabel');
   if(homeEnter) homeEnter.textContent=lang==='en'?'Enter':'Entrar';
 
-  // DP lang toggle buttons
-  const hPT=document.getElementById('dpLangPT');
-  const hEN=document.getElementById('dpLangEN');
-  if(hPT){
-    hPT.style.background=lang==='pt'?'rgba(255,255,255,0.15)':'transparent';
-    hPT.style.color=lang==='pt'?'#fff':'#6b7280';
-    hPT.style.fontWeight=lang==='pt'?'600':'400';
-  }
-  if(hEN){
-    hEN.style.background=lang==='en'?'rgba(255,255,255,0.15)':'transparent';
-    hEN.style.color=lang==='en'?'#fff':'#6b7280';
-    hEN.style.fontWeight=lang==='en'?'600':'400';
-  }
+  // Sync todos os toggles PT/EN (dp, header, paywall)
+  ['dpLangPT','headerLangPT','pwLangPT'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.style.background=lang==='pt'?'rgba(255,255,255,0.15)':'transparent';
+    el.style.color=lang==='pt'?'#fff':'#6b7280';
+    el.style.fontWeight=lang==='pt'?'600':'400';
+  });
+  ['dpLangEN','headerLangEN','pwLangEN'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.style.background=lang==='en'?'rgba(255,255,255,0.15)':'transparent';
+    el.style.color=lang==='en'?'#fff':'#6b7280';
+    el.style.fontWeight=lang==='en'?'600':'400';
+  });
 
   // DP theme toggle
   const hti=document.getElementById('dpThemeIcon');
