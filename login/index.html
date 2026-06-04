@@ -803,6 +803,32 @@ body.dark .confirm-delete{background:#dc2626}
 }
 /* paywall bg is always #080808 — no light-mode card overrides needed */
 
+/* ── PROFILE CARD (dashboard) ────────────────────────────────── */
+.profile-card{display:flex;align-items:center;gap:14px;background:var(--card);border:0.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 16px;margin-bottom:16px;cursor:pointer;transition:border-color .2s}
+.profile-card:hover{border-color:rgba(124,58,237,0.4)}
+.profile-card-avatar{width:48px;height:48px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;letter-spacing:-1px}
+.profile-card-info{flex:1;min-width:0}
+.profile-card-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.profile-card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#6b7280}
+.profile-card-obj{background:rgba(124,58,237,0.15);color:#a78bfa;padding:2px 8px;border-radius:50px;font-size:11px}
+.profile-card-edit{color:#4b5563;flex-shrink:0}
+
+/* ── ONBOARDING PROFILE SLIDE ────────────────────────────────── */
+.ob-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:1.2rem;flex-shrink:0}
+.ob-civil-btns{display:flex;gap:10px;width:100%;max-width:320px;margin-bottom:1rem}
+.ob-civil-btn{flex:1;padding:10px 0;border-radius:50px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#9ca3af;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.ob-civil-btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.ob-obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:320px;margin-bottom:.75rem}
+.ob-obj-btn{padding:9px 6px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.ob-obj-btn.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.ob-input{width:100%;max-width:320px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;font-size:14px;color:#f9fafb;outline:none;box-sizing:border-box;margin-bottom:.75rem}
+.ob-input::placeholder{color:#6b7280}
+.ob-input:focus{border-color:#7c3aed}
+.ob-section-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;align-self:flex-start;max-width:320px}
+
+/* ── PROFILE EDIT MODAL ──────────────────────────────────────── */
+#profileEditModal{display:none;position:fixed;inset:0;z-index:1100;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);padding:1rem}
+
   /* ── CURVED BOTTOM NAV ────────────────────────────────────────── */
   .bottom-nav {
     position: fixed;
@@ -1682,6 +1708,7 @@ body.dark .theme-pill-dark{color:#fff}
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
       </div>
     </div>
 
@@ -1698,6 +1725,7 @@ body.dark .theme-pill-dark{color:#fff}
       <div class="ob-dots">
         <div class="ob-dot done"></div>
         <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
@@ -1721,6 +1749,7 @@ body.dark .theme-pill-dark{color:#fff}
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
       </div>
     </div>
 
@@ -1738,6 +1767,7 @@ body.dark .theme-pill-dark{color:#fff}
         <div class="ob-dot done"></div>
         <div class="ob-dot done"></div>
         <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
         <div class="ob-dot"></div>
         <div class="ob-dot"></div>
       </div>
@@ -1772,19 +1802,64 @@ body.dark .theme-pill-dark{color:#fff}
         <div class="ob-dot done"></div>
         <div class="ob-dot active"></div>
         <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
       </div>
     </div>
 
-    <!-- Slide 5: CTA -->
+    <!-- Slide 5: Perfil -->
     <div class="ob-slide" id="ob-slide-5">
-      <div class="ob-badge" id="ob-s5-badge">Pronto!</div>
-      <div class="ob-slide-title" id="ob-s5-title">O seu controle começa agora</div>
-      <div class="ob-slide-sub" id="ob-s5-sub">Adicione sua renda, despesas e metas. Tudo em um só lugar — rápido, simples, bonito.</div>
-      <button class="ob-cta-btn" onclick="obFinish()" id="ob-s5-cta">Explorar o app →</button>
-      <div class="ob-nav" style="justify-content:center;margin-top:1rem">
-        <button class="ob-nav-btn" onclick="obGoSlide(4)" id="ob-s5-back" style="flex:unset;padding:8px 16px;font-size:12px">← Voltar</button>
+      <div class="ob-badge" id="ob-s5-badge">Perfil</div>
+      <div class="ob-slide-title" id="ob-s5-title">Seu Perfil</div>
+      <div class="ob-slide-sub" id="ob-s5-sub">Vamos personalizar sua experiência</div>
+      <div class="ob-avatar" id="obAvatar"><span id="obAvatarInitials">?</span></div>
+      <div class="ob-section-label" id="ob-s5-name-label">Seu nome</div>
+      <input class="ob-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()">
+      <div class="ob-section-label" id="ob-s5-civil-label">Estado civil</div>
+      <div class="ob-civil-btns">
+        <button class="ob-civil-btn" id="obSolteiro" onclick="obSetEstadoCivil('solteiro')">💙 Solteiro(a)</button>
+        <button class="ob-civil-btn" id="obCasado" onclick="obSetEstadoCivil('casado')">💑 Casado(a)</button>
+      </div>
+      <div id="obConjugeRow" style="display:none;width:100%;max-width:320px">
+        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge">
+      </div>
+      <div class="ob-section-label" id="ob-s5-obj-label">Objetivo financeiro</div>
+      <div class="ob-obj-grid">
+        <button class="ob-obj-btn" id="obObj_dividas" onclick="obSetObjetivo('dividas')">💳 Sair das dívidas</button>
+        <button class="ob-obj-btn" id="obObj_reserva" onclick="obSetObjetivo('reserva')">🛡️ Reserva de emergência</button>
+        <button class="ob-obj-btn" id="obObj_imovel" onclick="obSetObjetivo('imovel')">🏠 Comprar imóvel</button>
+        <button class="ob-obj-btn" id="obObj_viajar" onclick="obSetObjetivo('viajar')">✈️ Viajar</button>
+        <button class="ob-obj-btn" id="obObj_investir" onclick="obSetObjetivo('investir')">📈 Investir</button>
+        <button class="ob-obj-btn" id="obObj_outro" onclick="obSetObjetivo('outro')">✏️ Outro</button>
+      </div>
+      <div id="obOutroRow" style="display:none;width:100%;max-width:320px">
+        <input class="ob-input" id="obOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo">
+      </div>
+      <div class="ob-nav">
+        <button class="ob-nav-btn" onclick="obGoSlide(4)" id="ob-s5-back">← Voltar</button>
+        <button class="ob-nav-btn primary" onclick="obGoSlide(6)" id="ob-s5-next">Próximo →</button>
       </div>
       <div class="ob-dots">
+        <div class="ob-dot done"></div>
+        <div class="ob-dot done"></div>
+        <div class="ob-dot done"></div>
+        <div class="ob-dot done"></div>
+        <div class="ob-dot done"></div>
+        <div class="ob-dot active"></div>
+        <div class="ob-dot"></div>
+      </div>
+    </div>
+
+    <!-- Slide 6: CTA -->
+    <div class="ob-slide" id="ob-slide-6">
+      <div class="ob-badge" id="ob-s6-badge">Pronto!</div>
+      <div class="ob-slide-title" id="ob-s6-title">O seu controle começa agora</div>
+      <div class="ob-slide-sub" id="ob-s6-sub">Adicione sua renda, despesas e metas. Tudo em um só lugar — rápido, simples, bonito.</div>
+      <button class="ob-cta-btn" onclick="obFinish()" id="ob-s6-cta">Explorar o app →</button>
+      <div class="ob-nav" style="justify-content:center;margin-top:1rem">
+        <button class="ob-nav-btn" onclick="obGoSlide(5)" id="ob-s6-back" style="flex:unset;padding:8px 16px;font-size:12px">← Voltar</button>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot done"></div>
         <div class="ob-dot done"></div>
         <div class="ob-dot done"></div>
         <div class="ob-dot done"></div>
@@ -2107,6 +2182,7 @@ body.dark .theme-pill-dark{color:#fff}
 
   <!-- RENDA -->
   <div id="tab-renda" class="sec on">
+    <div id="profileCardWrap"></div>
     <button class="form-toggle-btn" id="rendaToggleBtn" onclick="toggleForm('renda')">
       <span class="ftb-icon">+</span>
       <span id="rendaToggleLabel" data-i18n="renda_form_title">Adicionar renda</span>
@@ -2400,6 +2476,42 @@ body.dark .theme-pill-dark{color:#fff}
     </div>
     <div class="pw-guarantee" id="pwGuarantee">🔒 Pagamento seguro via Stripe · Cancele a qualquer momento</div>
     <button class="pw-logout-btn" id="pwLogoutBtn" onclick="_supa.auth.signOut()">Sair</button>
+  </div>
+</div>
+
+<!-- PROFILE EDIT MODAL -->
+<div id="profileEditModal">
+  <div class="debt-pay-card" style="max-height:90vh;overflow-y:auto;width:100%;max-width:380px">
+    <div class="debt-pay-header">
+      <span class="debt-pay-title" id="peTitle">Editar perfil</span>
+      <button class="debt-pay-close" onclick="closeProfileEditModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:1rem">
+      <div class="ob-avatar" id="peAvatar"><span id="peAvatarInitials">?</span></div>
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peName-label">Seu nome</div>
+      <input class="ob-input" id="peDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="peUpdateAvatar()" style="margin-bottom:.75rem">
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peCivil-label">Estado civil</div>
+      <div class="ob-civil-btns" style="margin-bottom:.75rem">
+        <button class="ob-civil-btn" id="peSolteiro" onclick="peSetCivil('solteiro')">💙 Solteiro(a)</button>
+        <button class="ob-civil-btn" id="peCasado" onclick="peSetCivil('casado')">💑 Casado(a)</button>
+      </div>
+      <div id="peConjugeRow" style="display:none;width:100%">
+        <input class="ob-input" id="peConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" style="margin-bottom:.75rem">
+      </div>
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peObj-label">Objetivo financeiro</div>
+      <div class="ob-obj-grid" style="margin-bottom:.75rem">
+        <button class="ob-obj-btn" id="peObj_dividas" onclick="peSetObjetivo('dividas')">💳 Sair das dívidas</button>
+        <button class="ob-obj-btn" id="peObj_reserva" onclick="peSetObjetivo('reserva')">🛡️ Reserva de emergência</button>
+        <button class="ob-obj-btn" id="peObj_imovel" onclick="peSetObjetivo('imovel')">🏠 Comprar imóvel</button>
+        <button class="ob-obj-btn" id="peObj_viajar" onclick="peSetObjetivo('viajar')">✈️ Viajar</button>
+        <button class="ob-obj-btn" id="peObj_investir" onclick="peSetObjetivo('investir')">📈 Investir</button>
+        <button class="ob-obj-btn" id="peObj_outro" onclick="peSetObjetivo('outro')">✏️ Outro</button>
+      </div>
+      <div id="peOutroRow" style="display:none;width:100%">
+        <input class="ob-input" id="peOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo" style="margin-bottom:.75rem">
+      </div>
+      <button class="debt-pay-confirm" onclick="saveProfileEdit()" id="peSaveBtn" style="width:100%">Salvar</button>
+    </div>
   </div>
 </div>
 
@@ -3324,7 +3436,7 @@ async function loadFromSupabase(){
       _supa.from('bills').select('*').eq('user_id',uid),
       _supa.from('metas').select('*').eq('user_id',uid),
       _supa.from('dividas').select('*').eq('user_id',uid),
-      _supa.from('profiles').select('initial_balance,start_date').eq('user_id',uid).maybeSingle(),
+      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro').eq('user_id',uid).maybeSingle(),
     ]);
   } catch(e) {
     console.error('[load] network error:',e);
@@ -3374,6 +3486,8 @@ async function loadFromSupabase(){
   } else {
     START=new Date(2026,0,1);
   }
+  // store full profile for dashboard card
+  window._profile = prof.data || {};
   _computeFullDirty=true;
 }
 
@@ -4549,7 +4663,7 @@ function buildRelatorio(){
   document.getElementById('extratoList').innerHTML=exHtml||`<div style="color:#888;padding:8px">${t('rep_empty')}</div>`;
 }
 
-function rebuild(){_computeFullDirty=true;buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();}
+function rebuild(){_computeFullDirty=true;buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();}
 
 // ── NOTIFICATIONS ────────────────────────────────────────────────
 let _swReg = null;
@@ -4827,7 +4941,7 @@ function initApp(){
   weekStart=sunOf(START);
   calYear=START.getFullYear();calMonth=START.getMonth();
   ovFrom=new Date(START);ovTo=new Date(END);
-  buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();
+  buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('renda',true));
   // Show onboarding for first-time users
@@ -4965,7 +5079,7 @@ function obStart(){
 }
 
 function obGoSlide(n){
-  [0,1,2,3,4,5].forEach(i=>{
+  [0,1,2,3,4,5,6].forEach(i=>{
     const s=document.getElementById('ob-slide-'+i);
     if(s) s.classList.toggle('active',i===n);
   });
@@ -5002,11 +5116,32 @@ function obApplyLang(){
   if(el('ob-s4-back')) el('ob-s4-back').textContent='← Back';
   if(el('drawerStartDateLabel')) el('drawerStartDateLabel').textContent='Start date';
   if(el('drawerStartDateHint')) el('drawerStartDateHint').textContent='Sets the beginning of your navigation history.';
-  if(el('ob-s5-badge')) el('ob-s5-badge').textContent='Ready!';
-  if(el('ob-s5-title')) el('ob-s5-title').textContent='Your control starts now';
-  if(el('ob-s5-sub')) el('ob-s5-sub').textContent='Add your income, expenses and goals. All in one place — fast, simple, beautiful.';
-  if(el('ob-s5-cta')) el('ob-s5-cta').textContent='Explore the app →';
+  // slide 5: perfil
+  if(el('ob-s5-badge')) el('ob-s5-badge').textContent='Profile';
+  if(el('ob-s5-title')) el('ob-s5-title').textContent='Your Profile';
+  if(el('ob-s5-sub')) el('ob-s5-sub').textContent="Let's personalize your experience";
+  if(el('ob-s5-name-label')) el('ob-s5-name-label').textContent='Your name';
+  if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
+  if(el('ob-s5-civil-label')) el('ob-s5-civil-label').textContent='Relationship status';
+  if(el('obSolteiro')) el('obSolteiro').textContent='💙 Single';
+  if(el('obCasado')) el('obCasado').textContent='💑 Married';
+  if(el('obConjugeNome')) el('obConjugeNome').placeholder='Partner name';
+  if(el('ob-s5-obj-label')) el('ob-s5-obj-label').textContent='Financial goal';
+  if(el('obObj_dividas')) el('obObj_dividas').textContent='💳 Pay off debt';
+  if(el('obObj_reserva')) el('obObj_reserva').textContent='🛡️ Emergency fund';
+  if(el('obObj_imovel')) el('obObj_imovel').textContent='🏠 Buy property';
+  if(el('obObj_viajar')) el('obObj_viajar').textContent='✈️ Travel';
+  if(el('obObj_investir')) el('obObj_investir').textContent='📈 Invest';
+  if(el('obObj_outro')) el('obObj_outro').textContent='✏️ Other';
+  if(el('obOutroTexto')) el('obOutroTexto').placeholder='Describe your goal';
   if(el('ob-s5-back')) el('ob-s5-back').textContent='← Back';
+  if(el('ob-s5-next')) el('ob-s5-next').textContent='Next →';
+  // slide 6: CTA
+  if(el('ob-s6-badge')) el('ob-s6-badge').textContent='Ready!';
+  if(el('ob-s6-title')) el('ob-s6-title').textContent='Your control starts now';
+  if(el('ob-s6-sub')) el('ob-s6-sub').textContent='Add your income, expenses and goals. All in one place — fast, simple, beautiful.';
+  if(el('ob-s6-cta')) el('ob-s6-cta').textContent='Explore the app →';
+  if(el('ob-s6-back')) el('ob-s6-back').textContent='← Back';
 }
 
 function obReset(){
@@ -5014,6 +5149,165 @@ function obReset(){
   localStorage.removeItem('ob_done_v2_'+_user.id);
   closeDrawer();
   obStart();
+}
+
+// ── ONBOARDING PROFILE HELPERS ────────────────────────────────
+function obSetEstadoCivil(v){
+  window._obEstadoCivil=v;
+  const bs=document.getElementById('obSolteiro');
+  const bc=document.getElementById('obCasado');
+  if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
+  if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
+  const r=document.getElementById('obConjugeRow');if(r)r.style.display=v==='casado'?'block':'none';
+}
+
+function obSetObjetivo(v){
+  window._obObjetivo=v;
+  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
+    const b=document.getElementById('obObj_'+k);
+    if(b){b.style.background=v===k?'#7c3aed':'transparent';b.style.color=v===k?'#fff':'#9ca3af';b.classList.toggle('active',v===k);}
+  });
+  const r=document.getElementById('obOutroRow');if(r)r.style.display=v==='outro'?'block':'none';
+}
+
+function obUpdateAvatar(){
+  const name=(document.getElementById('obDisplayName')||{value:''}).value.trim();
+  const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const av=document.getElementById('obAvatarInitials');
+  if(av) av.textContent=initials;
+}
+
+// ── PROFILE CARD (dashboard) ──────────────────────────────────
+function buildProfileCard(){
+  const wrap=document.getElementById('profileCardWrap');
+  if(!wrap) return;
+  const p=window._profile||{};
+  const rawName=p.display_name||_user?.user_metadata?.full_name||_user?.email?.split('@')[0]||'';
+  const name=esc(rawName);
+  const initials=rawName?rawName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const estadoCivil=p.estado_civil||'';
+  const conjuge=esc(p.conjuge_nome||'');
+  const isEN=lang==='en';
+  const objetivoMap={
+    dividas:{pt:'💳 Sair das dívidas',en:'💳 Pay off debt'},
+    reserva:{pt:'🛡️ Reserva de emergência',en:'🛡️ Emergency fund'},
+    imovel:{pt:'🏠 Comprar imóvel',en:'🏠 Buy property'},
+    viajar:{pt:'✈️ Viajar',en:'✈️ Travel'},
+    investir:{pt:'📈 Investir',en:'📈 Invest'},
+    outro:{pt:'✏️ '+esc(p.objetivo_outro||'Outro'),en:'✏️ '+esc(p.objetivo_outro||'Other')}
+  };
+  const objLabel=p.objetivo&&objetivoMap[p.objetivo]?(isEN?objetivoMap[p.objetivo].en:objetivoMap[p.objetivo].pt):'';
+  const estadoLabel=estadoCivil==='casado'
+    ?(isEN?'💑 Married'+(conjuge?' · '+conjuge:''):'💑 Casado(a)'+(conjuge?' · '+conjuge:''))
+    :estadoCivil==='solteiro'
+      ?(isEN?'💙 Single':'💙 Solteiro(a)')
+      :'';
+  const nameFallback=isEN?'Add your name':'Adicione seu nome';
+  wrap.innerHTML=`<div class="profile-card" onclick="showProfileEdit()">
+    <div class="profile-card-avatar">${initials}</div>
+    <div class="profile-card-info">
+      <div class="profile-card-name">${name||nameFallback}</div>
+      <div class="profile-card-meta">
+        ${estadoLabel?`<span>${estadoLabel}</span>`:''}
+        ${objLabel?`<span class="profile-card-obj">${objLabel}</span>`:''}
+      </div>
+    </div>
+    <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+  </div>`;
+}
+
+// ── PROFILE EDIT MODAL ────────────────────────────────────────
+let _peEstadoCivil='solteiro';
+let _peObjetivo='';
+
+function showProfileEdit(){
+  const p=window._profile||{};
+  const isEN=lang==='en';
+  const modal=document.getElementById('profileEditModal');
+  if(!modal) return;
+  // populate fields
+  const nameEl=document.getElementById('peDisplayName');
+  if(nameEl) nameEl.value=p.display_name||'';
+  _peEstadoCivil=p.estado_civil||'solteiro';
+  _peObjetivo=p.objetivo||'';
+  // populate modal labels if EN
+  if(isEN){
+    const pt=document.getElementById('peTitle');if(pt)pt.textContent='Edit profile';
+    const pn=document.getElementById('peName-label');if(pn)pn.textContent='Your name';
+    const pc=document.getElementById('peCivil-label');if(pc)pc.textContent='Relationship status';
+    const po=document.getElementById('peObj-label');if(po)po.textContent='Financial goal';
+    if(nameEl) nameEl.placeholder='Your name';
+    const cnEl=document.getElementById('peConjugeNome');if(cnEl)cnEl.placeholder='Partner name';
+    const otEl=document.getElementById('peOutroTexto');if(otEl)otEl.placeholder='Describe your goal';
+    const sv=document.getElementById('peSaveBtn');if(sv)sv.textContent='Save';
+    const ps=document.getElementById('peSolteiro');if(ps)ps.textContent='💙 Single';
+    const pca=document.getElementById('peCasado');if(pca)pca.textContent='💑 Married';
+    const objBtns={dividas:'💳 Pay off debt',reserva:'🛡️ Emergency fund',imovel:'🏠 Buy property',viajar:'✈️ Travel',investir:'📈 Invest',outro:'✏️ Other'};
+    Object.entries(objBtns).forEach(([k,v])=>{const b=document.getElementById('peObj_'+k);if(b)b.textContent=v;});
+  }
+  peSetCivil(_peEstadoCivil);
+  const cnjEl=document.getElementById('peConjugeNome');
+  if(cnjEl) cnjEl.value=p.conjuge_nome||'';
+  peSetObjetivo(_peObjetivo);
+  const otEl=document.getElementById('peOutroTexto');
+  if(otEl) otEl.value=p.objetivo_outro||'';
+  peUpdateAvatar();
+  modal.style.display='flex';
+}
+
+function closeProfileEditModal(){
+  const modal=document.getElementById('profileEditModal');
+  if(modal) modal.style.display='none';
+}
+
+function peUpdateAvatar(){
+  const name=(document.getElementById('peDisplayName')||{value:''}).value.trim();
+  const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const av=document.getElementById('peAvatarInitials');
+  if(av) av.textContent=initials;
+}
+
+function peSetCivil(v){
+  _peEstadoCivil=v;
+  const bs=document.getElementById('peSolteiro');
+  const bc=document.getElementById('peCasado');
+  if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
+  if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
+  const r=document.getElementById('peConjugeRow');if(r)r.style.display=v==='casado'?'block':'none';
+}
+
+function peSetObjetivo(v){
+  _peObjetivo=v;
+  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
+    const b=document.getElementById('peObj_'+k);
+    if(b){b.style.background=v===k?'#7c3aed':'transparent';b.style.color=v===k?'#fff':'#9ca3af';b.classList.toggle('active',v===k);}
+  });
+  const r=document.getElementById('peOutroRow');if(r)r.style.display=v==='outro'?'block':'none';
+}
+
+async function saveProfileEdit(){
+  if(!_user) return;
+  const displayName=(document.getElementById('peDisplayName')||{value:''}).value.trim();
+  const estadoCivil=_peEstadoCivil||'solteiro';
+  const conjugeNome=(document.getElementById('peConjugeNome')||{value:''}).value.trim();
+  const objetivo=_peObjetivo||'';
+  const objetivoOutro=(document.getElementById('peOutroTexto')||{value:''}).value.trim();
+  const profileData={
+    display_name:displayName||null,
+    estado_civil:estadoCivil,
+    conjuge_nome:estadoCivil==='casado'?conjugeNome:null,
+    objetivo:objetivo||null,
+    objetivo_outro:objetivo==='outro'?objetivoOutro:null
+  };
+  const btn=document.getElementById('peSaveBtn');
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  const{error}=await _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
+  if(btn){btn.disabled=false;btn.textContent=lang==='en'?'Save':'Salvar';}
+  if(error){_showToast('Erro ao salvar perfil');return;}
+  window._profile=Object.assign(window._profile||{},profileData);
+  closeProfileEditModal();
+  rebuild();
+  _showToast(lang==='en'?'Profile saved!':'Perfil salvo!','#10b981');
 }
 
 function _dateToStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -5061,6 +5355,22 @@ async function saveDrawerStartDate(){
 
 function obFinish(){
   if(_user) localStorage.setItem('ob_done_v2_'+_user.id,'1');
+  const displayName=(document.getElementById('obDisplayName')||{value:''}).value.trim();
+  const estadoCivil=window._obEstadoCivil||'solteiro';
+  const conjugeNome=(document.getElementById('obConjugeNome')||{value:''}).value.trim();
+  const objetivo=window._obObjetivo||'';
+  const objetivoOutro=(document.getElementById('obOutroTexto')||{value:''}).value.trim();
+  if(_user){
+    const profileData={
+      display_name:displayName||null,
+      estado_civil:estadoCivil,
+      conjuge_nome:estadoCivil==='casado'?conjugeNome:null,
+      objetivo:objetivo||null,
+      objetivo_outro:objetivo==='outro'?objetivoOutro:null
+    };
+    _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
+    window._profile=Object.assign(window._profile||{},profileData);
+  }
   document.getElementById('onboardingScreen').style.display='none';
   initApp();
   setTimeout(()=>{ if(tourIsFirstTime()) tourStart(); },600);
