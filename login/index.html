@@ -533,127 +533,139 @@ body.dark .confirm-delete{background:#dc2626}
 .google-login-btn:hover{background:var(--accent-dim);border-color:var(--accent)}
 
 /* ═══ DOUBLE PANEL LOGIN ═══ */
+#loginScreen{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:999;padding:1rem;
+  background:#080808;
+  background-image:radial-gradient(ellipse 70% 50% at 50% -5%, rgba(124,58,237,0.18) 0%, transparent 65%);
+}
 .dp-container{
-  position:relative;overflow:hidden;
-  width:100%;max-width:820px;height:520px;
-  background:rgba(14,14,14,0.97);
+  position:relative;
+  width:820px;height:500px;
+  max-width:calc(100vw - 2rem);
+  background:#111;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,0.8);
   border:0.5px solid rgba(255,255,255,0.08);
-  border-radius:24px;
-  box-shadow:0 32px 100px rgba(0,0,0,0.7);
   display:flex;
-  flex-shrink:0;
 }
-/* Overlay gradiente que desliza */
+/* Dois painéis de formulário lado a lado */
+.dp-signin-container,
+.dp-signup-container{
+  position:absolute;
+  top:0;width:50%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 32px;
+  transition:all 0.6s ease;
+  overflow-y:auto;
+}
+.dp-signin-container{
+  left:0;
+  opacity:1;
+  transform:translateX(0);
+  z-index:2;
+}
+.dp-signup-container{
+  left:0;
+  opacity:0;
+  transform:translateX(-100%);
+  z-index:1;
+  pointer-events:none;
+}
+/* Estado: signup ativo */
+.dp-container.dp-right-active .dp-signin-container{
+  opacity:0;
+  transform:translateX(-100%);
+  z-index:1;
+  pointer-events:none;
+}
+.dp-container.dp-right-active .dp-signup-container{
+  opacity:1;
+  transform:translateX(0);
+  z-index:2;
+  pointer-events:all;
+}
+/* Painel roxo — sempre 50% direita */
 .dp-overlay{
-  position:absolute;top:0;left:50%;width:50%;height:100%;
-  overflow:hidden;z-index:100;
-  transition:transform 0.6s cubic-bezier(.77,0,.175,1);
-  border-radius:0 22px 22px 0;
+  position:absolute;
+  top:0;right:0;
+  width:50%;height:100%;
+  background:linear-gradient(135deg,#7c3aed,#4c1d95);
+  z-index:10;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform 0.6s ease;
+  border-radius:0 20px 20px 0;
 }
+/* Quando signup ativo, overlay vai para esquerda */
 .dp-container.dp-right-active .dp-overlay{
   transform:translateX(-100%);
-  border-radius:22px 0 0 22px;
+  border-radius:20px 0 0 20px;
 }
-.dp-overlay-panel{
-  position:absolute;top:0;width:100%;height:100%;
-  background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 50%,#4c1d95 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:40px 32px;text-align:center;
-}
-.dp-overlay-left{
-  left:0;width:100%;
-  transition:transform 0.6s cubic-bezier(.77,0,.175,1);
-}
-.dp-overlay-right{
-  left:0;width:100%;
-  transform:translateX(-100%);
-  transition:transform 0.6s cubic-bezier(.77,0,.175,1);
-}
-.dp-container.dp-right-active .dp-overlay-left{
-  transform:translateX(100%);
-}
-.dp-container.dp-right-active .dp-overlay-right{
-  transform:translateX(0);
+.dp-overlay-inner{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:40px 28px;
 }
 .dp-overlay-title{
   color:#fff;font-size:22px;font-weight:800;
-  letter-spacing:-.5px;margin:0 0 10px;
+  letter-spacing:-.5px;margin:12px 0 8px;
 }
 .dp-overlay-sub{
-  color:rgba(255,255,255,0.75);font-size:13px;
-  line-height:1.6;margin:0 0 24px;
+  color:rgba(255,255,255,0.78);font-size:13px;
+  line-height:1.6;margin:0 0 24px;max-width:200px;
 }
 .dp-ghost-btn{
-  padding:11px 32px;border-radius:50px;
+  padding:11px 28px;border-radius:50px;
   border:2px solid #fff;background:transparent;
-  color:#fff;font-size:13px;font-weight:700;
-  cursor:pointer;letter-spacing:.5px;
-  transition:background .2s,color .2s;
+  color:#fff;font-size:12px;font-weight:700;
+  cursor:pointer;letter-spacing:.8px;
   text-transform:uppercase;
+  transition:background .2s,color .2s;
 }
 .dp-ghost-btn:hover{background:#fff;color:#7c3aed}
-/* Form containers */
-.dp-form-container{
-  position:absolute;top:0;width:50%;height:100%;
-  display:flex;align-items:center;justify-content:center;
-  transition:transform 0.6s cubic-bezier(.77,0,.175,1), opacity 0.6s;
-  padding:32px 24px;
-  overflow-y:auto;
-}
-.dp-signin-container{left:0;z-index:2;transform:translateX(0);opacity:1;}
-.dp-signup-container{
-  left:50%;z-index:1;
-  transform:translateX(100%);opacity:0;
-}
-.dp-container.dp-right-active .dp-signin-container{
-  transform:translateX(-200%);opacity:0;z-index:1;
-}
-.dp-container.dp-right-active .dp-signup-container{
-  transform:translateX(0);opacity:1;z-index:2;
-}
-.dp-form-inner{width:100%;max-width:300px}
+.dp-form-inner{width:100%;max-width:290px}
 .dp-form-title{
   font-size:20px;font-weight:800;letter-spacing:-.5px;
-  color:var(--text);margin:0 0 18px;text-align:center;
+  color:#fff;margin:0 0 20px;text-align:center;
 }
-.dp-mobile-logo{display:none;flex-direction:column;align-items:center;gap:6px;margin-bottom:16px}
-.dp-mobile-logo-text{
-  font-size:22px;font-weight:800;letter-spacing:-1px;
-  background:linear-gradient(135deg,#fff,#b47bff);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.dp-mobile-switch{
-  text-align:center;margin-top:14px;font-size:12px;color:#6b7280;display:none;
-}
-.dp-mobile-switch a{color:#a78bfa;cursor:pointer;font-weight:600;margin-left:4px}
-.dp-mobile-switch a:hover{text-decoration:underline}
+/* Toggles no rodapé */
 .dp-bottom-toggles{
-  position:absolute;bottom:16px;left:50%;
-  transform:translateX(-50%);
-  display:flex;align-items:center;gap:12px;
+  position:absolute;bottom:14px;
+  left:25%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:10px;
   z-index:200;
+  transition:left 0.6s ease;
 }
-/* Mobile: stack vertical, sem overlay */
+.dp-container.dp-right-active .dp-bottom-toggles{
+  left:75%;
+}
+/* Mobile */
 @media(max-width:640px){
   .dp-container{
-    max-width:360px;min-height:auto;
-    flex-direction:column;border-radius:20px;
-    overflow:visible;
+    width:100%;max-width:380px;height:auto;
+    flex-direction:column;
   }
   .dp-overlay{display:none}
-  .dp-form-container{
+  .dp-signin-container,
+  .dp-signup-container{
     position:relative;width:100%;height:auto;
-    transform:none !important;opacity:1 !important;
-    padding:28px 20px 16px;
+    transform:none !important;
+    padding:28px 24px 20px;
   }
-  .dp-signup-container{display:none}
-  .dp-container.dp-right-active .dp-signin-container{display:none}
-  .dp-container.dp-right-active .dp-signup-container{display:flex}
-  .dp-mobile-logo{display:flex}
-  .dp-mobile-switch{display:block}
+  .dp-signup-container{
+    display:none;opacity:1;pointer-events:all;
+  }
+  .dp-container.dp-right-active .dp-signin-container{
+    display:none;
+  }
+  .dp-container.dp-right-active .dp-signup-container{
+    display:flex;
+  }
   .dp-bottom-toggles{
-    position:relative;bottom:auto;left:auto;
-    transform:none;margin:12px auto 20px;
+    position:relative;bottom:auto;
+    left:auto !important;transform:none;
+    margin:0 auto 20px;
+    justify-content:center;
   }
 }
 
@@ -1420,73 +1432,16 @@ body.dark .theme-pill-dark{color:#fff}
 <body>
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" style="display:none">
-  <div class="dp-container">
+  <div class="dp-container" id="dpContainer">
 
-    <!-- PAINEL ESQUERDO — INFO / BRANDING -->
-    <div class="dp-overlay" id="dpOverlay">
-      <!-- Lado Esquerdo (visível quando em Sign In) -->
-      <div class="dp-overlay-panel dp-overlay-left" id="dpOverlayLeft">
-        <svg width="52" height="52" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px">
-          <defs>
-            <linearGradient id="dpBg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(255,255,255,0.3)"/><stop offset="100%" stop-color="rgba(255,255,255,0.05)"/></linearGradient>
-            <linearGradient id="dpArr1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient>
-          </defs>
-          <rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpBg1)"/>
-          <rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/>
-          <rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/>
-          <rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/>
-          <path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpArr1)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          <line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>
-          <line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/>
-        </svg>
-        <h1 class="dp-overlay-title" id="dpLeftTitle">Bem-vindo de volta!</h1>
-        <p class="dp-overlay-sub" id="dpLeftSub">Já tem uma conta? Entre e continue controlando seu dinheiro.</p>
-        <button class="dp-ghost-btn" id="dpGoSignIn" onclick="dpSwitchTo('signin')">Entrar / Sign In</button>
-      </div>
-      <!-- Lado Direito (visível quando em Sign Up) -->
-      <div class="dp-overlay-panel dp-overlay-right" id="dpOverlayRight">
-        <svg width="52" height="52" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px">
-          <defs>
-            <linearGradient id="dpBg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(255,255,255,0.3)"/><stop offset="100%" stop-color="rgba(255,255,255,0.05)"/></linearGradient>
-            <linearGradient id="dpArr2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient>
-          </defs>
-          <rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpBg2)"/>
-          <rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/>
-          <rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/>
-          <rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/>
-          <path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpArr2)" stroke-width="4" stroke-linecap="round"/>
-          <path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-          <line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>
-          <line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/>
-        </svg>
-        <h1 class="dp-overlay-title" id="dpRightTitle">Olá! Hello!</h1>
-        <p class="dp-overlay-sub" id="dpRightSub">Novo por aqui? Crie sua conta e comece sua liberdade financeira.</p>
-        <button class="dp-ghost-btn" id="dpGoSignUp" onclick="dpSwitchTo('signup')">Criar conta / Sign Up</button>
-      </div>
-    </div>
-
-    <!-- FORMULÁRIO SIGN IN -->
-    <div class="dp-form-container dp-signin-container" id="dpSigninContainer">
+    <!-- FORMULÁRIO SIGN IN (esquerda) -->
+    <div class="dp-signin-container" id="dpSigninContainer">
       <div class="dp-form-inner">
-        <div class="dp-mobile-logo">
-          <svg width="40" height="40" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="dpMBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient>
-              <linearGradient id="dpMArr" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient>
-            </defs>
-            <rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpMBg)"/>
-            <rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/>
-            <rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/>
-            <rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/>
-            <path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpMArr)" stroke-width="4" stroke-linecap="round"/>
-            <path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>
-            <line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/>
-          </svg>
-          <span class="dp-mobile-logo-text">tryfreed</span>
+        <div class="dp-mobile-logo" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-bottom:14px">
+          <svg width="38" height="38" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dpLg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient><linearGradient id="dpAr1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient></defs><rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpLg1)"/><rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/><rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/><rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/><path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpAr1)" stroke-width="4" stroke-linecap="round"/><path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/><line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/></svg>
+          <span style="font-size:20px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#fff,#b47bff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">tryfreed</span>
         </div>
-        <h2 class="dp-form-title" id="signinTitle">Entrar / Sign In</h2>
+        <h2 class="dp-form-title" id="signinTitle">Entrar</h2>
         <div class="login-error" id="loginError"></div>
         <div class="login-field">
           <label id="loginEmailLabel">EMAIL</label>
@@ -1496,25 +1451,23 @@ body.dark .theme-pill-dark{color:#fff}
           <label id="loginPwdLabel">SENHA / PASSWORD</label>
           <div style="position:relative">
             <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:40px">
-            <button type="button" onclick="togglePwdVisibility()" id="pwdEyeBtn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#6b7280;display:flex;align-items:center;justify-content:center;line-height:0">
+            <button type="button" onclick="togglePwdVisibility()" id="pwdEyeBtn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#6b7280;display:flex;align-items:center;line-height:0">
               <svg id="pwdEyeOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <svg id="pwdEyeClosed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
         </div>
-        <div class="login-forgot" id="forgotRow"><a onclick="showReset()" id="loginForgotLink">Esqueci minha senha / Forgot password</a></div>
-        <button class="login-btn" id="authBtn" onclick="handleAuth()">Entrar / Sign In</button>
+        <div class="login-forgot" id="forgotRow"><a onclick="showReset()" id="loginForgotLink">Forgot password?</a></div>
+        <button class="login-btn" id="authBtn" onclick="handleAuth()">Sign In</button>
         <div class="login-divider"><span>ou / or</span></div>
         <button class="google-login-btn" onclick="loginWithGoogle()">
-          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          <span id="googleLoginText">Entrar com Google</span>
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          <span id="googleLoginText">Sign in with Google</span>
         </button>
-        <!-- Mobile: link para signup -->
-        <div class="dp-mobile-switch">
-          <span id="dpMobileSwitchText1">Não tem conta?</span>
-          <a onclick="dpSwitchTo('signup')" id="dpMobileSwitchLink1">Criar conta</a>
+        <div class="dp-mobile-switch" style="display:none;text-align:center;margin-top:12px;font-size:12px;color:#6b7280">
+          Não tem conta? <a onclick="dpSwitchTo('signup')" style="color:#a78bfa;cursor:pointer;font-weight:600">Criar conta</a>
         </div>
-        <!-- Hidden placeholders to keep JS references intact -->
+        <!-- placeholders JS -->
         <span id="loginSubtitle" style="display:none"></span>
         <span id="loginSwitchText" style="display:none"></span>
         <span id="loginSwitchLink" style="display:none"></span>
@@ -1522,27 +1475,14 @@ body.dark .theme-pill-dark{color:#fff}
       </div>
     </div>
 
-    <!-- FORMULÁRIO SIGN UP -->
-    <div class="dp-form-container dp-signup-container" id="dpSignupContainer">
+    <!-- FORMULÁRIO SIGN UP (esquerda, escondido inicialmente) -->
+    <div class="dp-signup-container" id="dpSignupContainer">
       <div class="dp-form-inner">
-        <div class="dp-mobile-logo">
-          <svg width="40" height="40" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="dpMBg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient>
-              <linearGradient id="dpMArr2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient>
-            </defs>
-            <rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpMBg2)"/>
-            <rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/>
-            <rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/>
-            <rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/>
-            <path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpMArr2)" stroke-width="4" stroke-linecap="round"/>
-            <path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-            <line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/>
-            <line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/>
-          </svg>
-          <span class="dp-mobile-logo-text">tryfreed</span>
+        <div class="dp-mobile-logo" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-bottom:14px">
+          <svg width="38" height="38" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dpLg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient><linearGradient id="dpAr2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient></defs><rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpLg2)"/><rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/><rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/><rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/><path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpAr2)" stroke-width="4" stroke-linecap="round"/><path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/><line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/></svg>
+          <span style="font-size:20px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#fff,#b47bff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">tryfreed</span>
         </div>
-        <h2 class="dp-form-title" id="signupTitle">Criar Conta / Sign Up</h2>
+        <h2 class="dp-form-title" id="signupTitle">Criar Conta</h2>
         <div class="login-error" id="signupError"></div>
         <div class="login-field">
           <label id="signupNameLabel">NOME / NAME</label>
@@ -1556,34 +1496,42 @@ body.dark .theme-pill-dark{color:#fff}
           <label id="signupPwdLabel">SENHA / PASSWORD</label>
           <div style="position:relative">
             <input id="signupPassword" type="password" placeholder="••••••••" autocomplete="new-password" style="padding-right:40px">
-            <button type="button" onclick="toggleSignupPwdVisibility()" id="signupEyeBtn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#6b7280;display:flex;align-items:center;justify-content:center;line-height:0">
+            <button type="button" onclick="toggleSignupPwdVisibility()" id="signupEyeBtn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:#6b7280;display:flex;align-items:center;line-height:0">
               <svg id="signupEyeOpen" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               <svg id="signupEyeClosed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
             </button>
           </div>
         </div>
-        <button class="login-btn" id="signupBtn" onclick="handleSignup()" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">Criar Conta / Sign Up</button>
+        <button class="login-btn" id="signupBtn" onclick="handleSignup()">Criar Conta</button>
         <div class="login-divider"><span>ou / or</span></div>
         <button class="google-login-btn" onclick="loginWithGoogle()">
-          <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-          <span>Entrar com Google</span>
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          <span>Sign up with Google</span>
         </button>
-        <!-- Mobile: link para signin -->
-        <div class="dp-mobile-switch">
-          <span id="dpMobileSwitchText2">Já tem conta?</span>
-          <a onclick="dpSwitchTo('signin')" id="dpMobileSwitchLink2">Entrar</a>
+        <div class="dp-mobile-switch" style="display:none;text-align:center;margin-top:12px;font-size:12px;color:#6b7280">
+          Já tem conta? <a onclick="dpSwitchTo('signin')" style="color:#a78bfa;cursor:pointer;font-weight:600">Entrar</a>
         </div>
       </div>
     </div>
 
-    <!-- Lang + Theme toggles (canto inferior) -->
-    <div class="dp-bottom-toggles">
-      <div style="display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:3px">
-        <button id="dpLangPT" onclick="setLang('pt')" style="padding:4px 12px;border-radius:50px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;transition:all .2s">🇧🇷 PT</button>
-        <button id="dpLangEN" onclick="setLang('en')" style="padding:4px 12px;border-radius:50px;border:none;cursor:pointer;font-size:11px;font-weight:400;background:transparent;color:#6b7280;transition:all .2s">🇺🇸 EN</button>
+    <!-- PAINEL ROXO (direita) -->
+    <div class="dp-overlay" id="dpOverlay">
+      <div class="dp-overlay-inner" id="dpOverlayInner">
+        <svg width="48" height="48" viewBox="60 40 160 160" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dpOvBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="rgba(255,255,255,0.25)"/><stop offset="100%" stop-color="rgba(255,255,255,0.05)"/></linearGradient><linearGradient id="dpOvAr" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.4)"/><stop offset="100%" stop-color="rgba(255,255,255,1)"/></linearGradient></defs><rect x="60" y="40" width="160" height="160" rx="32" fill="url(#dpOvBg)"/><rect x="78" y="158" width="22" height="22" rx="4" fill="rgba(255,255,255,0.22)"/><rect x="108" y="138" width="22" height="42" rx="4" fill="rgba(255,255,255,0.35)"/><rect x="138" y="118" width="22" height="62" rx="4" fill="rgba(255,255,255,0.48)"/><path d="M89 152 Q130 190 168 110" fill="none" stroke="url(#dpOvAr)" stroke-width="4" stroke-linecap="round"/><path d="M157 112 L169 106 L175 118" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><line x1="178" y1="52" x2="178" y2="88" stroke="white" stroke-width="7" stroke-linecap="round"/><line x1="160" y1="64" x2="196" y2="64" stroke="white" stroke-width="7" stroke-linecap="round"/></svg>
+        <div class="dp-overlay-title" id="dpOverlayTitle">Olá! Hello!</div>
+        <div class="dp-overlay-sub" id="dpOverlaySub">Novo por aqui? Crie sua conta e comece sua liberdade financeira.</div>
+        <button class="dp-ghost-btn" id="dpOverlayBtn" onclick="dpSwitchTo('signup')">Sign Up</button>
       </div>
-      <div onclick="toggleTheme()" style="display:flex;align-items:center;gap:7px;cursor:pointer;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:4px 12px">
-        <span id="dpThemeIcon" style="font-size:13px;line-height:1;display:flex;align-items:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
+    </div>
+
+    <!-- Toggles lang/theme -->
+    <div class="dp-bottom-toggles" id="dpBottomToggles">
+      <div style="display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:3px">
+        <button id="dpLangPT" onclick="setLang('pt')" style="padding:4px 11px;border-radius:50px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;transition:all .2s">🇧🇷 PT</button>
+        <button id="dpLangEN" onclick="setLang('en')" style="padding:4px 11px;border-radius:50px;border:none;cursor:pointer;font-size:11px;background:transparent;color:#6b7280;transition:all .2s">🇺🇸 EN</button>
+      </div>
+      <div onclick="toggleTheme()" style="display:flex;align-items:center;gap:6px;cursor:pointer;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:4px 11px">
+        <span id="dpThemeIcon" style="font-size:12px;display:flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
         <span id="dpThemeLabel" style="font-size:11px;color:#9ca3af">Light</span>
       </div>
     </div>
@@ -3111,12 +3059,21 @@ function showLogin(){
 function showLoginFromHome(){showLogin();}
 
 function dpSwitchTo(panel){
-  const c=document.getElementById('loginScreen')?.querySelector('.dp-container');
+  const c=document.getElementById('dpContainer');
+  const overlayTitle=document.getElementById('dpOverlayTitle');
+  const overlaySub=document.getElementById('dpOverlaySub');
+  const overlayBtn=document.getElementById('dpOverlayBtn');
   if(!c) return;
   if(panel==='signup'){
     c.classList.add('dp-right-active');
+    if(overlayTitle) overlayTitle.textContent='Bem-vindo de volta!';
+    if(overlaySub) overlaySub.textContent='Já tem uma conta? Entre e continue.';
+    if(overlayBtn){overlayBtn.textContent='Sign In';overlayBtn.onclick=()=>dpSwitchTo('signin');}
   } else {
     c.classList.remove('dp-right-active');
+    if(overlayTitle) overlayTitle.textContent='Olá! Hello!';
+    if(overlaySub) overlaySub.textContent='Novo por aqui? Crie sua conta e comece sua liberdade financeira.';
+    if(overlayBtn){overlayBtn.textContent='Sign Up';overlayBtn.onclick=()=>dpSwitchTo('signup');}
   }
 }
 
