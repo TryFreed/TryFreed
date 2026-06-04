@@ -4850,6 +4850,15 @@ async function checkSubAndLaunch(skipOnboarding=false){
 let _booted = false;
 let _appRunning = false;
 
+// Re-verifica subscription toda vez que a aba volta ao foco
+// Impede acesso ao app por histórico do browser após abandono do paywall
+document.addEventListener('visibilitychange', async()=>{
+  if(document.visibilityState==='visible' && _user && _appRunning){
+    const {data}=await _supa.from('profiles').select('subscribed').eq('user_id',_user.id).single();
+    if(data && !data.subscribed){_appRunning=false;showPaywall();}
+  }
+});
+
 // Listen for auth state changes (login/logout, and OAuth redirect SIGNED_IN)
 _supa.auth.onAuthStateChange(async (event, session)=>{
   // Block non-SIGNED_IN events during boot (bootApp handles initial session).
