@@ -803,6 +803,34 @@ body.dark .confirm-delete{background:#dc2626}
 }
 /* paywall bg is always #080808 — no light-mode card overrides needed */
 
+/* ── HOME DASHBOARD ──────────────────────────────────────────── */
+.hd-section{background:var(--card);border:0.5px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;margin-bottom:14px}
+.hd-section-title{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
+.hd-health-bar-bg{height:8px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;margin-bottom:6px}
+.hd-health-bar-fill{height:100%;border-radius:50px;transition:width 0.8s ease}
+.hd-health-row{display:flex;justify-content:space-between;align-items:center}
+.hd-health-score{font-size:13px;font-weight:700;color:var(--text)}
+.hd-health-label{font-size:12px;font-weight:600}
+.hd-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.hd-mini-card{background:var(--card);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 12px}
+.hd-mini-label{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin-bottom:4px}
+.hd-mini-value{font-size:18px;font-weight:800;color:var(--text)}
+.hd-goal-item{margin-bottom:12px}
+.hd-goal-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;justify-content:space-between}
+.hd-goal-bar-bg{height:6px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;margin-bottom:3px}
+.hd-goal-bar-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa);border-radius:50px;transition:width .6s ease}
+.hd-goal-sub{font-size:11px;color:#6b7280}
+.hd-tx-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)}
+.hd-tx-item:last-child{border-bottom:none}
+.hd-tx-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hd-tx-name{flex:1;font-size:13px;color:var(--text);font-weight:500}
+.hd-tx-right{text-align:right}
+.hd-tx-val{font-size:13px;font-weight:700}
+.hd-tx-date{font-size:10px;color:#6b7280}
+.hd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;margin-left:6px}
+.hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
+.hd-see-all:hover{text-decoration:underline}
+
 /* ── PROFILE CARD (dashboard) ────────────────────────────────── */
 .profile-card{display:flex;align-items:center;gap:14px;background:var(--card);border:0.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 16px;margin-bottom:16px;cursor:pointer;transition:border-color .2s}
 .profile-card:hover{border-color:rgba(124,58,237,0.4)}
@@ -2063,7 +2091,8 @@ body.dark .theme-pill-dark{color:#fff}
   <div class="app-header-inner">
     <div class="app-logo">TryFreed</div>
     <div class="tabs">
-      <button class="tab on" onclick="showTab('renda')" id="tab-btn-renda">Renda</button>
+      <button class="tab on" onclick="showTab('home')" id="tab-btn-home">Home</button>
+      <button class="tab" onclick="showTab('renda')" id="tab-btn-renda">Renda</button>
       <button class="tab" onclick="showTab('bills')" id="tab-btn-bills">Despesas</button>
       <button class="tab" onclick="showTab('dividas')" id="tab-btn-dividas">Dívidas</button>
       <button class="tab" onclick="showTab('semana')" id="tab-btn-semana">Semana</button>
@@ -2111,7 +2140,11 @@ body.dark .theme-pill-dark{color:#fff}
       <path id="bnShapePath" fill="#0f0f1a"/>
     </svg>
     <div id="bn-bubble"></div>
-    <button class="bn-item on" id="bn-renda" onclick="showTab('renda')">
+    <button class="bn-item on" id="bn-home" onclick="showTab('home')">
+      <div class="bn-bubble"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <span class="bn-label">Home</span>
+    </button>
+    <button class="bn-item" id="bn-renda" onclick="showTab('renda')">
       <div class="bn-bubble"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
       <span class="bn-label">Renda</span>
     </button>
@@ -2190,8 +2223,13 @@ body.dark .theme-pill-dark{color:#fff}
     </div>
   </div>
 
+  <!-- HOME -->
+  <div id="tab-home" class="sec on">
+    <div id="homeDashboard"></div>
+  </div>
+
   <!-- RENDA -->
-  <div id="tab-renda" class="sec on">
+  <div id="tab-renda" class="sec">
     <div id="profileCardWrap"></div>
     <button class="form-toggle-btn" id="rendaToggleBtn" onclick="toggleForm('renda')">
       <span class="ftb-icon">+</span>
@@ -2566,10 +2604,10 @@ let lang = localStorage.getItem('lang') || 'pt';
 const TRANSLATIONS = {
   pt: {
     // Nav tabs
-    tab_renda:'Renda', tab_bills:'Despesas', tab_semana:'Semana',
+    tab_home:'Home', tab_renda:'Renda', tab_bills:'Despesas', tab_semana:'Semana',
     tab_cal:'Calendário', tab_metas:'Metas', tab_relatorio:'Relatório',
     // Bottom nav
-    bn_renda:'Renda', bn_bills:'Despesas', bn_semana:'Semana',
+    bn_home:'Home', bn_renda:'Renda', bn_bills:'Despesas', bn_semana:'Semana',
     bn_cal:'Calendário', bn_metas:'Metas', bn_relatorio:'Relatório',
     // Header / drawer
     theme_light:'Claro', theme_dark:'Escuro',
@@ -2791,9 +2829,9 @@ const TRANSLATIONS = {
     save_start_date_ok:'✓ Data de início salva!',
   },
   en: {
-    tab_renda:'Income', tab_bills:'Expenses', tab_semana:'Week',
+    tab_home:'Home', tab_renda:'Income', tab_bills:'Expenses', tab_semana:'Week',
     tab_cal:'Calendar', tab_metas:'Goals', tab_relatorio:'Report',
-    bn_renda:'Income', bn_bills:'Expenses', bn_semana:'Week',
+    bn_home:'Home', bn_renda:'Income', bn_bills:'Expenses', bn_semana:'Week',
     bn_cal:'Calendar', bn_metas:'Goals', bn_relatorio:'Report',
     theme_light:'Light', theme_dark:'Dark',
     drawer_appearance:'Appearance',
@@ -3100,8 +3138,8 @@ function applyLang(){
   if(rel) rel.textContent='Email';
 
   // ── App tabs ──
-  const tabKeys=['renda','bills','dividas','semana','cal','metas','relatorio'];
-  document.querySelectorAll('.tab').forEach((el,i)=>{el.textContent=t('tab_'+tabKeys[i]);});
+  const tabKeys=['home','renda','bills','dividas','semana','cal','metas','relatorio'];
+  document.querySelectorAll('.tab').forEach((el,i)=>{if(tabKeys[i])el.textContent=t('tab_'+tabKeys[i]);});
   // Bottom nav labels
   tabKeys.forEach(k=>{
     const el=document.getElementById('bn-'+k);
@@ -4683,7 +4721,12 @@ function buildRelatorio(){
   document.getElementById('extratoList').innerHTML=exHtml||`<div style="color:#888;padding:8px">${t('rep_empty')}</div>`;
 }
 
-function rebuild(){_computeFullDirty=true;buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();}
+function rebuild(){
+  _computeFullDirty=true;
+  buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
+  const homeEl=document.getElementById('tab-home');
+  if(homeEl&&homeEl.classList.contains('on')) buildHomeDashboard();
+}
 
 // ── NOTIFICATIONS ────────────────────────────────────────────────
 let _swReg = null;
@@ -4839,6 +4882,7 @@ function chartColors(){
 }
 
 const BN_ICONS={
+  home:`<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
   renda:`<svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`,
   bills:`<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>`,
   dividas:`<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>`,
@@ -4872,17 +4916,26 @@ function updateBnShape(tabId,instant){
 function showTab(tabId){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
   document.getElementById('tab-'+tabId).classList.add('on');
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['renda','bills','dividas','semana','cal','metas','relatorio'][i]===tabId));
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['home','renda','bills','dividas','semana','cal','metas','relatorio'][i]===tabId));
   // sync bottom nav
-  ['renda','bills','dividas','semana','cal','metas','relatorio'].forEach(k=>{
+  ['home','renda','bills','dividas','semana','cal','metas','relatorio'].forEach(k=>{
     const el=document.getElementById('bn-'+k);
     if(el) el.classList.toggle('on',k===tabId);
   });
   updateBnShape(tabId);
+  if(tabId==='home'){
+    if(typeof Chart==='undefined'){
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
+        .then(()=>buildHomeDashboard())
+        .catch(()=>{});
+    } else {
+      buildHomeDashboard();
+    }
+  }
   if(tabId==='relatorio' && typeof Chart==='undefined'){
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
       .then(()=>buildRelatorio())
-      .catch(()=>showToast(lang==='en'?'Failed to load charts':'Erro ao carregar gráficos'));
+      .catch(()=>_showToast(lang==='en'?'Failed to load charts':'Erro ao carregar gráficos'));
   }
 }
 
@@ -4962,8 +5015,9 @@ function initApp(){
   calYear=START.getFullYear();calMonth=START.getMonth();
   ovFrom=new Date(START);ovTo=new Date(END);
   buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
+  showTab('home');
   // Init bottom-nav dip position
-  requestAnimationFrame(()=>updateBnShape('renda',true));
+  requestAnimationFrame(()=>updateBnShape('home',true));
   // Show onboarding for first-time users
   obStart();
   // Push notifications daily check
@@ -5175,6 +5229,198 @@ function obReset(){
   localStorage.removeItem('ob_done_v2_'+_user.id);
   closeDrawer();
   obStart();
+}
+
+// ── HOME DASHBOARD ────────────────────────────────────────────
+function buildHomeDashboard(){
+  const wrap=document.getElementById('homeDashboard');
+  if(!wrap) return;
+  const isEN=lang==='en';
+  const p=window._profile||{};
+  const full=computeFull();
+  const {monthly,daily}=full;
+
+  // A — Profile
+  const rawName=p.display_name||_user?.user_metadata?.full_name||_user?.email?.split('@')[0]||'';
+  const name=esc(rawName);
+  const initials=rawName?rawName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const estadoCivil=p.estado_civil||'';
+  const conjuge=esc(p.conjuge_nome||'');
+  const objKeys=(p.objetivo||'').split(',').filter(Boolean);
+  const _omap={dividas:{pt:'Sair das dívidas',en:'Pay off debt'},reserva:{pt:'Reserva de emergência',en:'Emergency fund'},imovel:{pt:'Comprar imóvel',en:'Buy property'},viajar:{pt:'Viajar',en:'Travel'},investir:{pt:'Investir',en:'Invest'},outro:{pt:esc(p.objetivo_outro||'Outro'),en:esc(p.objetivo_outro||'Other')}};
+  const objBadges=objKeys.map(k=>_omap[k]?(isEN?_omap[k].en:_omap[k].pt):'').filter(Boolean);
+  let estadoL='';
+  if(estadoCivil==='casado') estadoL=(isEN?'Married / Partner':'Casado(a)')+(conjuge?' · '+conjuge:'');
+  else if(estadoCivil==='solteiro') estadoL=isEN?'Single':'Solteiro(a)';
+  const nameFallback=isEN?'Add your name':'Adicione seu nome';
+
+  // B — Health score
+  const curMk=_today.getFullYear()+'-'+_today.getMonth();
+  const curM=monthly[curMk]||{in:0,out:0};
+  const todayEntry=daily.find(d=>d.date.toDateString()===_today.toDateString());
+  const currentBal=todayEntry?todayEntry.bal:full.bal;
+  let score=0;
+  if(curM.in>curM.out) score+=40;
+  if(metas.some(m=>!m.done)) score+=20;
+  const hasOverdue=bills.some(b=>{
+    if(b.type==='once'||!b.day) return false;
+    const due=new Date(_today.getFullYear(),_today.getMonth(),b.day);
+    if(due>_today) return false;
+    return !(b.pagamentos||[]).some(pg=>pg.year===_today.getFullYear()&&pg.month===_today.getMonth());
+  });
+  if(!hasOverdue) score+=20;
+  if(currentBal>0) score+=20;
+  const sc=score<=30?'#ef4444':score<=60?'#f59e0b':score<=80?'#3b82f6':'#22c55e';
+  const sl=score<=30?(isEN?'Critical':'Crítico'):score<=60?(isEN?'Fair':'Regular'):score<=80?(isEN?'Good':'Bom'):(isEN?'Excellent':'Ótimo');
+
+  // C — Monthly projection
+  const projMargem=curM.in-curM.out;
+
+  // D — Chart data: last 4 months
+  const mnths=isEN?['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const chartM=[];
+  for(let i=3;i>=0;i--){const d=new Date(_today.getFullYear(),_today.getMonth()-i,1);chartM.push({mk:d.getFullYear()+'-'+d.getMonth(),label:mnths[d.getMonth()]});}
+  const cLabels=chartM.map(x=>x.label);
+  const cIn=chartM.map(x=>(monthly[x.mk]||{in:0}).in);
+  const cOut=chartM.map(x=>(monthly[x.mk]||{out:0}).out);
+
+  // E — Metas
+  const activeMetas=metas.filter(m=>!m.done).slice(0,3);
+
+  // F — Upcoming bills (next 7 days)
+  const end7=new Date(_today);end7.setDate(_today.getDate()+7);
+  const upcoming=[];
+  bills.forEach(b=>{
+    if(!b.day||b.type==='once') return;
+    const due=new Date(_today.getFullYear(),_today.getMonth(),b.day);
+    if(due<_today||due>end7) return;
+    const daysLeft=Math.round((due-_today)/(864e5));
+    upcoming.push({name:b.name,val:b.val,date:due,days:daysLeft});
+  });
+  upcoming.sort((a,b2)=>a.date-b2.date);
+
+  // G — Last 5 transactions
+  const allTx=[];
+  for(let i=daily.length-1;i>=0&&allTx.length<30;i--){
+    const d=daily[i];
+    if(d.date>_today) continue;
+    d.evs.forEach(e=>allTx.push({name:esc(e.name||''),val:e.a,date:d.date}));
+  }
+  const recentTx=allTx.slice(0,5);
+
+  const fd=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+
+  wrap.innerHTML=`
+<div class="hd-section" style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="showProfileEdit()">
+  <div class="profile-card-avatar">${initials}</div>
+  <div style="flex:1;min-width:0">
+    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px">${name||nameFallback}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      ${estadoL?`<span style="font-size:12px;color:#6b7280">${estadoL}</span>`:''}
+      ${objBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
+    </div>
+  </div>
+  <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+</div>
+<div class="hd-section">
+  <div class="hd-section-title">${isEN?'Financial Health':'Saúde Financeira'}</div>
+  <div class="hd-health-bar-bg"><div class="hd-health-bar-fill" style="width:${score}%;background:${sc}"></div></div>
+  <div class="hd-health-row">
+    <span class="hd-health-score">${score}/100</span>
+    <span class="hd-health-label" style="color:${sc}">${sl}</span>
+  </div>
+</div>
+<div class="hd-two-col">
+  <div class="hd-mini-card">
+    <div class="hd-mini-label">${isEN?'Current Balance':'Saldo Atual'}</div>
+    <div class="hd-mini-value" style="color:${currentBal>=0?'var(--green)':'var(--red)'}">${fmt(currentBal)}</div>
+  </div>
+  <div class="hd-mini-card">
+    <div class="hd-mini-label">${isEN?'Month Projection':'Projeção do Mês'}</div>
+    <div class="hd-mini-value" style="color:${projMargem>=0?'var(--green)':'var(--red)'}">${fmt(projMargem)}</div>
+  </div>
+</div>
+<div class="hd-section">
+  <div class="hd-section-title">${isEN?'Income vs Expenses':'Receita vs Despesa'}</div>
+  <canvas id="hdChartReceita" height="160"></canvas>
+</div>
+<div class="hd-section">
+  <div class="hd-section-title">${isEN?'Goal Progress':'Progresso das Metas'}</div>
+  ${activeMetas.length===0
+    ?`<div style="font-size:13px;color:#6b7280;margin-bottom:10px">${isEN?'No active goals':'Nenhuma meta ativa'}</div><button class="btn" onclick="showTab('metas')" style="font-size:12px;padding:6px 14px">${isEN?'Create goal':'Criar meta'}</button>`
+    :activeMetas.map(m=>{
+      const acc=(m.checkins||[]).reduce((s,c)=>s+(c.val||0),0);
+      const pct=Math.min(100,m.val>0?Math.round(acc/m.val*100):0);
+      return `<div class="hd-goal-item">
+        <div class="hd-goal-name"><span>${esc(m.name)}</span><span style="font-size:12px;color:#6b7280">${pct}%</span></div>
+        <div class="hd-goal-bar-bg"><div class="hd-goal-bar-fill" style="width:${pct}%"></div></div>
+        <div class="hd-goal-sub">${isEN?'Missing':'Falta'}: ${fmt(Math.max(0,m.val-acc))}</div>
+      </div>`;
+    }).join('')+`<span class="hd-see-all" onclick="showTab('metas')">${isEN?'See all →':'Ver todas →'}</span>`}
+</div>
+<div class="hd-section">
+  <div class="hd-section-title">${isEN?'Upcoming Due Dates':'Próximos Vencimentos'}</div>
+  ${upcoming.length===0
+    ?`<div style="font-size:13px;color:#6b7280">${isEN?'No bills due in the next 7 days':'Nenhuma conta nos próximos 7 dias'}</div>`
+    :upcoming.slice(0,5).map(x=>{
+      const bClr=x.days<=1?'#ef4444':'rgba(255,255,255,0.1)';
+      const bTxt=x.days===0?(isEN?'Today':'Hoje'):x.days===1?(isEN?'Tomorrow':'Amanhã'):`${x.days}d`;
+      return `<div class="hd-tx-item">
+        <div style="flex:1"><div class="hd-tx-name">${esc(x.name)}</div><div class="hd-tx-date">${fd(x.date)}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="hd-badge" style="background:${bClr};color:${x.days<=1?'#fff':'#9ca3af'}">${bTxt}</span>
+          <span class="hd-tx-val" style="color:var(--red)">${fmt(x.val)}</span>
+        </div>
+      </div>`;
+    }).join('')}
+</div>
+<div class="hd-section">
+  <div class="hd-section-title">${isEN?'Recent Transactions':'Últimas Transações'}</div>
+  ${recentTx.length===0
+    ?`<div style="font-size:13px;color:#6b7280">${isEN?'No recent transactions':'Nenhuma transação recente'}</div>`
+    :recentTx.map(tx=>{
+      const isIn=tx.val>0;
+      return `<div class="hd-tx-item">
+        <div class="hd-tx-icon" style="background:${isIn?'rgba(34,197,94,0.12)':'rgba(239,68,68,0.12)'}"><span style="color:${isIn?'#22c55e':'#ef4444'}">${isIn?'↑':'↓'}</span></div>
+        <div class="hd-tx-name">${tx.name}</div>
+        <div class="hd-tx-right"><div class="hd-tx-val" style="color:${isIn?'#22c55e':'#ef4444'}">${isIn?'+':''}${fmt(tx.val)}</div><div class="hd-tx-date">${fd(tx.date)}</div></div>
+      </div>`;
+    }).join('')}
+</div>`;
+
+  // Render chart after DOM update
+  if(typeof Chart==='undefined'){
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
+      .then(()=>_buildHdChart(cLabels,cIn,cOut))
+      .catch(()=>{});
+  } else {
+    setTimeout(()=>_buildHdChart(cLabels,cIn,cOut),0);
+  }
+}
+
+function _buildHdChart(labels,dataIn,dataOut){
+  if(window._hdChart){try{window._hdChart.destroy();}catch(e){}}
+  const canvas=document.getElementById('hdChartReceita');
+  if(!canvas) return;
+  const isEN=lang==='en';
+  window._hdChart=new Chart(canvas,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:isEN?'Income':'Renda',data:dataIn,backgroundColor:'#7c3aed',borderRadius:4,borderSkipped:false},
+        {label:isEN?'Expenses':'Despesas',data:dataOut,backgroundColor:'#ef4444',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#9ca3af',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:'#6b7280',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#6b7280',font:{size:10},callback:v=>'$'+Math.abs(v).toLocaleString('pt-BR')},grid:{color:'rgba(255,255,255,0.05)'}}
+      }
+    }
+  });
 }
 
 // ── ONBOARDING PROFILE HELPERS ────────────────────────────────
