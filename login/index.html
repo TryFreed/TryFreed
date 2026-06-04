@@ -3124,26 +3124,36 @@ async function handleSignup(){
   const pwd=(document.getElementById('signupPassword')||{value:''}).value;
   const errEl=document.getElementById('signupError');
   const btn=document.getElementById('signupBtn');
+  const isEN=lang==='en';
   if(errEl){errEl.style.display='none';errEl.className='login-error';}
   if(!email||!pwd){
-    if(errEl){errEl.textContent='Preencha email e senha. / Fill email and password.';errEl.className='login-error err';errEl.style.display='block';}
+    if(errEl){errEl.textContent=isEN?'Fill email and password.':'Preencha email e senha.';errEl.className='login-error err';errEl.style.display='block';}
     return;
   }
   if(pwd.length<6){
-    if(errEl){errEl.textContent='Senha mínimo 6 caracteres. / Password min 6 chars.';errEl.className='login-error err';errEl.style.display='block';}
+    if(errEl){errEl.textContent=isEN?'Password min 6 characters.':'Senha mínimo 6 caracteres.';errEl.className='login-error err';errEl.style.display='block';}
     return;
   }
-  if(btn){btn.disabled=true;btn.textContent='Criando... / Creating...';}
+  if(btn){btn.disabled=true;btn.textContent=isEN?'Creating...':'Criando...';}
   try{
     const {data,error}=await _supa.auth.signUp({email,password:pwd,options:{data:{full_name:name||email.split('@')[0]}}});
     if(error) throw error;
-    if(errEl){errEl.textContent='Conta criada! Verifique seu email. / Account created! Check your email.';errEl.className='login-error ok';errEl.style.display='block';}
-    if(btn){btn.disabled=false;btn.textContent='Criar Conta / Sign Up';}
-    setTimeout(()=>dpSwitchTo('signin'),2500);
+    if(data?.session?.user){
+      // Auto-confirm ativo: sessão imediata → ir direto para o paywall
+      _user=data.session.user;
+      _booted=true;
+      setUserUI(_user);
+      showPaywall();
+    } else {
+      // Email confirmation ativo: mostrar mensagem e voltar para signin
+      if(errEl){errEl.textContent=isEN?'Account created! Check your email to confirm.':'Conta criada! Verifique seu email para confirmar.';errEl.className='login-error ok';errEl.style.display='block';}
+      if(btn){btn.disabled=false;btn.textContent=isEN?'Create Account':'Criar Conta';}
+      setTimeout(()=>dpSwitchTo('signin'),3000);
+    }
   }catch(e){
     const msg=translateSupabaseError(e.message||String(e));
     if(errEl){errEl.textContent=msg;errEl.className='login-error err';errEl.style.display='block';}
-    if(btn){btn.disabled=false;btn.textContent='Criar Conta / Sign Up';}
+    if(btn){btn.disabled=false;btn.textContent=isEN?'Create Account':'Criar Conta';}
   }
 }
 
