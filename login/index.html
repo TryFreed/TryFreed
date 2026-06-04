@@ -790,6 +790,13 @@ body.dark .confirm-delete{background:#dc2626}
   transition:color .15s;
 }
 .pw-logout-btn:hover{color:var(--accent)}
+.pw-features{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 16px;margin-bottom:24px;width:100%}
+.pw-features span{display:flex;align-items:center;gap:5px;font-size:13px;color:#9ca3af}
+.pw-check{color:#4ade80;font-weight:700}
+.pw-bullets{list-style:none;padding:0;margin:0;text-align:left;width:100%}
+.pw-bullets li{font-size:12px;color:#9b92b8;padding:3px 0 3px 16px;position:relative}
+.pw-bullets li::before{content:'✓';position:absolute;left:0;color:#4ade80;font-weight:700}
+.pw-guarantee{font-size:11px;color:#4b5563;text-align:center;margin-top:16px}
 @media(max-width:480px){
   #paywallScreen{padding:24px 16px}
   .pw-plans{grid-template-columns:1fr}
@@ -2354,6 +2361,13 @@ body.dark .theme-pill-dark{color:#fff}
     <div class="pw-logo">TryFreed</div>
     <div class="pw-title" id="pwTitle">Assine para continuar</div>
     <div class="pw-sub" id="pwSub">Escolha seu plano</div>
+    <div class="pw-features">
+      <span><span class="pw-check">✓</span> <span id="pwF1">Controle de gastos</span></span>
+      <span><span class="pw-check">✓</span> <span id="pwF2">Metas financeiras</span></span>
+      <span><span class="pw-check">✓</span> <span id="pwF3">Assistente IA</span></span>
+      <span><span class="pw-check">✓</span> <span id="pwF4">Relatórios</span></span>
+      <span><span class="pw-check">✓</span> <span id="pwF5">Sem anúncios</span></span>
+    </div>
     <div class="pw-plans">
       <div class="pw-plan">
         <div class="pw-plan-name" id="pwMonthLabel">Mensal</div>
@@ -2361,6 +2375,11 @@ body.dark .theme-pill-dark{color:#fff}
           <span class="pw-price">$9.99</span>
           <span class="pw-per" id="pwMonthPer">/mês</span>
         </div>
+        <ul class="pw-bullets">
+          <li id="pwMB1">Acesso completo ao app</li>
+          <li id="pwMB2">Assistente IA incluído</li>
+          <li id="pwMB3">Cancele quando quiser</li>
+        </ul>
         <a href="https://buy.stripe.com/7sY5kD1xS9pT0c9bEe83C00" target="_blank" class="pw-btn" id="pwMonthBtn">Começar</a>
       </div>
       <div class="pw-plan pw-plan-featured">
@@ -2371,9 +2390,15 @@ body.dark .theme-pill-dark{color:#fff}
           <span class="pw-per" id="pwAnnualPer">/ano</span>
         </div>
         <div class="pw-save" id="pwAnnualSave">Economize 17%</div>
+        <ul class="pw-bullets">
+          <li id="pwAB1">Tudo do plano mensal</li>
+          <li id="pwAB2">2 meses grátis</li>
+          <li id="pwAB3">Suporte prioritário</li>
+        </ul>
         <a href="https://buy.stripe.com/aFabJ1gsM7hL5wtcIi83C01" target="_blank" class="pw-btn" id="pwAnnualBtn">Começar</a>
       </div>
     </div>
+    <div class="pw-guarantee" id="pwGuarantee">🔒 Pagamento seguro via Stripe · Cancele a qualquer momento</div>
     <button class="pw-logout-btn" id="pwLogoutBtn" onclick="_supa.auth.signOut()">Sair</button>
   </div>
 </div>
@@ -2609,6 +2634,10 @@ const TRANSLATIONS = {
     pw_annual:'Anual', pw_annual_per:'/ano',
     pw_annual_save:'Economize 17% — como 2 meses grátis',
     pw_badge:'Mais popular', pw_btn:'Começar', pw_logout:'Sair',
+    pw_f1:'Controle de gastos', pw_f2:'Metas financeiras', pw_f3:'Assistente IA', pw_f4:'Relatórios', pw_f5:'Sem anúncios',
+    pw_mb1:'Acesso completo ao app', pw_mb2:'Assistente IA incluído', pw_mb3:'Cancele quando quiser',
+    pw_ab1:'Tudo do plano mensal', pw_ab2:'2 meses grátis', pw_ab3:'Suporte prioritário',
+    pw_guarantee:'🔒 Pagamento seguro via Stripe · Cancele a qualquer momento',
     // Day edit modal
     dayedit_title:'Editar agenda', dayedit_save:'Confirmar', dayedit_freq:'Frequência',
     dayedit_cat:'Categoria', dayedit_dow:'Dia da semana', dayedit_dom:'Dia do mês (1–31)',
@@ -2817,6 +2846,10 @@ const TRANSLATIONS = {
     pw_annual:'Annual', pw_annual_per:'/year',
     pw_annual_save:'Save 17% — like 2 months free',
     pw_badge:'Most popular', pw_btn:'Get started', pw_logout:'Log out',
+    pw_f1:'Expense tracking', pw_f2:'Financial goals', pw_f3:'AI assistant', pw_f4:'Reports', pw_f5:'No ads',
+    pw_mb1:'Full app access', pw_mb2:'AI assistant included', pw_mb3:'Cancel anytime',
+    pw_ab1:'Everything in monthly', pw_ab2:'2 months free', pw_ab3:'Priority support',
+    pw_guarantee:'🔒 Secure payment via Stripe · Cancel anytime',
     // Day edit modal
     dayedit_title:'Edit schedule', dayedit_save:'Save', dayedit_freq:'Frequency',
     dayedit_cat:'Category', dayedit_dow:'Day of week', dayedit_dom:'Day of month (1–31)',
@@ -3020,7 +3053,11 @@ function applyLang(){
   // Paywall
   const _pw={pwTitle:'pw_title',pwSub:'pw_sub',pwMonthLabel:'pw_monthly',pwMonthPer:'pw_monthly_per',
     pwAnnualLabel:'pw_annual',pwAnnualPer:'pw_annual_per',pwAnnualSave:'pw_annual_save',
-    pwBadge:'pw_badge',pwMonthBtn:'pw_btn',pwAnnualBtn:'pw_btn',pwLogoutBtn:'pw_logout'};
+    pwBadge:'pw_badge',pwMonthBtn:'pw_btn',pwAnnualBtn:'pw_btn',pwLogoutBtn:'pw_logout',
+    pwF1:'pw_f1',pwF2:'pw_f2',pwF3:'pw_f3',pwF4:'pw_f4',pwF5:'pw_f5',
+    pwMB1:'pw_mb1',pwMB2:'pw_mb2',pwMB3:'pw_mb3',
+    pwAB1:'pw_ab1',pwAB2:'pw_ab2',pwAB3:'pw_ab3',
+    pwGuarantee:'pw_guarantee'};
   Object.entries(_pw).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=t(key);});
 }
 function _qry(sel,attr,val){const el=document.querySelector(sel);if(el)el[attr]=val;}
