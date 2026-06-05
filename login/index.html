@@ -831,6 +831,11 @@ body.dark .confirm-delete{background:#dc2626}
 .hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
 .hd-see-all:hover{text-decoration:underline}
 
+/* ── COLOR PICKER + CONJUGE CARD ─────────────────────────────── */
+.color-picker-row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;justify-content:center}
+.profile-conjuge-card{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:0.5px solid rgba(255,255,255,0.07);cursor:pointer}
+.profile-conjuge-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
+
 /* ── PROFILE CARD (dashboard) ────────────────────────────────── */
 .profile-card{display:flex;align-items:center;gap:14px;background:var(--card);border:0.5px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 16px;margin-bottom:16px;cursor:pointer;transition:border-color .2s}
 .profile-card:hover{border-color:rgba(124,58,237,0.4)}
@@ -1840,6 +1845,8 @@ body.dark .theme-pill-dark{color:#fff}
       <div class="ob-slide-title" id="ob-s5-title">Seu Perfil</div>
       <div class="ob-slide-sub" id="ob-s5-sub">Vamos personalizar sua experiência</div>
       <div class="ob-avatar" id="obAvatar"><span id="obAvatarInitials">?</span></div>
+      <div class="ob-section-label" id="ob-s5-color-label">Cor do avatar</div>
+      <div class="color-picker-row" id="obColorPickerUser"></div>
       <div class="ob-section-label" id="ob-s5-name-label">Seu nome</div>
       <input class="ob-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()">
       <div class="ob-section-label" id="ob-s5-civil-label">Estado civil</div>
@@ -1859,6 +1866,8 @@ body.dark .theme-pill-dark{color:#fff}
           <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')">Masculino</button>
           <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')">Feminino</button>
         </div>
+        <div class="ob-section-label" id="ob-s5-color-conjuge-label" style="margin-top:.5rem">Cor do(a) parceiro(a)</div>
+        <div class="color-picker-row" id="obColorPickerConjuge"></div>
       </div>
       <div class="ob-section-label" id="ob-s5-obj-label">Objetivo financeiro</div>
       <div class="ob-obj-grid">
@@ -2536,6 +2545,8 @@ body.dark .theme-pill-dark{color:#fff}
     </div>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:1rem">
       <div class="ob-avatar" id="peAvatar"><span id="peAvatarInitials">?</span></div>
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;margin-top:.25rem;align-self:flex-start" id="peColor-label">Cor do avatar</div>
+      <div class="color-picker-row" id="peColorPickerUser" style="margin-bottom:.5rem"></div>
       <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peName-label">Seu nome</div>
       <input class="ob-input" id="peDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="peUpdateAvatar()" style="margin-bottom:.75rem">
       <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peCivil-label">Estado civil</div>
@@ -2555,6 +2566,8 @@ body.dark .theme-pill-dark{color:#fff}
           <button class="ob-civil-btn" id="peSexoConjuge_M" onclick="peSetSexo('conjuge','M')">Masculino</button>
           <button class="ob-civil-btn" id="peSexoConjuge_F" onclick="peSetSexo('conjuge','F')">Feminino</button>
         </div>
+        <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peColorConjuge-label">Cor do(a) parceiro(a)</div>
+        <div class="color-picker-row" id="peColorPickerConjuge" style="margin-bottom:.5rem"></div>
       </div>
       <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peObj-label">Objetivo financeiro</div>
       <div class="ob-obj-grid" style="margin-bottom:.75rem">
@@ -2569,6 +2582,41 @@ body.dark .theme-pill-dark{color:#fff}
         <input class="ob-input" id="peOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo" style="margin-bottom:.75rem">
       </div>
       <button class="debt-pay-confirm" onclick="saveProfileEdit()" id="peSaveBtn" style="width:100%">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONJUGE EDIT MODAL -->
+<div id="conjuEditModal" style="display:none;position:fixed;inset:0;z-index:1100;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);padding:1rem">
+  <div class="debt-pay-card" style="max-height:90vh;overflow-y:auto;width:100%;max-width:380px">
+    <div class="debt-pay-header">
+      <span class="debt-pay-title" id="cjTitle">Perfil do(a) cônjuge</span>
+      <button class="debt-pay-close" onclick="closeConjugeEditModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:1rem">
+      <div class="ob-avatar" id="cjAvatar"><span id="cjAvatarInitials">?</span></div>
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;margin-top:.25rem;align-self:flex-start" id="cjColor-label">Cor do avatar</div>
+      <div class="color-picker-row" id="cjColorPicker" style="margin-bottom:.5rem"></div>
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="cjName-label">Nome</div>
+      <input class="ob-input" id="editConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" oninput="cjUpdateAvatar()" style="margin-bottom:.75rem">
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="cjSexo-label">Sexo</div>
+      <div class="ob-civil-btns" style="margin-bottom:.75rem">
+        <button class="ob-civil-btn" id="cjSexo_M" onclick="conjuSetSexo('M')">Masculino</button>
+        <button class="ob-civil-btn" id="cjSexo_F" onclick="conjuSetSexo('F')">Feminino</button>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="cjObj-label">Objetivo financeiro</div>
+      <div class="ob-obj-grid" style="margin-bottom:.75rem">
+        <button class="ob-obj-btn" id="cjObj_dividas" onclick="conjuToggleObj('dividas')">Sair das dívidas</button>
+        <button class="ob-obj-btn" id="cjObj_reserva" onclick="conjuToggleObj('reserva')">Reserva de emergência</button>
+        <button class="ob-obj-btn" id="cjObj_imovel" onclick="conjuToggleObj('imovel')">Comprar imóvel</button>
+        <button class="ob-obj-btn" id="cjObj_viajar" onclick="conjuToggleObj('viajar')">Viajar</button>
+        <button class="ob-obj-btn" id="cjObj_investir" onclick="conjuToggleObj('investir')">Investir</button>
+        <button class="ob-obj-btn" id="cjObj_outro" onclick="conjuToggleObj('outro')">Outro</button>
+      </div>
+      <div id="cjOutroRow" style="display:none;width:100%">
+        <input class="ob-input" id="cjOutroTexto" type="text" maxlength="80" placeholder="Descreva o objetivo" style="margin-bottom:.75rem">
+      </div>
+      <button class="debt-pay-confirm" onclick="saveConjugeEdit()" id="cjSaveBtn" style="width:100%">Salvar</button>
     </div>
   </div>
 </div>
@@ -3494,7 +3542,7 @@ async function loadFromSupabase(){
       _supa.from('bills').select('*').eq('user_id',uid),
       _supa.from('metas').select('*').eq('user_id',uid),
       _supa.from('dividas').select('*').eq('user_id',uid),
-      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge').eq('user_id',uid).maybeSingle(),
+      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge').eq('user_id',uid).maybeSingle(),
     ]);
   } catch(e) {
     console.error('[load] network error:',e);
@@ -5015,6 +5063,7 @@ function initApp(){
   calYear=START.getFullYear();calMonth=START.getMonth();
   ovFrom=new Date(START);ovTo=new Date(END);
   buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
+  if(_user) setUserUI(_user);
   showTab('home');
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('home',true));
@@ -5031,7 +5080,9 @@ function initApp(){
 }
 
 function setUserUI(user){
-  document.getElementById('userEmail').textContent=user.email;
+  const p=window._profile||{};
+  const displayVal=p.display_name?_capitalize(p.display_name):user.email;
+  document.getElementById('userEmail').textContent=displayVal;
   const de=document.getElementById('drawerEmail');
   if(de) de.textContent=user.email;
   ['loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen']
@@ -5157,6 +5208,11 @@ function obGoSlide(n){
     const s=document.getElementById('ob-slide-'+i);
     if(s) s.classList.toggle('active',i===n);
   });
+  if(n===5){
+    buildColorPicker(window._obAvatarColor||'#7c3aed','obPickColor','obColorPickerUser');
+    const av=document.getElementById('obAvatar');
+    if(av) av.style.background=window._obAvatarColor||'#7c3aed';
+  }
 }
 
 function obApplyLang(){
@@ -5194,6 +5250,8 @@ function obApplyLang(){
   if(el('ob-s5-badge')) el('ob-s5-badge').textContent='Profile';
   if(el('ob-s5-title')) el('ob-s5-title').textContent='Your Profile';
   if(el('ob-s5-sub')) el('ob-s5-sub').textContent="Let's personalize your experience";
+  if(el('ob-s5-color-label')) el('ob-s5-color-label').textContent='Avatar color';
+  if(el('ob-s5-color-conjuge-label')) el('ob-s5-color-conjuge-label').textContent="Partner's color";
   if(el('ob-s5-name-label')) el('ob-s5-name-label').textContent='Your name';
   if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
   if(el('ob-s5-civil-label')) el('ob-s5-civil-label').textContent='Relationship status';
@@ -5242,10 +5300,13 @@ function buildHomeDashboard(){
 
   // A — Profile
   const rawName=p.display_name||_user?.user_metadata?.full_name||_user?.email?.split('@')[0]||'';
-  const name=esc(rawName);
+  const name=esc(_capitalize(rawName));
   const initials=rawName?rawName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const avatarColor=p.avatar_color||'#7c3aed';
   const estadoCivil=p.estado_civil||'';
   const conjuge=esc(p.conjuge_nome||'');
+  const conjInitials=p.conjuge_nome?p.conjuge_nome.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const conjColor=p.avatar_color_conjuge||'#2563eb';
   const objKeys=(p.objetivo||'').split(',').filter(Boolean);
   const _omap={dividas:{pt:'Sair das dívidas',en:'Pay off debt'},reserva:{pt:'Reserva de emergência',en:'Emergency fund'},imovel:{pt:'Comprar imóvel',en:'Buy property'},viajar:{pt:'Viajar',en:'Travel'},investir:{pt:'Investir',en:'Invest'},outro:{pt:esc(p.objetivo_outro||'Outro'),en:esc(p.objetivo_outro||'Other')}};
   const objBadges=objKeys.map(k=>_omap[k]?(isEN?_omap[k].en:_omap[k].pt):'').filter(Boolean);
@@ -5310,17 +5371,29 @@ function buildHomeDashboard(){
 
   const fd=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 
-  wrap.innerHTML=`
-<div class="hd-section" style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="showProfileEdit()">
-  <div class="profile-card-avatar">${initials}</div>
-  <div style="flex:1;min-width:0">
-    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px">${name||nameFallback}</div>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-      ${estadoL?`<span style="font-size:12px;color:#6b7280">${estadoL}</span>`:''}
-      ${objBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
+  const hdConjuge=estadoCivil==='casado'?`
+  <div class="profile-conjuge-card" onclick="event.stopPropagation();showConjugeEdit()">
+    <div class="profile-conjuge-avatar" style="background:${conjColor}">${conjInitials}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:14px;font-weight:700;color:var(--text)">${conjuge||'Cônjuge'}</div>
+      <div style="font-size:11px;color:#6b7280">${isEN?'Partner':'Parceiro(a)'}</div>
     </div>
-  </div>
-  <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+    <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+  </div>`:'';
+
+  wrap.innerHTML=`
+<div class="hd-section" style="cursor:pointer" onclick="showProfileEdit()">
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="profile-card-avatar" style="background:${avatarColor}">${initials}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px">${name||nameFallback}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        ${estadoL?`<span style="font-size:12px;color:#6b7280">${estadoL}</span>`:''}
+        ${objBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
+      </div>
+    </div>
+    <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+  </div>${hdConjuge}
 </div>
 <div class="hd-section">
   <div class="hd-section-title">${isEN?'Financial Health':'Saúde Financeira'}</div>
@@ -5337,7 +5410,7 @@ function buildHomeDashboard(){
   </div>
   <div class="hd-mini-card">
     <div class="hd-mini-label">${isEN?'Month Projection':'Projeção do Mês'}</div>
-    <div class="hd-mini-value" style="color:${projMargem>=0?'var(--green)':'var(--red)'}">${fmt(projMargem)}</div>
+    <div class="hd-mini-value" style="color:${projMargem>=0?'var(--green)':'var(--red)'}">${projMargem>0?'+':''}${fmt(projMargem)}</div>
   </div>
 </div>
 <div class="hd-section">
@@ -5423,6 +5496,38 @@ function _buildHdChart(labels,dataIn,dataOut){
   });
 }
 
+// ── COLOR PICKER HELPERS ─────────────────────────────────────
+const _COLORS=['#7c3aed','#2563eb','#059669','#d97706','#dc2626','#db2777','#0891b2','#65a30d'];
+function _capitalize(str){
+  if(!str) return '';
+  return str.replace(/\b\w/g,c=>c.toUpperCase());
+}
+function buildColorPicker(selectedColor,fnName,containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML=_COLORS.map(c=>`<div onclick="${fnName}('${c}')" style="width:24px;height:24px;border-radius:50%;background:${c};cursor:pointer;flex-shrink:0;border:2.5px solid ${c===selectedColor?'#fff':'transparent'};box-sizing:border-box;transition:border-color .15s"></div>`).join('');
+}
+function obPickColor(c){
+  window._obAvatarColor=c;
+  const av=document.getElementById('obAvatar');
+  if(av) av.style.background=c;
+  buildColorPicker(c,'obPickColor','obColorPickerUser');
+}
+function obPickColorConjuge(c){
+  window._obAvatarColorConjuge=c;
+  buildColorPicker(c,'obPickColorConjuge','obColorPickerConjuge');
+}
+function pePickColor(c){
+  window._peAvatarColor=c;
+  const av=document.getElementById('peAvatar');
+  if(av) av.style.background=c;
+  buildColorPicker(c,'pePickColor','peColorPickerUser');
+}
+function pePickColorConjuge(c){
+  window._peAvatarColorConjuge=c;
+  buildColorPicker(c,'pePickColorConjuge','peColorPickerConjuge');
+}
+
 // ── ONBOARDING PROFILE HELPERS ────────────────────────────────
 function obSetEstadoCivil(v){
   window._obEstadoCivil=v;
@@ -5431,6 +5536,7 @@ function obSetEstadoCivil(v){
   if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
   if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
   const r=document.getElementById('obConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
+  if(v==='casado') buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obPickColorConjuge','obColorPickerConjuge');
 }
 
 function obSetObjetivo(v){
@@ -5459,6 +5565,8 @@ function obUpdateAvatar(){
   const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
   const av=document.getElementById('obAvatarInitials');
   if(av) av.textContent=initials;
+  const avEl=document.getElementById('obAvatar');
+  if(avEl) avEl.style.background=window._obAvatarColor||'#7c3aed';
 }
 
 // ── PROFILE CARD (dashboard) ──────────────────────────────────
@@ -5467,10 +5575,13 @@ function buildProfileCard(){
   if(!wrap) return;
   const p=window._profile||{};
   const rawName=p.display_name||_user?.user_metadata?.full_name||_user?.email?.split('@')[0]||'';
-  const name=esc(rawName);
+  const name=esc(_capitalize(rawName));
   const initials=rawName?rawName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const avatarColor=p.avatar_color||'#7c3aed';
   const estadoCivil=p.estado_civil||'';
   const conjuge=esc(p.conjuge_nome||'');
+  const conjInitials=p.conjuge_nome?p.conjuge_nome.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const conjColor=p.avatar_color_conjuge||'#2563eb';
   const isEN=lang==='en';
   const objetivoMap={
     dividas:{pt:'Sair das dívidas',en:'Pay off debt'},
@@ -5482,28 +5593,33 @@ function buildProfileCard(){
   };
   const objKeys=(p.objetivo||'').split(',').filter(Boolean);
   const objBadges=objKeys.map(k=>objetivoMap[k]?(isEN?objetivoMap[k].en:objetivoMap[k].pt):'').filter(Boolean);
-  const sexoUser=p.sexo_user||'';
-  const sexoConjuge=p.sexo_conjuge||'';
-  const sexoUserLabel=sexoUser?(isEN?(sexoUser==='M'?'Male':'Female'):(sexoUser==='M'?'Masculino':'Feminino')):'';
-  const sexoConjugeLabel=sexoConjuge?(isEN?(sexoConjuge==='M'?'Male partner':'Female partner'):(sexoConjuge==='M'?'Parceiro M':'Parceira F')):'';
   let estadoLabel='';
   if(estadoCivil==='casado'){
-    estadoLabel=(isEN?'Married / Partner':'Casado(a) / Parceiro(a)')+(conjuge?' · '+conjuge:'')+(sexoUserLabel?' · '+sexoUserLabel:'')+(sexoConjugeLabel?' · '+sexoConjugeLabel:'');
+    estadoLabel=isEN?'Married / Partner':'Casado(a) / Parceiro(a)';
   } else if(estadoCivil==='solteiro'){
     estadoLabel=isEN?'Single':'Solteiro(a)';
   }
   const nameFallback=isEN?'Add your name':'Adicione seu nome';
+  const conjugeCard=estadoCivil==='casado'?`
+    <div class="profile-conjuge-card" onclick="event.stopPropagation();showConjugeEdit()">
+      <div class="profile-conjuge-avatar" style="background:${conjColor}">${conjInitials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;color:var(--text)">${conjuge||'Cônjuge'}</div>
+        <div style="font-size:11px;color:#6b7280">${isEN?'Partner':'Parceiro(a)'}</div>
+      </div>
+      <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+    </div>`:'';
   wrap.innerHTML=`<div class="profile-card" onclick="showProfileEdit()">
-    <div class="profile-card-avatar">${initials}</div>
+    <div class="profile-card-avatar" style="background:${avatarColor}">${initials}</div>
     <div class="profile-card-info">
       <div class="profile-card-name">${name||nameFallback}</div>
       <div class="profile-card-meta">
-        ${estadoLabel?`<span>${esc(estadoLabel)}</span>`:''}
+        ${estadoLabel?`<span>${estadoLabel}</span>`:''}
         ${objBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
       </div>
     </div>
     <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-  </div>`;
+  </div>${conjugeCard}`;
 }
 
 // ── PROFILE EDIT MODAL ────────────────────────────────────────
@@ -5520,6 +5636,8 @@ function showProfileEdit(){
   if(nameEl) nameEl.value=p.display_name||'';
   _peEstadoCivil=p.estado_civil||'solteiro';
   _peObjetivos=(p.objetivo||'').split(',').filter(Boolean);
+  window._peAvatarColor=p.avatar_color||'#7c3aed';
+  window._peAvatarColorConjuge=p.avatar_color_conjuge||'#2563eb';
   // populate modal labels if EN
   if(isEN){
     const pt=document.getElementById('peTitle');if(pt)pt.textContent='Edit profile';
@@ -5536,6 +5654,8 @@ function showProfileEdit(){
     Object.entries(objBtns).forEach(([k,v])=>{const b=document.getElementById('peObj_'+k);if(b)b.textContent=v;});
     const suu=document.getElementById('peSexoUser-label');if(suu)suu.textContent='Your gender';
     const scu=document.getElementById('peSexoConjuge-label');if(scu)scu.textContent="Partner's gender";
+    const pcl=document.getElementById('peColor-label');if(pcl)pcl.textContent='Avatar color';
+    const pccl=document.getElementById('peColorConjuge-label');if(pccl)pccl.textContent="Partner's color";
     ['peSexoUser_M','peSexoConjuge_M'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Male';});
     ['peSexoUser_F','peSexoConjuge_F'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Female';});
   }
@@ -5551,6 +5671,7 @@ function showProfileEdit(){
   const otEl=document.getElementById('peOutroTexto');
   if(otEl) otEl.value=p.objetivo_outro||'';
   peUpdateAvatar();
+  buildColorPicker(window._peAvatarColor||'#7c3aed','pePickColor','peColorPickerUser');
   modal.style.display='flex';
 }
 
@@ -5564,6 +5685,8 @@ function peUpdateAvatar(){
   const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
   const av=document.getElementById('peAvatarInitials');
   if(av) av.textContent=initials;
+  const avEl=document.getElementById('peAvatar');
+  if(avEl) avEl.style.background=window._peAvatarColor||'#7c3aed';
 }
 
 function peSetCivil(v){
@@ -5573,6 +5696,7 @@ function peSetCivil(v){
   if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
   if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
   const r=document.getElementById('peConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
+  if(v==='casado') buildColorPicker(window._peAvatarColorConjuge||'#2563eb','pePickColorConjuge','peColorPickerConjuge');
 }
 
 function _peToggleObjBtn(k,forceOn){
@@ -5611,7 +5735,9 @@ async function saveProfileEdit(){
     objetivo:objetivo||null,
     objetivo_outro:_peObjetivos.includes('outro')?objetivoOutro:null,
     sexo_user:window._peSexo_user||null,
-    sexo_conjuge:estadoCivil==='casado'?(window._peSexo_conjuge||null):null
+    sexo_conjuge:estadoCivil==='casado'?(window._peSexo_conjuge||null):null,
+    avatar_color:window._peAvatarColor||null,
+    avatar_color_conjuge:estadoCivil==='casado'?(window._peAvatarColorConjuge||null):null
   };
   const btn=document.getElementById('peSaveBtn');
   if(btn){btn.disabled=true;btn.textContent='...';}
@@ -5621,7 +5747,101 @@ async function saveProfileEdit(){
   window._profile=Object.assign(window._profile||{},profileData);
   closeProfileEditModal();
   rebuild();
+  if(_user) setUserUI(_user);
   _showToast(lang==='en'?'Profile saved!':'Perfil salvo!','#10b981');
+}
+
+// ── CONJUGE EDIT MODAL ───────────────────────────────────────
+let _editObjetivosConjuge=[];
+let _editConjugeSexo=null;
+let _cjAvatarColor='#2563eb';
+
+function cjUpdateAvatar(){
+  const name=(document.getElementById('editConjugeNome')||{value:''}).value.trim();
+  const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const av=document.getElementById('cjAvatarInitials');
+  if(av) av.textContent=initials;
+  const avEl=document.getElementById('cjAvatar');
+  if(avEl) avEl.style.background=_cjAvatarColor;
+}
+function cjPickColor(c){
+  _cjAvatarColor=c;
+  const avEl=document.getElementById('cjAvatar');
+  if(avEl) avEl.style.background=c;
+  buildColorPicker(c,'cjPickColor','cjColorPicker');
+}
+function conjuSetSexo(v){
+  _editConjugeSexo=v;
+  ['M','F'].forEach(s=>{
+    const b=document.getElementById('cjSexo_'+s);
+    if(b){b.style.background=v===s?'#7c3aed':'transparent';b.style.color=v===s?'#fff':'#9ca3af';b.style.borderColor=v===s?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',v===s);}
+  });
+}
+function conjuToggleObj(k){
+  const idx=_editObjetivosConjuge.indexOf(k);
+  if(idx>=0) _editObjetivosConjuge.splice(idx,1); else _editObjetivosConjuge.push(k);
+  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(key=>{
+    const on=_editObjetivosConjuge.includes(key);
+    const b=document.getElementById('cjObj_'+key);
+    if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
+  });
+  const r=document.getElementById('cjOutroRow');if(r)r.style.display=_editObjetivosConjuge.includes('outro')?'block':'none';
+}
+function showConjugeEdit(){
+  const p=window._profile||{};
+  const isEN=lang==='en';
+  const modal=document.getElementById('conjuEditModal');
+  if(!modal) return;
+  _cjAvatarColor=p.avatar_color_conjuge||'#2563eb';
+  _editConjugeSexo=p.sexo_conjuge||null;
+  _editObjetivosConjuge=(p.objetivo_conjuge||'').split(',').filter(Boolean);
+  const nameEl=document.getElementById('editConjugeNome');
+  if(nameEl) nameEl.value=p.conjuge_nome||'';
+  if(isEN){
+    const t=document.getElementById('cjTitle');if(t)t.textContent="Partner's profile";
+    const cn=document.getElementById('cjName-label');if(cn)cn.textContent='Name';
+    const cs=document.getElementById('cjSexo-label');if(cs)cs.textContent='Gender';
+    const co=document.getElementById('cjObj-label');if(co)co.textContent='Financial goal';
+    const cc=document.getElementById('cjColor-label');if(cc)cc.textContent='Avatar color';
+    if(nameEl) nameEl.placeholder='Partner name';
+    const ot=document.getElementById('cjOutroTexto');if(ot)ot.placeholder='Describe goal';
+    const sv=document.getElementById('cjSaveBtn');if(sv)sv.textContent='Save';
+    ['cjSexo_M'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Male';});
+    ['cjSexo_F'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Female';});
+    const objBtns={dividas:'Pay off debt',reserva:'Emergency fund',imovel:'Buy property',viajar:'Travel',investir:'Invest',outro:'Other'};
+    Object.entries(objBtns).forEach(([k,v])=>{const b=document.getElementById('cjObj_'+k);if(b)b.textContent=v;});
+  }
+  if(_editConjugeSexo) conjuSetSexo(_editConjugeSexo);
+  _editObjetivosConjuge.forEach(k=>conjuToggleObj(k));
+  const r=document.getElementById('cjOutroRow');if(r)r.style.display=_editObjetivosConjuge.includes('outro')?'block':'none';
+  const otEl=document.getElementById('cjOutroTexto');if(otEl) otEl.value=p.objetivo_conjuge_outro||'';
+  cjUpdateAvatar();
+  buildColorPicker(_cjAvatarColor,'cjPickColor','cjColorPicker');
+  modal.style.display='flex';
+}
+function closeConjugeEditModal(){
+  const modal=document.getElementById('conjuEditModal');
+  if(modal) modal.style.display='none';
+}
+async function saveConjugeEdit(){
+  if(!_user) return;
+  const conjugeNome=(document.getElementById('editConjugeNome')||{value:''}).value.trim();
+  const objetivoOutro=(document.getElementById('cjOutroTexto')||{value:''}).value.trim();
+  const profileData={
+    conjuge_nome:conjugeNome||null,
+    sexo_conjuge:_editConjugeSexo||null,
+    objetivo_conjuge:_editObjetivosConjuge.join(',')||null,
+    avatar_color_conjuge:_cjAvatarColor||null
+  };
+  const btn=document.getElementById('cjSaveBtn');
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  const{error}=await _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
+  if(btn){btn.disabled=false;btn.textContent=lang==='en'?'Save':'Salvar';}
+  if(error){_showToast('Erro ao salvar');return;}
+  window._profile=Object.assign(window._profile||{},profileData);
+  closeConjugeEditModal();
+  rebuild();
+  _showToast(lang==='en'?'Partner saved!':'Cônjuge salvo!','#10b981');
 }
 
 function _dateToStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -5682,7 +5902,9 @@ function obFinish(){
       objetivo:objetivos||null,
       objetivo_outro:(window._obObjetivos||[]).includes('outro')?objetivoOutro:null,
       sexo_user:window._obSexo_user||null,
-      sexo_conjuge:estadoCivil==='casado'?(window._obSexo_conjuge||null):null
+      sexo_conjuge:estadoCivil==='casado'?(window._obSexo_conjuge||null):null,
+      avatar_color:window._obAvatarColor||null,
+      avatar_color_conjuge:estadoCivil==='casado'?(window._obAvatarColorConjuge||null):null
     };
     _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
     window._profile=Object.assign(window._profile||{},profileData);
