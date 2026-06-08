@@ -321,6 +321,12 @@ body.dark .gs-done{color:#a78bfa;border-color:rgba(167,139,250,.3)}
   transition:left .35s cubic-bezier(.4,0,.2,1),top .35s cubic-bezier(.4,0,.2,1),bottom .35s cubic-bezier(.4,0,.2,1),background .25s;
 }
 @media(min-width:641px){#tourTooltip{width:380px}}
+@media(max-width:640px){
+  #tourTooltip{max-width:calc(100vw - 32px)!important;left:16px!important;width:calc(100vw - 32px)!important}
+  #tourDesc{font-size:13px!important}
+  #tourTitle{font-size:14px!important}
+  .tour-next-btn,.tour-skip-btn{min-height:44px;font-size:14px;padding:8px 16px}
+}
 #tourTooltip.tour-ai{background:linear-gradient(135deg,#3b1a6e 0%,#5b21b6 52%,#1d4ed8 100%);border-color:rgba(167,139,250,0.45)}
 #tourTooltip.tour-ai #tourTitle{color:#fff}
 #tourTooltip.tour-ai #tourDesc{color:rgba(255,255,255,0.78)}
@@ -860,6 +866,29 @@ body.dark .confirm-delete{background:#dc2626}
 .ob-input{width:100%;max-width:320px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:10px 14px;font-size:14px;color:#f9fafb;outline:none;box-sizing:border-box;margin-bottom:.75rem}
 .ob-input::placeholder{color:#6b7280}
 .ob-input:focus{border-color:#7c3aed}
+/* Fix: texto visível em todos os modais e onboarding */
+#profileEditModal input,#conjuEditModal input,#profileEditModal textarea,#conjuEditModal textarea{color:var(--text)!important;-webkit-text-fill-color:var(--text)!important;opacity:1!important}
+#onboardingScreen input{color:#f9fafb!important;-webkit-text-fill-color:#f9fafb!important;opacity:1!important}
+/* Onboarding slide 5 redesign */
+.ob-profile-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:20px}
+.ob-civil-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.ob-civil-card{border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;background:transparent}
+.ob-civil-card.active{border-color:#7c3aed;background:rgba(124,58,237,0.12)}
+.ob-civil-card-icon{font-size:24px;margin-bottom:6px}
+.ob-civil-card-title{font-size:14px;font-weight:700;color:var(--text)}
+.ob-civil-card-sub{font-size:11px;color:#6b7280;margin-top:2px}
+.ob-conjuge-section{overflow:hidden;max-height:0;transition:max-height .4s ease;border-top:0.5px solid rgba(255,255,255,0.07);margin-top:12px;padding-top:0;width:100%;max-width:320px}
+.ob-conjuge-section.open{max-height:620px;padding-top:14px}
+.ob-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.ob-goal-card{border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;background:transparent}
+.ob-goal-card.active{border-color:#7c3aed;background:rgba(124,58,237,0.12)}
+.ob-goal-card svg{margin-bottom:4px;color:#9ca3af;display:block;margin-left:auto;margin-right:auto}
+.ob-goal-card.active svg{color:#a78bfa}
+.ob-goal-card-label{font-size:11px;font-weight:600;color:#9ca3af}
+.ob-goal-card.active .ob-goal-card-label{color:#fff}
+.ob-sex-row{display:flex;gap:8px;align-items:center;margin:8px 0;width:100%;max-width:320px}
+.ob-sex-label{font-size:11px;color:#6b7280;min-width:72px;text-align:left}
+#ob-slide-5{overflow-y:auto;justify-content:flex-start;padding-bottom:2rem}
 .ob-section-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;align-self:flex-start;max-width:320px}
 
 /* ── PROFILE EDIT MODAL ──────────────────────────────────────── */
@@ -1842,63 +1871,123 @@ body.dark .theme-pill-dark{color:#fff}
       </div>
     </div>
 
-    <!-- Slide 5: Perfil -->
+    <!-- Slide 5: Perfil (redesign) -->
     <div class="ob-slide" id="ob-slide-5">
       <div class="ob-badge" id="ob-s5-badge">Perfil</div>
       <div class="ob-slide-title" id="ob-s5-title">Seu Perfil</div>
-      <div class="ob-slide-sub" id="ob-s5-sub">Vamos personalizar sua experiência</div>
-      <div class="ob-avatar" id="obAvatar"><span id="obAvatarInitials">?</span></div>
-      <div class="ob-section-label" id="ob-s5-color-label">Cor do avatar</div>
-      <div class="color-picker-row" id="obColorPickerUser"></div>
-      <div class="ob-section-label" id="ob-s5-name-label">Seu nome</div>
-      <input class="ob-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()">
-      <div class="ob-section-label" id="ob-s5-civil-label">Estado civil</div>
-      <div class="ob-civil-btns">
-        <button class="ob-civil-btn" id="obSolteiro" onclick="obSetEstadoCivil('solteiro')">Solteiro(a)</button>
-        <button class="ob-civil-btn" id="obCasado" onclick="obSetEstadoCivil('casado')">Casado(a) / Parceiro(a)</button>
+
+      <!-- Avatar + cor + nome -->
+      <div class="ob-profile-avatar-wrap">
+        <div class="ob-avatar" id="obAvatar" style="width:80px;height:80px;font-size:30px;margin-bottom:0"><span id="obAvatarInitials">?</span></div>
+        <div class="color-picker-row" id="obColorPickerUser"></div>
       </div>
-      <div id="obConjugeRow" style="display:none;width:100%;max-width:320px;flex-direction:column;align-items:center">
-        <div class="ob-section-label" id="ob-s5-sexo-user-label" style="margin-top:.5rem">Seu sexo</div>
-        <div class="ob-civil-btns">
-          <button class="ob-civil-btn" id="obSexoUser_M" onclick="obSetSexo('user','M')">Masculino</button>
-          <button class="ob-civil-btn" id="obSexoUser_F" onclick="obSetSexo('user','F')">Feminino</button>
+      <input class="ob-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()" style="text-align:center;font-size:16px;font-weight:500;margin-bottom:16px">
+
+      <!-- Divider -->
+      <div style="height:0.5px;background:rgba(255,255,255,0.07);width:100%;max-width:320px;margin-bottom:8px"></div>
+
+      <!-- Estado civil — cards visuais -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;width:100%;max-width:320px;margin-bottom:2px" id="ob-s5-civil-label">Estado civil</div>
+      <div class="ob-civil-cards" style="width:100%;max-width:320px">
+        <div class="ob-civil-card active" id="obCivilCardSolteiro" onclick="obSetEstadoCivil('solteiro')">
+          <div class="ob-civil-card-icon">👤</div>
+          <div class="ob-civil-card-title" id="obCivilTitleSolteiro">Solteiro(a)</div>
+          <div class="ob-civil-card-sub" id="obCivilSubSolteiro">Apenas eu</div>
         </div>
-        <div style="height:1px;background:rgba(255,255,255,0.07);width:100%;margin:14px 0 10px"></div>
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;text-align:center" id="ob-s5-conjuge-title">Perfil do(a) Parceiro(a)</div>
-        <div class="ob-avatar" id="obConjugeAvatar" style="width:56px;height:56px;font-size:20px;margin-bottom:6px"><span id="obConjugeAvatarInitials">?</span></div>
-        <div class="ob-section-label" id="ob-s5-color-conjuge-label" style="margin-top:.25rem">Cor do(a) parceiro(a)</div>
-        <div class="color-picker-row" id="obColorPickerConjuge" style="margin-bottom:.5rem"></div>
-        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" oninput="obConjugeUpdateAvatar()" style="margin-top:.25rem">
-        <div class="ob-section-label" id="ob-s5-sexo-conjuge-label" style="margin-top:.5rem">Sexo do(a) parceiro(a)</div>
-        <div class="ob-civil-btns">
-          <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')">Masculino</button>
-          <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')">Feminino</button>
+        <div class="ob-civil-card" id="obCivilCardCasado" onclick="obSetEstadoCivil('casado')">
+          <div class="ob-civil-card-icon">👥</div>
+          <div class="ob-civil-card-title" id="obCivilTitleCasado">Casado(a)/Parceiro(a)</div>
+          <div class="ob-civil-card-sub" id="obCivilSubCasado">Somos dois</div>
         </div>
-        <div class="ob-section-label" id="ob-s5-obj-conjuge-label" style="margin-top:.5rem">Objetivo financeiro</div>
-        <div class="ob-obj-grid">
-          <button class="ob-obj-btn" id="obConjObj_dividas" onclick="obConjSetObjetivo('dividas')">Sair das dívidas</button>
-          <button class="ob-obj-btn" id="obConjObj_reserva" onclick="obConjSetObjetivo('reserva')">Reserva de emergência</button>
-          <button class="ob-obj-btn" id="obConjObj_imovel" onclick="obConjSetObjetivo('imovel')">Comprar imóvel</button>
-          <button class="ob-obj-btn" id="obConjObj_viajar" onclick="obConjSetObjetivo('viajar')">Viajar</button>
-          <button class="ob-obj-btn" id="obConjObj_investir" onclick="obConjSetObjetivo('investir')">Investir</button>
-          <button class="ob-obj-btn" id="obConjObj_outro" onclick="obConjSetObjetivo('outro')">Outro</button>
+      </div>
+
+      <!-- Sexo do usuário -->
+      <div class="ob-sex-row">
+        <span class="ob-sex-label" id="ob-s5-sexo-user-label">Seu sexo</span>
+        <button class="ob-civil-btn" id="obSexoUser_M" onclick="obSetSexo('user','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
+        <button class="ob-civil-btn" id="obSexoUser_F" onclick="obSetSexo('user','F')" style="flex:1;padding:7px 0;font-size:12px">Feminino</button>
+      </div>
+
+      <!-- Seção parceiro — expansão suave -->
+      <div class="ob-conjuge-section" id="obConjugeSection">
+        <div style="font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:12px;text-align:center" id="ob-s5-conjuge-title">Sobre seu(sua) parceiro(a):</div>
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="ob-avatar" id="obConjugeAvatar" style="width:56px;height:56px;font-size:20px;margin-bottom:6px"><span id="obConjugeAvatarInitials">?</span></div>
+          <div class="color-picker-row" id="obColorPickerConjuge" style="margin-bottom:8px"></div>
+          <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" oninput="obConjugeUpdateAvatar()" style="text-align:center;margin-bottom:6px">
+          <div class="ob-sex-row" style="max-width:none">
+            <span class="ob-sex-label" id="ob-s5-sexo-conjuge-label">Parceiro(a)</span>
+            <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
+            <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')" style="flex:1;padding:7px 0;font-size:12px">Feminino</button>
+          </div>
         </div>
-        <div id="obConjOutroRow" style="display:none;width:100%;max-width:320px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin:12px 0 4px" id="ob-s5-obj-conjuge-label">Objetivo do(a) parceiro(a)</div>
+        <div class="ob-goal-grid">
+          <div class="ob-goal-card" id="obConjObj_dividas" onclick="obConjSetObjetivo('dividas')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <div class="ob-goal-card-label" id="obConjObjLabel_dividas">Sair das dívidas</div>
+          </div>
+          <div class="ob-goal-card" id="obConjObj_reserva" onclick="obConjSetObjetivo('reserva')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div class="ob-goal-card-label" id="obConjObjLabel_reserva">Reserva</div>
+          </div>
+          <div class="ob-goal-card" id="obConjObj_imovel" onclick="obConjSetObjetivo('imovel')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <div class="ob-goal-card-label" id="obConjObjLabel_imovel">Imóvel</div>
+          </div>
+          <div class="ob-goal-card" id="obConjObj_viajar" onclick="obConjSetObjetivo('viajar')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 21 4s-2 0-3.5 1.5L14 9 5.8 6.2c-.5-.2-1 .1-1.2.5l-.5 1c-.2.5 0 1.1.5 1.3L11 11l-2 3H7l-1 1 3 2 2 3 1-1v-2l3-2 3.5 5.5c.3.5.9.6 1.3.3l1-.5c.5-.1.7-.7.5-1.1z"/></svg>
+            <div class="ob-goal-card-label" id="obConjObjLabel_viajar">Viajar</div>
+          </div>
+          <div class="ob-goal-card" id="obConjObj_investir" onclick="obConjSetObjetivo('investir')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <div class="ob-goal-card-label" id="obConjObjLabel_investir">Investir</div>
+          </div>
+          <div class="ob-goal-card" id="obConjObj_outro" onclick="obConjSetObjetivo('outro')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"/></svg>
+            <div class="ob-goal-card-label" id="obConjObjLabel_outro">Outro</div>
+          </div>
+        </div>
+        <div id="obConjOutroRow" style="display:none;width:100%;margin-top:8px">
           <input class="ob-input" id="obConjOutroTexto" type="text" maxlength="80" placeholder="Descreva o objetivo">
         </div>
       </div>
-      <div class="ob-section-label" id="ob-s5-obj-label">Objetivo financeiro</div>
-      <div class="ob-obj-grid">
-        <button class="ob-obj-btn" id="obObj_dividas" onclick="obSetObjetivo('dividas')">Sair das dívidas</button>
-        <button class="ob-obj-btn" id="obObj_reserva" onclick="obSetObjetivo('reserva')">Reserva de emergência</button>
-        <button class="ob-obj-btn" id="obObj_imovel" onclick="obSetObjetivo('imovel')">Comprar imóvel</button>
-        <button class="ob-obj-btn" id="obObj_viajar" onclick="obSetObjetivo('viajar')">Viajar</button>
-        <button class="ob-obj-btn" id="obObj_investir" onclick="obSetObjetivo('investir')">Investir</button>
-        <button class="ob-obj-btn" id="obObj_outro" onclick="obSetObjetivo('outro')">Outro</button>
+
+      <!-- Divider -->
+      <div style="height:0.5px;background:rgba(255,255,255,0.07);width:100%;max-width:320px;margin:16px 0 8px"></div>
+
+      <!-- Objetivos do usuário -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;width:100%;max-width:320px;margin-bottom:4px" id="ob-s5-obj-label">Qual seu principal objetivo?</div>
+      <div class="ob-goal-grid" style="width:100%;max-width:320px">
+        <div class="ob-goal-card" id="obObj_dividas" onclick="obSetObjetivo('dividas')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <div class="ob-goal-card-label" id="obObjLabel_dividas">Sair das dívidas</div>
+        </div>
+        <div class="ob-goal-card" id="obObj_reserva" onclick="obSetObjetivo('reserva')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <div class="ob-goal-card-label" id="obObjLabel_reserva">Reserva</div>
+        </div>
+        <div class="ob-goal-card" id="obObj_imovel" onclick="obSetObjetivo('imovel')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <div class="ob-goal-card-label" id="obObjLabel_imovel">Imóvel</div>
+        </div>
+        <div class="ob-goal-card" id="obObj_viajar" onclick="obSetObjetivo('viajar')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 21 4s-2 0-3.5 1.5L14 9 5.8 6.2c-.5-.2-1 .1-1.2.5l-.5 1c-.2.5 0 1.1.5 1.3L11 11l-2 3H7l-1 1 3 2 2 3 1-1v-2l3-2 3.5 5.5c.3.5.9.6 1.3.3l1-.5c.5-.1.7-.7.5-1.1z"/></svg>
+          <div class="ob-goal-card-label" id="obObjLabel_viajar">Viajar</div>
+        </div>
+        <div class="ob-goal-card" id="obObj_investir" onclick="obSetObjetivo('investir')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          <div class="ob-goal-card-label" id="obObjLabel_investir">Investir</div>
+        </div>
+        <div class="ob-goal-card" id="obObj_outro" onclick="obSetObjetivo('outro')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"/></svg>
+          <div class="ob-goal-card-label" id="obObjLabel_outro">Outro</div>
+        </div>
       </div>
-      <div id="obOutroRow" style="display:none;width:100%;max-width:320px">
+      <div id="obOutroRow" style="display:none;width:100%;max-width:320px;margin-top:8px">
         <input class="ob-input" id="obOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo">
       </div>
+
       <div class="ob-nav">
         <button class="ob-nav-btn" onclick="obGoSlide(4)" id="ob-s5-back">← Voltar</button>
         <button class="ob-nav-btn primary" onclick="obGoSlide(6)" id="ob-s5-next">Próximo →</button>
@@ -2506,6 +2595,52 @@ body.dark .theme-pill-dark{color:#fff}
   </div>
 </div>
 
+<!-- META EDIT MODAL -->
+<div id="metaEditModal" style="display:none">
+  <div class="day-edit-overlay" onclick="closeMetaEditModal()"></div>
+  <div class="day-edit-sheet">
+    <div class="day-edit-header">
+      <span class="day-edit-title" id="metaEditTitle">Editar meta</span>
+      <button class="day-edit-close" onclick="closeMetaEditModal()">✕</button>
+    </div>
+    <div class="day-edit-body">
+      <div style="margin-bottom:12px"><label id="mel-name-label">Nome</label><input id="mel-name" type="text" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="mel-val-label">Valor ($)</label><input id="mel-val" type="number" inputmode="decimal" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="mel-date-label">Data alvo</label><input id="mel-date" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="mel-desc-label">Descrição</label><input id="mel-desc" type="text" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div id="metaEditOwnerSel"></div>
+    </div>
+    <button id="metaEditSaveBtn" class="day-edit-save" onclick="saveMetaEdit()">Salvar</button>
+  </div>
+</div>
+
+<!-- DIVIDA EDIT MODAL -->
+<div id="dividaEditModal" style="display:none">
+  <div class="day-edit-overlay" onclick="closeDividaEditModal()"></div>
+  <div class="day-edit-sheet">
+    <div class="day-edit-header">
+      <span class="day-edit-title" id="dividaEditTitle">Editar dívida</span>
+      <button class="day-edit-close" onclick="closeDividaEditModal()">✕</button>
+    </div>
+    <div class="day-edit-body">
+      <div style="margin-bottom:12px"><label id="del-name-label">Nome</label><input id="del-name" type="text" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="del-remaining-label">Saldo devedor ($)</label><input id="del-remaining" type="number" inputmode="decimal" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="del-juros-label">Juros mensais (%)</label><input id="del-juros" type="number" step="0.1" inputmode="decimal" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="del-min-label">Pagamento mínimo ($)</label><input id="del-min" type="number" inputmode="decimal" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div style="margin-bottom:12px"><label id="del-freq-label">Frequência</label>
+        <select id="del-freq" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none">
+          <option value="monthly" id="del-freq-monthly">Mensal</option>
+          <option value="biweekly" id="del-freq-biweekly">Quinzenal</option>
+          <option value="weekly" id="del-freq-weekly">Semanal</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px"><label id="del-date-label">Data alvo (opcional)</label><input id="del-date" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box"></div>
+      <div id="dividaEditOwnerSel"></div>
+    </div>
+    <button id="dividaEditSaveBtn" class="day-edit-save" onclick="saveDividaEdit()">Salvar</button>
+  </div>
+</div>
+
 <!-- PAYWALL SCREEN -->
 <div id="paywallScreen" style="display:none">
   <div style="position:absolute;top:16px;right:16px;display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:2px;z-index:10">
@@ -2838,6 +2973,8 @@ const TRANSLATIONS = {
     tour_7_title:'Calendário', tour_7_body:'Veja todos os seus compromissos financeiros no calendário.',
     tour_8_title:'Semana', tour_8_body:'Acompanhe seus gastos e recebimentos semana a semana.',
     tour_9_title:'Relatório', tour_9_body:'Veja gráficos e análises mensais das suas finanças.',
+    tour_profile_title:'Seu perfil', tour_profile_body:'Seu perfil está aqui no dashboard. Clique para editar nome, cor, objetivos e informações do seu parceiro(a) se for casado(a).',
+    tour_owner_title:'Atribuir a quem?', tour_owner_body:'Ao adicionar rendas ou despesas, você pode atribuir cada item a um perfil — seu ou do(a) seu(sua) parceiro(a). Assim você vê claramente quem ganha e quem gasta o quê.',
     tour_10_title:'PIN de segurança', tour_10_body:'Proteja o app com um PIN de 4 dígitos. Acesse pelo menu lateral.',
     tour_11_title:'Assistente IA ✨',
     tour_11_body:'Fale uma despesa, envie foto de boleto ou planilha — a IA cria tudo automaticamente.',
@@ -2882,6 +3019,11 @@ const TRANSLATIONS = {
     dayedit_title:'Editar agenda', dayedit_save:'Confirmar', dayedit_freq:'Frequência',
     dayedit_cat:'Categoria', dayedit_dow:'Dia da semana', dayedit_dom:'Dia do mês (1–31)',
     dayedit_pay1:'1º pagamento', dayedit_pay2:'2º pagamento', dayedit_date:'Data',
+    // Meta edit modal
+    metaedit_title:'Editar meta', metaedit_save:'Salvar', metaedit_btn:'Editar',
+    // Divida edit modal
+    dividaedit_title:'Editar dívida', dividaedit_save:'Salvar', dividaedit_btn:'Editar',
+    dividaedit_remaining_label:'Saldo devedor ($)',
     // Notif banner
     notif_banner_title:(n)=>`Contas nos próximos 7 dias (${n})`,
     notif_banner_total:'Total da semana:', notif_banner_today:'hoje',
@@ -3050,6 +3192,8 @@ const TRANSLATIONS = {
     tour_7_title:'Calendar', tour_7_body:'See all your financial commitments in the calendar.',
     tour_8_title:'Week', tour_8_body:'Track your income and expenses week by week.',
     tour_9_title:'Report', tour_9_body:'View monthly charts and analysis of your finances.',
+    tour_profile_title:'Your profile', tour_profile_body:'Your profile is here on the dashboard. Click to edit name, color, goals and partner info if married.',
+    tour_owner_title:'Assign to who?', tour_owner_body:"When adding income or expenses, you can assign each item to a profile — yours or your partner's. This way you can clearly see who earns and spends what.",
     tour_10_title:'Security PIN', tour_10_body:'Protect the app with a 4-digit PIN. Access it via the side menu.',
     tour_11_title:'AI Assistant ✨',
     tour_11_body:'Say an expense, upload a receipt photo, or paste a spreadsheet — AI creates everything automatically.',
@@ -3094,6 +3238,11 @@ const TRANSLATIONS = {
     dayedit_title:'Edit schedule', dayedit_save:'Save', dayedit_freq:'Frequency',
     dayedit_cat:'Category', dayedit_dow:'Day of week', dayedit_dom:'Day of month (1–31)',
     dayedit_pay1:'1st payment', dayedit_pay2:'2nd payment', dayedit_date:'Date',
+    // Meta edit modal
+    metaedit_title:'Edit goal', metaedit_save:'Save', metaedit_btn:'Edit',
+    // Divida edit modal
+    dividaedit_title:'Edit debt', dividaedit_save:'Save', dividaedit_btn:'Edit',
+    dividaedit_remaining_label:'Remaining balance ($)',
     // Notif banner
     notif_banner_title:(n)=>`Bills in the next 7 days (${n})`,
     notif_banner_total:'Week total:', notif_banner_today:'today',
@@ -3578,28 +3727,29 @@ async function loadFromSupabase(){
   }
   rendas = (r.data||[]).map(x=>({
     id:x.id, name:x.name, val:x.val, type:x.type,
-    dow:x.dow, day:x.day, day2:x.day2??null, month:x.month, year:x.year, locked:x.locked
+    dow:x.dow, day:x.day, day2:x.day2??null, month:x.month, year:x.year, locked:x.locked,
+    owner:x.owner||null
   }));
   bills = (b.data||[]).map(x=>({
     id:x.id, name:x.name, val:x.val, type:x.type,
     day:x.day, month:x.month, year:x.year, cat:x.cat,
     note:x.note, locked:x.locked,
     metaId:x.meta_id, metaEnd:x.meta_end?new Date(x.meta_end):null,
-    pagamentos:x.pagamentos||[]
+    pagamentos:x.pagamentos||[], owner:x.owner||null
   }));
   metas = (m.data||[]).map(x=>({
     id:x.id, name:x.name, val:x.val,
     day:x.day, month:x.month, year:x.year,
     desc:x.descricao, done:x.done, billId:x.bill_id,
     needPerWeek:x.need_per_week, weeksLeft:x.weeks_left,
-    checkins:x.checkins||[]
+    checkins:x.checkins||[], owner:x.owner||null
   }));
   dividas = (dv.data||[]).map(x=>({
     id:x.id, name:x.name, total:x.total, remaining:x.remaining,
     juros:x.juros||0, min_payment:x.min_payment||0,
     frequencia:x.frequencia||'monthly',
     target_date:x.target_date||null, payments:x.payments||[],
-    parcelas:x.parcelas||[]
+    parcelas:x.parcelas||[], owner:x.owner||null
   }));
   // load initial balance from Supabase profiles, fallback to localStorage for migration
   if(prof.data?.initial_balance!=null){
@@ -3761,6 +3911,24 @@ function setMetaOwner(v){
 }
 function setDividaOwner(v){
   window._dividaOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+function setEditOwner(v){
+  window._editOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+function setMetaEditOwner(v){
+  window._metaEditOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+function setDividaEditOwner(v){
+  window._dividaEditOwner=v;
   const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
   if(ub)ub.classList.toggle('active',v!=='conjuge');
   if(cb)cb.classList.toggle('active',v==='conjuge');
@@ -4274,8 +4442,12 @@ function openDayEditModal(itemType,id){
     <select id="dei-cat">
       ${Object.entries(CATS).map(([k,c])=>`<option value="${k}"${(item.cat||'outros')===k?' selected':''}>${c.icon} ${c.label}</option>`).join('')}
     </select></div>`:'';
-  document.getElementById('dayEditBody').innerHTML=typeRow+catRow+`<div id="dei-day-area"></div>`;
+  const initOwner=item.owner||'user';
+  window._editOwner=initOwner;
+  document.getElementById('dayEditBody').innerHTML=typeRow+catRow+`<div id="dei-day-area"></div><div id="dayEditOwnerSel"></div>`;
   _renderDayArea(item.type,item,isEN,itemType);
+  const ownerSd=document.getElementById('dayEditOwnerSel');
+  if(ownerSd)ownerSd.innerHTML=buildOwnerSelector(initOwner,setEditOwner);
   document.getElementById('dayEditModal').style.display='flex';
 }
 function _renderDayArea(type,item,isEN,itemType){
@@ -4331,6 +4503,7 @@ function saveDayEdit(){
   }
   const catEl=document.getElementById('dei-cat');
   if(catEl&&itemType==='bill') item.cat=catEl.value;
+  item.owner=window._editOwner||item.owner||'user';
   if(itemType==='renda'){saveRenda(item);buildRendaList();}
   else{saveBill(item);renderBills();}
   rebuild();
@@ -4340,6 +4513,100 @@ function closeDayEditModal(){
   document.getElementById('dayEditModal').style.display='none';
   _dayEdit=null;
 }
+
+// ── META EDIT MODAL ──────────────────────────────────────────────
+let _metaEditId=null;
+function openMetaEditModal(id){
+  const meta=metas.find(x=>x.id===id);
+  if(!meta)return;
+  _metaEditId=id;
+  const initOwner=meta.owner||'user';
+  window._metaEditOwner=initOwner;
+  document.getElementById('metaEditTitle').textContent=t('metaedit_title');
+  document.getElementById('metaEditSaveBtn').textContent=t('metaedit_save');
+  document.getElementById('mel-name-label').textContent=t('meta_name_label');
+  document.getElementById('mel-val-label').textContent=t('meta_val_label');
+  document.getElementById('mel-date-label').textContent=t('meta_date_label');
+  document.getElementById('mel-desc-label').textContent=t('meta_desc_label');
+  document.getElementById('mel-name').value=meta.name;
+  document.getElementById('mel-val').value=meta.val;
+  const mo=String(meta.month+1).padStart(2,'0');
+  const dy=String(meta.day||1).padStart(2,'0');
+  document.getElementById('mel-date').value=`${meta.year}-${mo}-${dy}`;
+  document.getElementById('mel-desc').value=meta.desc||'';
+  const sd=document.getElementById('metaEditOwnerSel');
+  if(sd)sd.innerHTML=buildOwnerSelector(initOwner,setMetaEditOwner);
+  document.getElementById('metaEditModal').style.display='flex';
+}
+function saveMetaEdit(){
+  const meta=metas.find(x=>x.id===_metaEditId);
+  if(!meta)return;
+  const name=document.getElementById('mel-name').value.trim();
+  const val=parseFloat(document.getElementById('mel-val').value)||0;
+  const dv=document.getElementById('mel-date').value;
+  const desc=document.getElementById('mel-desc').value.trim();
+  if(!name||!val||!dv){alert(t('alert_fill_all'));return;}
+  const[yr,mo,dy]=dv.split('-').map(Number);
+  meta.name=name;meta.val=val;meta.year=yr;meta.month=mo-1;meta.day=dy;meta.desc=desc;
+  meta.owner=window._metaEditOwner||meta.owner||'user';
+  saveMeta(meta);buildMetas();rebuild();
+  closeMetaEditModal();
+}
+function closeMetaEditModal(){
+  document.getElementById('metaEditModal').style.display='none';
+  _metaEditId=null;
+}
+
+// ── DIVIDA EDIT MODAL ─────────────────────────────────────────────
+let _dividaEditId=null;
+function openDividaEditModal(id){
+  const d=dividas.find(x=>x.id===id);
+  if(!d)return;
+  _dividaEditId=id;
+  const initOwner=d.owner||'user';
+  window._dividaEditOwner=initOwner;
+  document.getElementById('dividaEditTitle').textContent=t('dividaedit_title');
+  document.getElementById('dividaEditSaveBtn').textContent=t('dividaedit_save');
+  document.getElementById('del-name-label').textContent=t('dividas_name_label');
+  document.getElementById('del-remaining-label').textContent=t('dividaedit_remaining_label');
+  document.getElementById('del-juros-label').textContent=t('dividas_juros_label');
+  document.getElementById('del-min-label').textContent=t('dividas_min_label');
+  document.getElementById('del-freq-label').textContent=t('dividas_freq_label');
+  document.getElementById('del-date-label').textContent=t('dividas_date_label');
+  document.getElementById('del-freq-monthly').textContent=t('dividas_freq_monthly');
+  document.getElementById('del-freq-biweekly').textContent=t('dividas_freq_biweekly');
+  document.getElementById('del-freq-weekly').textContent=t('dividas_freq_weekly');
+  document.getElementById('del-name').value=d.name;
+  document.getElementById('del-remaining').value=d.remaining;
+  document.getElementById('del-juros').value=d.juros||0;
+  document.getElementById('del-min').value=d.min_payment||0;
+  document.getElementById('del-freq').value=d.frequencia||'monthly';
+  document.getElementById('del-date').value=d.target_date||'';
+  const sd=document.getElementById('dividaEditOwnerSel');
+  if(sd)sd.innerHTML=buildOwnerSelector(initOwner,setDividaEditOwner);
+  document.getElementById('dividaEditModal').style.display='flex';
+}
+function saveDividaEdit(){
+  const d=dividas.find(x=>x.id===_dividaEditId);
+  if(!d)return;
+  const name=document.getElementById('del-name').value.trim();
+  const remaining=parseFloat(document.getElementById('del-remaining').value)||0;
+  const juros=parseFloat(document.getElementById('del-juros').value)||0;
+  const min_payment=parseFloat(document.getElementById('del-min').value)||0;
+  const frequencia=document.getElementById('del-freq').value||'monthly';
+  const target_date=document.getElementById('del-date').value||null;
+  if(!name){alert(t('alert_fill_name_val'));return;}
+  d.name=name;d.remaining=remaining;d.juros=juros;d.min_payment=min_payment;
+  d.frequencia=frequencia;d.target_date=target_date;
+  d.owner=window._dividaEditOwner||d.owner||'user';
+  saveDivida(d);buildDividas();
+  closeDividaEditModal();
+}
+function closeDividaEditModal(){
+  document.getElementById('dividaEditModal').style.display='none';
+  _dividaEditId=null;
+}
+
 function removeBill(id){
   const b=bills.find(x=>x.id===id);
   if(b?.locked){alert(t('alert_unlock_before_remove'));return;}
@@ -4616,6 +4883,7 @@ function buildMetas(){
 
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
         ${!meta.done?`<button class="btn success" style="font-size:12px;padding:5px 12px" onclick="completeMeta('${meta.id}')">${t('meta_complete_btn')}</button>`:''}
+        <button class="btn" style="font-size:12px;padding:5px 12px" onclick="openMetaEditModal('${meta.id}')">${t('metaedit_btn')}</button>
         <button class="btn" style="font-size:12px;padding:5px 12px" onclick="removeMeta('${meta.id}')">${t('meta_remove_btn')}</button>
       </div>`;
     list.appendChild(card);
@@ -5343,37 +5611,35 @@ function obApplyLang(){
   // slide 5: perfil
   if(el('ob-s5-badge')) el('ob-s5-badge').textContent='Profile';
   if(el('ob-s5-title')) el('ob-s5-title').textContent='Your Profile';
-  if(el('ob-s5-sub')) el('ob-s5-sub').textContent="Let's personalize your experience";
-  if(el('ob-s5-color-label')) el('ob-s5-color-label').textContent='Avatar color';
-  if(el('ob-s5-color-conjuge-label')) el('ob-s5-color-conjuge-label').textContent="Partner's color";
-  if(el('ob-s5-conjuge-title')) el('ob-s5-conjuge-title').textContent="Partner's Profile";
-  if(el('ob-s5-obj-conjuge-label')) el('ob-s5-obj-conjuge-label').textContent='Financial goal';
-  if(el('obConjObj_dividas')) el('obConjObj_dividas').textContent='Pay off debt';
-  if(el('obConjObj_reserva')) el('obConjObj_reserva').textContent='Emergency fund';
-  if(el('obConjObj_imovel')) el('obConjObj_imovel').textContent='Buy property';
-  if(el('obConjObj_viajar')) el('obConjObj_viajar').textContent='Travel';
-  if(el('obConjObj_investir')) el('obConjObj_investir').textContent='Invest';
-  if(el('obConjObj_outro')) el('obConjObj_outro').textContent='Other';
-  if(el('obConjOutroTexto')) el('obConjOutroTexto').placeholder='Describe goal';
-  if(el('ob-s5-name-label')) el('ob-s5-name-label').textContent='Your name';
-  if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
   if(el('ob-s5-civil-label')) el('ob-s5-civil-label').textContent='Relationship status';
-  if(el('obSolteiro')) el('obSolteiro').textContent='Single';
-  if(el('obCasado')) el('obCasado').textContent='Married / Partner';
+  if(el('obCivilTitleSolteiro')) el('obCivilTitleSolteiro').textContent='Single';
+  if(el('obCivilSubSolteiro')) el('obCivilSubSolteiro').textContent='Just me';
+  if(el('obCivilTitleCasado')) el('obCivilTitleCasado').textContent='Married/Partner';
+  if(el('obCivilSubCasado')) el('obCivilSubCasado').textContent="We're two";
+  if(el('ob-s5-conjuge-title')) el('ob-s5-conjuge-title').textContent='About your partner:';
+  if(el('ob-s5-obj-conjuge-label')) el('ob-s5-obj-conjuge-label').textContent="Partner's goal";
+  if(el('obConjObjLabel_dividas')) el('obConjObjLabel_dividas').textContent='Pay off debt';
+  if(el('obConjObjLabel_reserva')) el('obConjObjLabel_reserva').textContent='Emergency fund';
+  if(el('obConjObjLabel_imovel')) el('obConjObjLabel_imovel').textContent='Buy property';
+  if(el('obConjObjLabel_viajar')) el('obConjObjLabel_viajar').textContent='Travel';
+  if(el('obConjObjLabel_investir')) el('obConjObjLabel_investir').textContent='Invest';
+  if(el('obConjObjLabel_outro')) el('obConjObjLabel_outro').textContent='Other';
+  if(el('obConjOutroTexto')) el('obConjOutroTexto').placeholder='Describe goal';
+  if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
   if(el('obConjugeNome')) el('obConjugeNome').placeholder='Partner name';
   if(el('ob-s5-sexo-user-label')) el('ob-s5-sexo-user-label').textContent='Your gender';
   if(el('obSexoUser_M')) el('obSexoUser_M').textContent='Male';
   if(el('obSexoUser_F')) el('obSexoUser_F').textContent='Female';
-  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent="Partner's gender";
+  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent='Partner';
   if(el('obSexoConjuge_M')) el('obSexoConjuge_M').textContent='Male';
   if(el('obSexoConjuge_F')) el('obSexoConjuge_F').textContent='Female';
-  if(el('ob-s5-obj-label')) el('ob-s5-obj-label').textContent='Financial goal';
-  if(el('obObj_dividas')) el('obObj_dividas').textContent='Pay off debt';
-  if(el('obObj_reserva')) el('obObj_reserva').textContent='Emergency fund';
-  if(el('obObj_imovel')) el('obObj_imovel').textContent='Buy property';
-  if(el('obObj_viajar')) el('obObj_viajar').textContent='Travel';
-  if(el('obObj_investir')) el('obObj_investir').textContent='Invest';
-  if(el('obObj_outro')) el('obObj_outro').textContent='Other';
+  if(el('ob-s5-obj-label')) el('ob-s5-obj-label').textContent="What's your main goal?";
+  if(el('obObjLabel_dividas')) el('obObjLabel_dividas').textContent='Pay off debt';
+  if(el('obObjLabel_reserva')) el('obObjLabel_reserva').textContent='Emergency fund';
+  if(el('obObjLabel_imovel')) el('obObjLabel_imovel').textContent='Buy property';
+  if(el('obObjLabel_viajar')) el('obObjLabel_viajar').textContent='Travel';
+  if(el('obObjLabel_investir')) el('obObjLabel_investir').textContent='Invest';
+  if(el('obObjLabel_outro')) el('obObjLabel_outro').textContent='Other';
   if(el('obOutroTexto')) el('obOutroTexto').placeholder='Describe your goal';
   if(el('ob-s5-back')) el('ob-s5-back').textContent='← Back';
   if(el('ob-s5-next')) el('ob-s5-next').textContent='Next →';
@@ -5644,15 +5910,16 @@ function pePickColorConjuge(c){
 // ── ONBOARDING PROFILE HELPERS ────────────────────────────────
 function obSetEstadoCivil(v){
   window._obEstadoCivil=v;
-  const bs=document.getElementById('obSolteiro');
-  const bc=document.getElementById('obCasado');
-  if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
-  if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
-  const r=document.getElementById('obConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
+  const cs=document.getElementById('obCivilCardSolteiro');
+  const cc=document.getElementById('obCivilCardCasado');
+  if(cs)cs.classList.toggle('active',v==='solteiro');
+  if(cc)cc.classList.toggle('active',v==='casado');
+  const sec=document.getElementById('obConjugeSection');
+  if(sec)sec.classList.toggle('open',v==='casado');
   if(v==='casado'){
     buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obPickColorConjuge','obColorPickerConjuge');
     const cj=document.getElementById('obConjugeAvatar');
-    if(cj) cj.style.background=window._obAvatarColorConjuge||'#2563eb';
+    if(cj)cj.style.background=window._obAvatarColorConjuge||'#2563eb';
   }
 }
 
@@ -5661,9 +5928,8 @@ function obSetObjetivo(v){
   const idx=window._obObjetivos.indexOf(v);
   if(idx>=0) window._obObjetivos.splice(idx,1); else window._obObjetivos.push(v);
   ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
-    const on=window._obObjetivos.includes(k);
-    const b=document.getElementById('obObj_'+k);
-    if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
+    const card=document.getElementById('obObj_'+k);
+    if(card)card.classList.toggle('active',window._obObjetivos.includes(k));
   });
   const r=document.getElementById('obOutroRow');if(r)r.style.display=window._obObjetivos.includes('outro')?'block':'none';
 }
@@ -5698,9 +5964,8 @@ function obConjSetObjetivo(v){
   const idx=window._obObjetivosConjuge.indexOf(v);
   if(idx>=0) window._obObjetivosConjuge.splice(idx,1); else window._obObjetivosConjuge.push(v);
   ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
-    const on=window._obObjetivosConjuge.includes(k);
-    const b=document.getElementById('obConjObj_'+k);
-    if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
+    const card=document.getElementById('obConjObj_'+k);
+    if(card)card.classList.toggle('active',window._obObjetivosConjuge.includes(k));
   });
   const r=document.getElementById('obConjOutroRow');if(r)r.style.display=window._obObjetivosConjuge.includes('outro')?'block':'none';
 }
@@ -6074,8 +6339,10 @@ function obFinish(){
 let _tourStep=0;
 const TOUR_STEPS=[
   {tab:null,        emoji:'👋', dSel:'.app-logo',           mSel:'.app-logo',     tk:'tour_1'},
+  {tab:'renda',     emoji:'👤', dSel:'#profileCardWrap',    mSel:'#profileCardWrap', tk:'tour_profile'},
   {tab:'renda',     emoji:'📊', dSel:'.cards',              mSel:'.cards',         tk:'tour_2'},
   {tab:'renda',     emoji:'💵', dSel:'#tab-btn-renda',      mSel:'#bn-renda',      tk:'tour_3'},
+  {tab:'renda',     emoji:'👥', dSel:null,                  mSel:null,             tk:'tour_owner'},
   {tab:'bills',     emoji:'📋', dSel:'#tab-btn-bills',      mSel:'#bn-bills',      tk:'tour_4'},
   {tab:'dividas',   emoji:'💳', dSel:'#tab-btn-dividas',    mSel:'#bn-dividas',    tk:'tour_5'},
   {tab:'metas',     emoji:'🎯', dSel:'#tab-btn-metas',      mSel:'#bn-metas',      tk:'tour_6'},
@@ -6118,8 +6385,11 @@ function tourShow(){
   // bottom nav: position:fixed; bottom:20px; height:65px → top edge at 85px from screen bottom
   const BN_CLEAR=20+65+15; // 100px — safe clearance above bottom nav
   const pad=8;
-  // Match actual CSS width: min(340px,90vw) on mobile, 380px on desktop
-  const ttW=isMobile?Math.min(340,Math.round(window.innerWidth*0.9)):Math.min(380,window.innerWidth-24);
+  // On mobile: fixed left:16, width:vw-32 (matches CSS override)
+  const mobileLeft=16;
+  const mobileW=window.innerWidth-32;
+  const desktopW=Math.min(380,window.innerWidth-24);
+  const ttW=isMobile?mobileW:desktopW;
 
   if(el){
     const r=el.getBoundingClientRect();
@@ -6130,19 +6400,24 @@ function tourShow(){
     hl.style.height=(r.height+pad*2)+'px';
 
     const elCx=r.left+r.width/2;
-    const ttLeft=Math.min(Math.max(elCx-ttW/2,12),window.innerWidth-ttW-12);
-    const arLeft=Math.min(Math.max(elCx-ttLeft-9,12),ttW-30);
-    tt.style.left=ttLeft+'px';
-    ar.style.left=arLeft+'px';
     ar.style.display='';
 
     if(isMobile){
-      // Anchor tooltip above bottom nav with proper clearance
+      // Fixed left:16, arrow offset relative to that fixed left
+      tt.style.left=mobileLeft+'px';
+      tt.style.width=mobileW+'px';
+      const arLeft=Math.min(Math.max(elCx-mobileLeft-9,12),mobileW-30);
+      ar.style.left=arLeft+'px';
       ar.className='down';
       tt.style.top='auto';
       tt.style.bottom=BN_CLEAR+'px';
     } else {
       // Anchor tooltip below element, arrow pointing up; flip up if not enough space
+      const ttLeft=Math.min(Math.max(elCx-ttW/2,12),window.innerWidth-ttW-12);
+      const arLeft=Math.min(Math.max(elCx-ttLeft-9,12),ttW-30);
+      tt.style.left=ttLeft+'px';
+      tt.style.width='';
+      ar.style.left=arLeft+'px';
       ar.className='up';
       tt.style.bottom='auto';
       const ttTop=r.bottom+pad+12;
@@ -6153,8 +6428,14 @@ function tourShow(){
     hl.style.display='none';
     ar.style.display='none';
     tt.style.bottom='auto';
-    const ttLeft=Math.max(12,Math.round((window.innerWidth-ttW)/2));
-    tt.style.left=ttLeft+'px';
+    if(isMobile){
+      tt.style.left=mobileLeft+'px';
+      tt.style.width=mobileW+'px';
+    } else {
+      const ttLeft=Math.max(12,Math.round((window.innerWidth-ttW)/2));
+      tt.style.left=ttLeft+'px';
+      tt.style.width='';
+    }
     // Vertically: center but ensure it stays above bottom nav
     const maxBottom=window.innerHeight-BN_CLEAR;
     const idealTop=Math.round(window.innerHeight/2-120);
@@ -7084,6 +7365,7 @@ function buildDividas(){
       ${buildDebtInstallmentsHTML(d)}
       <div class="debt-actions">
         <button class="btn primary" style="font-size:12px;padding:5px 14px" onclick="openDebtPayModal('${d.id}')">${t('dividas_pay_btn')}</button>
+        <button class="btn" style="font-size:12px;padding:5px 14px" onclick="openDividaEditModal('${d.id}')">${t('dividaedit_btn')}</button>
         <button class="btn" style="font-size:12px;padding:5px 14px" onclick="removeDivida('${d.id}')">${t('dividas_remove')}</button>
       </div>`;
     list.appendChild(card);
