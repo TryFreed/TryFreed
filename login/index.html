@@ -845,6 +845,9 @@ body.dark .confirm-delete{background:#dc2626}
 .profile-card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:#6b7280}
 .profile-card-obj{background:rgba(124,58,237,0.15);color:#a78bfa;padding:2px 8px;border-radius:50px;font-size:11px}
 .profile-card-edit{color:#4b5563;flex-shrink:0}
+.owner-selector{display:flex;gap:8px;flex-wrap:wrap}
+.owner-btn{display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.12);background:transparent;cursor:pointer;font-size:12px;font-weight:600;color:#9ca3af;transition:all .2s}
+.owner-btn.active{border-color:#7c3aed;background:rgba(124,58,237,0.15);color:#fff}
 
 /* ── ONBOARDING PROFILE SLIDE ────────────────────────────────── */
 .ob-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#4c1d95);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:1.2rem;flex-shrink:0}
@@ -1855,19 +1858,34 @@ body.dark .theme-pill-dark{color:#fff}
         <button class="ob-civil-btn" id="obCasado" onclick="obSetEstadoCivil('casado')">Casado(a) / Parceiro(a)</button>
       </div>
       <div id="obConjugeRow" style="display:none;width:100%;max-width:320px;flex-direction:column;align-items:center">
-        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" style="margin-top:.5rem">
         <div class="ob-section-label" id="ob-s5-sexo-user-label" style="margin-top:.5rem">Seu sexo</div>
         <div class="ob-civil-btns">
           <button class="ob-civil-btn" id="obSexoUser_M" onclick="obSetSexo('user','M')">Masculino</button>
           <button class="ob-civil-btn" id="obSexoUser_F" onclick="obSetSexo('user','F')">Feminino</button>
         </div>
+        <div style="height:1px;background:rgba(255,255,255,0.07);width:100%;margin:14px 0 10px"></div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;text-align:center" id="ob-s5-conjuge-title">Perfil do(a) Parceiro(a)</div>
+        <div class="ob-avatar" id="obConjugeAvatar" style="width:56px;height:56px;font-size:20px;margin-bottom:6px"><span id="obConjugeAvatarInitials">?</span></div>
+        <div class="ob-section-label" id="ob-s5-color-conjuge-label" style="margin-top:.25rem">Cor do(a) parceiro(a)</div>
+        <div class="color-picker-row" id="obColorPickerConjuge" style="margin-bottom:.5rem"></div>
+        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" oninput="obConjugeUpdateAvatar()" style="margin-top:.25rem">
         <div class="ob-section-label" id="ob-s5-sexo-conjuge-label" style="margin-top:.5rem">Sexo do(a) parceiro(a)</div>
         <div class="ob-civil-btns">
           <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')">Masculino</button>
           <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')">Feminino</button>
         </div>
-        <div class="ob-section-label" id="ob-s5-color-conjuge-label" style="margin-top:.5rem">Cor do(a) parceiro(a)</div>
-        <div class="color-picker-row" id="obColorPickerConjuge"></div>
+        <div class="ob-section-label" id="ob-s5-obj-conjuge-label" style="margin-top:.5rem">Objetivo financeiro</div>
+        <div class="ob-obj-grid">
+          <button class="ob-obj-btn" id="obConjObj_dividas" onclick="obConjSetObjetivo('dividas')">Sair das dívidas</button>
+          <button class="ob-obj-btn" id="obConjObj_reserva" onclick="obConjSetObjetivo('reserva')">Reserva de emergência</button>
+          <button class="ob-obj-btn" id="obConjObj_imovel" onclick="obConjSetObjetivo('imovel')">Comprar imóvel</button>
+          <button class="ob-obj-btn" id="obConjObj_viajar" onclick="obConjSetObjetivo('viajar')">Viajar</button>
+          <button class="ob-obj-btn" id="obConjObj_investir" onclick="obConjSetObjetivo('investir')">Investir</button>
+          <button class="ob-obj-btn" id="obConjObj_outro" onclick="obConjSetObjetivo('outro')">Outro</button>
+        </div>
+        <div id="obConjOutroRow" style="display:none;width:100%;max-width:320px">
+          <input class="ob-input" id="obConjOutroTexto" type="text" maxlength="80" placeholder="Descreva o objetivo">
+        </div>
       </div>
       <div class="ob-section-label" id="ob-s5-obj-label">Objetivo financeiro</div>
       <div class="ob-obj-grid">
@@ -2270,6 +2288,7 @@ body.dark .theme-pill-dark{color:#fff}
             <button class="btn primary" style="width:100%" onclick="addRenda()" data-i18n="renda_add_btn">+ Adicionar</button>
           </div>
         </div>
+        <div id="rendaOwnerSel"></div>
       </div>
     </div>
     <div id="rendaList"></div>
@@ -2313,6 +2332,7 @@ body.dark .theme-pill-dark{color:#fff}
             </select>
           </div>
         </div>
+        <div id="billsOwnerSel"></div>
         <button class="btn primary" onclick="addBill()" data-i18n="bills_add_btn">+ Adicionar despesa</button>
       </div>
     </div>
@@ -2338,6 +2358,7 @@ body.dark .theme-pill-dark{color:#fff}
           <div><label id="dv-date-label">Data alvo (opcional)</label><input id="dv-date" type="date"></div>
           <div style="display:flex;align-items:flex-end"><button class="btn primary" style="width:100%" onclick="addDivida()" id="dv-add-btn">+ Adicionar dívida</button></div>
         </div>
+        <div id="dividasOwnerSel"></div>
       </div>
     </div>
     <div id="dividasList"></div>
@@ -2392,6 +2413,7 @@ body.dark .theme-pill-dark{color:#fff}
           <div><label data-i18n="meta_desc_label">Descrição</label><input id="m-desc" placeholder="opcional"></div>
           <div style="display:flex;align-items:flex-end"><button class="btn primary" style="width:100%" onclick="addMeta()" data-i18n="meta_add_btn">+ Criar meta</button></div>
         </div>
+        <div id="metasOwnerSel"></div>
       </div>
     </div>
     <div id="metasList"></div>
@@ -3542,7 +3564,7 @@ async function loadFromSupabase(){
       _supa.from('bills').select('*').eq('user_id',uid),
       _supa.from('metas').select('*').eq('user_id',uid),
       _supa.from('dividas').select('*').eq('user_id',uid),
-      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge').eq('user_id',uid).maybeSingle(),
+      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge,objetivo_conjuge_outro').eq('user_id',uid).maybeSingle(),
     ]);
   } catch(e) {
     console.error('[load] network error:',e);
@@ -3605,7 +3627,7 @@ function _showToast(msg,color){
 }
 async function saveRenda(r){
   if(!_user) return;
-  let payload={id:r.id,user_id:_user.id,name:r.name,val:r.val,type:r.type,dow:r.dow,day:r.day,day2:r.day2??null,month:r.month,year:r.year,locked:r.locked};
+  let payload={id:r.id,user_id:_user.id,name:r.name,val:r.val,type:r.type,dow:r.dow,day:r.day,day2:r.day2??null,month:r.month,year:r.year,locked:r.locked,owner:r.owner||null};
   let {data,error}=await _supa.from('rendas').upsert(payload,{onConflict:'id'}).select();
   for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
@@ -3624,7 +3646,7 @@ async function deleteRenda(id){
 }
 async function saveBill(b){
   if(!_user) return;
-  let payload={id:b.id,user_id:b.user_id||_user.id,name:b.name,val:b.val,type:b.type,day:b.day,month:b.month??null,year:b.year??null,cat:b.cat,note:b.note||null,locked:b.locked,meta_id:b.metaId||null,meta_end:b.metaEnd||null,pagamentos:b.pagamentos||[]};
+  let payload={id:b.id,user_id:b.user_id||_user.id,name:b.name,val:b.val,type:b.type,day:b.day,month:b.month??null,year:b.year??null,cat:b.cat,note:b.note||null,locked:b.locked,meta_id:b.metaId||null,meta_end:b.metaEnd||null,pagamentos:b.pagamentos||[],owner:b.owner||null};
   let {data,error}=await _supa.from('bills').upsert(payload,{onConflict:'id'}).select();
   for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
@@ -3643,7 +3665,7 @@ async function deleteBill(id){
 }
 async function saveMeta(m){
   if(!_user) return;
-  let payload={id:m.id,user_id:_user.id,name:m.name,val:m.val,day:m.day,month:m.month,year:m.year,descricao:m.desc||null,done:m.done,bill_id:m.billId||null,need_per_week:m.needPerWeek,weeks_left:m.weeksLeft,checkins:m.checkins||[]};
+  let payload={id:m.id,user_id:_user.id,name:m.name,val:m.val,day:m.day,month:m.month,year:m.year,descricao:m.desc||null,done:m.done,bill_id:m.billId||null,need_per_week:m.needPerWeek,weeks_left:m.weeksLeft,checkins:m.checkins||[],owner:m.owner||null};
   let {data,error}=await _supa.from('metas').upsert(payload,{onConflict:'id'}).select();
   for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
@@ -3678,6 +3700,72 @@ let _computeFullCache=null, _computeFullDirty=true;
 
 function fmt(v){if(v==null||isNaN(v))return '$0';const n=Math.round(v);return(n<0?'-$':'$')+Math.abs(n).toLocaleString('pt-BR')}
 function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function getOwnerAvatar(owner){
+  const p=window._profile||{};
+  if(!owner) return '';
+  const isConjuge=owner==='conjuge';
+  const color=isConjuge?(p.avatar_color_conjuge||'#ec4899'):(p.avatar_color||'#7c3aed');
+  const name=esc(isConjuge?(p.conjuge_nome||'?'):(p.display_name||'?'));
+  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  return `<div style="width:20px;height:20px;border-radius:50%;background:${color};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-right:4px">${initials}</div>`;
+}
+
+function buildOwnerSelector(currentOwner, setFn){
+  const p=window._profile||{};
+  if(p.estado_civil!=='casado') return '';
+  const isEN=(lang||'pt')==='en';
+  const userName=_capitalize(p.display_name||(_user?.email?.split('@')[0]||''));
+  const conjName=_capitalize(p.conjuge_nome||'');
+  const uColor=p.avatar_color||'#7c3aed';
+  const cColor=p.avatar_color_conjuge||'#ec4899';
+  const uInit=userName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  const cInit=conjName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  return `<div style="margin:10px 0">
+    <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin-bottom:6px">${isEN?'Assign to':'Atribuir a'}</div>
+    <div class="owner-selector">
+      <button type="button" onclick="(${setFn})('user')" id="ownerBtnUser" class="owner-btn ${currentOwner!=='conjuge'?'active':''}">
+        <div style="width:20px;height:20px;border-radius:50%;background:${uColor};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">${uInit}</div>
+        ${esc(userName)}
+      </button>
+      <button type="button" onclick="(${setFn})('conjuge')" id="ownerBtnConjuge" class="owner-btn ${currentOwner==='conjuge'?'active':''}">
+        <div style="width:20px;height:20px;border-radius:50%;background:${cColor};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">${cInit}</div>
+        ${esc(conjName)}
+      </button>
+    </div>
+  </div>`;
+}
+
+window._rendaOwner='user';
+window._billOwner='user';
+window._metaOwner='user';
+window._dividaOwner='user';
+
+function setRendaOwner(v){
+  window._rendaOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+function setBillOwner(v){
+  window._billOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+function setMetaOwner(v){
+  window._metaOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+function setDividaOwner(v){
+  window._dividaOwner=v;
+  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
+  if(ub)ub.classList.toggle('active',v!=='conjuge');
+  if(cb)cb.classList.toggle('active',v==='conjuge');
+}
+
 function translateSupabaseError(msg){
   if(!msg) return msg;
   const isEN=lang==='en';
@@ -4024,7 +4112,7 @@ function makeRendaRow(r){
   const _cn=r.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   row.innerHTML=`
     <div>
-      <div class="rname" onclick="startInlineEdit(this,'renda','${r.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer">${esc(r.name)} <span class="badge ${bc}">${bl}</span></div>
+      <div class="rname" onclick="startInlineEdit(this,'renda','${r.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${r.owner?getOwnerAvatar(r.owner):''}${esc(r.name)} <span class="badge ${bc}">${bl}</span></div>
       <div class="rsub">${(!r.locked&&r.type!=='once')?`<span class="rsub-edit" onclick="openDayEditModal('renda','${r.id}')">${dl}</span>`:dl}</div>
     </div>
     <div class="rval" onclick="startInlineEditVal(this,'renda','${r.id}')" title="${lang==='en'?'Click to edit value':'Clique para editar o valor'}">${fmt(r.val)}</div>
@@ -4090,7 +4178,7 @@ function addRenda(){
   const yr=parts[0]||new Date().getFullYear();
   const mo=parts[1]||new Date().getMonth()+1;
   const day2=type==='biweekly'?(parseInt(document.getElementById('re-day2').value)||null):null;
-  const nr={id:newId(),name,val,day,day2,month:mo-1,year:yr,type,locked:false,dow:5};
+  const nr={id:newId(),name,val,day,day2,month:mo-1,year:yr,type,locked:false,dow:5,owner:window._rendaOwner||'user'};
   rendas.push(nr);
   saveRenda(nr);
   document.getElementById('re-name').value='';
@@ -4144,7 +4232,7 @@ function makeBillRow(b){
   const _cn=b.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   row.innerHTML=`
     <div>
-      <div class="rname" onclick="startInlineEdit(this,'bill','${b.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer">${esc(b.name)} <span class="badge ${bc}">${bl}</span></div>
+      <div class="rname" onclick="startInlineEdit(this,'bill','${b.id}')" title="${lang==='en'?'Click to edit name':'Clique para editar o nome'}" style="cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;gap:4px">${b.owner?getOwnerAvatar(b.owner):''}${esc(b.name)} <span class="badge ${bc}">${bl}</span></div>
       <div class="rsub">${(!b.locked&&b.type!=='once')?`<span class="rsub-edit" onclick="openDayEditModal('bill','${b.id}')">${dl}</span>`:dl} · ${cat.label}</div>
     </div>
     <div class="rval" onclick="startInlineEditVal(this,'bill','${b.id}')" title="${lang==='en'?'Click to edit value':'Clique para editar o valor'}">${fmt(b.val)}</div>
@@ -4269,7 +4357,7 @@ function addBill(){
   const parts=rawMy.split('-').map(Number);
   const yr=parts[0]||new Date().getFullYear();
   const mo=parts[1]||new Date().getMonth()+1;
-  const nb={id:newId(),name,val,day,type,locked:false,cat};
+  const nb={id:newId(),name,val,day,type,locked:false,cat,owner:window._billOwner||'user'};
   if(type==='once'){nb.month=mo-1;nb.year=yr;}
   bills.push(nb);
   saveBill(nb);
@@ -4488,7 +4576,7 @@ function buildMetas(){
     card.innerHTML=`
       <div class="goal-header">
         <div>
-          <div style="font-size:15px;font-weight:500">${esc(meta.name)}</div>
+          <div style="font-size:15px;font-weight:500;display:flex;align-items:center;gap:4px">${meta.owner?getOwnerAvatar(meta.owner):''}${esc(meta.name)}</div>
           ${meta.desc?`<div style="font-size:11px;color:var(--sub);margin-top:1px">${esc(meta.desc)}</div>`:''}
           <div style="font-size:11px;color:var(--sub);margin-top:3px">${meta.month+1}/${meta.day}/${meta.year}</div>
         </div>
@@ -4556,7 +4644,7 @@ function addMeta(){
   const nb={id:billId,name:'Guardar — '+name,val:needPerWeek,day:5,type:'weekly',locked:false,cat:'outros',metaId,metaEnd:targetDate,note:`Save every Friday until ${mo}/${dy}/${yr}`};
   bills.push(nb);
   saveBill(nb);
-  const nm={id:metaId,name,val,day:dy,month:mo-1,year:yr,desc,done:false,billId,needPerWeek,weeksLeft,checkins:[]};
+  const nm={id:metaId,name,val,day:dy,month:mo-1,year:yr,desc,done:false,billId,needPerWeek,weeksLeft,checkins:[],owner:window._metaOwner||'user'};
   nm.checkins=generateMetaCheckins(nm);
   metas.push(nm);
   saveMeta(nm);
@@ -4589,6 +4677,12 @@ function toggleForm(which, forceOpen){
   const isOpen = forceOpen !== undefined ? forceOpen : !form.classList.contains('open');
   form.classList.toggle('open', isOpen);
   btn.classList.toggle('open', isOpen);
+  if(isOpen){
+    if(which==='renda'){window._rendaOwner='user';const sd=document.getElementById('rendaOwnerSel');if(sd)sd.innerHTML=buildOwnerSelector('user',setRendaOwner);}
+    else if(which==='bills'){window._billOwner='user';const sd=document.getElementById('billsOwnerSel');if(sd)sd.innerHTML=buildOwnerSelector('user',setBillOwner);}
+    else if(which==='metas'){window._metaOwner='user';const sd=document.getElementById('metasOwnerSel');if(sd)sd.innerHTML=buildOwnerSelector('user',setMetaOwner);}
+    else if(which==='dividas'){window._dividaOwner='user';const sd=document.getElementById('dividasOwnerSel');if(sd)sd.innerHTML=buildOwnerSelector('user',setDividaOwner);}
+  }
 }
 
 // ── CONFIRM MODAL ────────────────────────────────────────────────
@@ -5252,6 +5346,15 @@ function obApplyLang(){
   if(el('ob-s5-sub')) el('ob-s5-sub').textContent="Let's personalize your experience";
   if(el('ob-s5-color-label')) el('ob-s5-color-label').textContent='Avatar color';
   if(el('ob-s5-color-conjuge-label')) el('ob-s5-color-conjuge-label').textContent="Partner's color";
+  if(el('ob-s5-conjuge-title')) el('ob-s5-conjuge-title').textContent="Partner's Profile";
+  if(el('ob-s5-obj-conjuge-label')) el('ob-s5-obj-conjuge-label').textContent='Financial goal';
+  if(el('obConjObj_dividas')) el('obConjObj_dividas').textContent='Pay off debt';
+  if(el('obConjObj_reserva')) el('obConjObj_reserva').textContent='Emergency fund';
+  if(el('obConjObj_imovel')) el('obConjObj_imovel').textContent='Buy property';
+  if(el('obConjObj_viajar')) el('obConjObj_viajar').textContent='Travel';
+  if(el('obConjObj_investir')) el('obConjObj_investir').textContent='Invest';
+  if(el('obConjObj_outro')) el('obConjObj_outro').textContent='Other';
+  if(el('obConjOutroTexto')) el('obConjOutroTexto').placeholder='Describe goal';
   if(el('ob-s5-name-label')) el('ob-s5-name-label').textContent='Your name';
   if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
   if(el('ob-s5-civil-label')) el('ob-s5-civil-label').textContent='Relationship status';
@@ -5314,6 +5417,11 @@ function buildHomeDashboard(){
   if(estadoCivil==='casado') estadoL=(isEN?'Married / Partner':'Casado(a)')+(conjuge?' · '+conjuge:'');
   else if(estadoCivil==='solteiro') estadoL=isEN?'Single':'Solteiro(a)';
   const nameFallback=isEN?'Add your name':'Adicione seu nome';
+  const conjNameFallbackHD=isEN?'Add partner name':'Adicione o nome';
+  const hdConjObjMap={dividas:{pt:'Sair das dívidas',en:'Pay off debt'},reserva:{pt:'Reserva de emergência',en:'Emergency fund'},imovel:{pt:'Comprar imóvel',en:'Buy property'},viajar:{pt:'Viajar',en:'Travel'},investir:{pt:'Investir',en:'Invest'},outro:{pt:esc(p.objetivo_conjuge_outro||'Outro'),en:esc(p.objetivo_conjuge_outro||'Other')}};
+  const conjObjKeysHD=(p.objetivo_conjuge||'').split(',').filter(Boolean);
+  const conjObjBadgesHD=conjObjKeysHD.map(k=>hdConjObjMap[k]?(isEN?hdConjObjMap[k].en:hdConjObjMap[k].pt):'').filter(Boolean);
+  const editSVG=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
 
   // B — Health score
   const curMk=_today.getFullYear()+'-'+_today.getMonth();
@@ -5372,13 +5480,16 @@ function buildHomeDashboard(){
   const fd=d=>`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
 
   const hdConjuge=estadoCivil==='casado'?`
-  <div class="profile-conjuge-card" onclick="event.stopPropagation();showConjugeEdit()">
-    <div class="profile-conjuge-avatar" style="background:${conjColor}">${conjInitials}</div>
+  <div style="height:1px;background:rgba(255,255,255,0.07);margin:4px 0"></div>
+  <div style="display:flex;align-items:center;gap:14px;cursor:pointer" onclick="event.stopPropagation();showConjugeEdit()">
+    <div class="profile-card-avatar" style="background:${conjColor}">${conjInitials}</div>
     <div style="flex:1;min-width:0">
-      <div style="font-size:14px;font-weight:700;color:var(--text)">${conjuge||'Cônjuge'}</div>
-      <div style="font-size:11px;color:#6b7280">${isEN?'Partner':'Parceiro(a)'}</div>
+      <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px">${conjuge||conjNameFallbackHD}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+        ${conjObjBadgesHD.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
+      </div>
     </div>
-    <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+    <div class="profile-card-edit">${editSVG}</div>
   </div>`:'';
 
   wrap.innerHTML=`
@@ -5392,7 +5503,7 @@ function buildHomeDashboard(){
         ${objBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
       </div>
     </div>
-    <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+    <div class="profile-card-edit">${editSVG}</div>
   </div>${hdConjuge}
 </div>
 <div class="hd-section">
@@ -5515,6 +5626,8 @@ function obPickColor(c){
 }
 function obPickColorConjuge(c){
   window._obAvatarColorConjuge=c;
+  const avEl=document.getElementById('obConjugeAvatar');
+  if(avEl) avEl.style.background=c;
   buildColorPicker(c,'obPickColorConjuge','obColorPickerConjuge');
 }
 function pePickColor(c){
@@ -5536,7 +5649,11 @@ function obSetEstadoCivil(v){
   if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
   if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
   const r=document.getElementById('obConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
-  if(v==='casado') buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obPickColorConjuge','obColorPickerConjuge');
+  if(v==='casado'){
+    buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obPickColorConjuge','obColorPickerConjuge');
+    const cj=document.getElementById('obConjugeAvatar');
+    if(cj) cj.style.background=window._obAvatarColorConjuge||'#2563eb';
+  }
 }
 
 function obSetObjetivo(v){
@@ -5567,6 +5684,25 @@ function obUpdateAvatar(){
   if(av) av.textContent=initials;
   const avEl=document.getElementById('obAvatar');
   if(avEl) avEl.style.background=window._obAvatarColor||'#7c3aed';
+}
+function obConjugeUpdateAvatar(){
+  const name=(document.getElementById('obConjugeNome')||{value:''}).value.trim();
+  const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const av=document.getElementById('obConjugeAvatarInitials');
+  if(av) av.textContent=initials;
+  const avEl=document.getElementById('obConjugeAvatar');
+  if(avEl) avEl.style.background=window._obAvatarColorConjuge||'#2563eb';
+}
+function obConjSetObjetivo(v){
+  if(!window._obObjetivosConjuge) window._obObjetivosConjuge=[];
+  const idx=window._obObjetivosConjuge.indexOf(v);
+  if(idx>=0) window._obObjetivosConjuge.splice(idx,1); else window._obObjetivosConjuge.push(v);
+  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>{
+    const on=window._obObjetivosConjuge.includes(k);
+    const b=document.getElementById('obConjObj_'+k);
+    if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
+  });
+  const r=document.getElementById('obConjOutroRow');if(r)r.style.display=window._obObjetivosConjuge.includes('outro')?'block':'none';
 }
 
 // ── PROFILE CARD (dashboard) ──────────────────────────────────
@@ -5600,15 +5736,30 @@ function buildProfileCard(){
     estadoLabel=isEN?'Single':'Solteiro(a)';
   }
   const nameFallback=isEN?'Add your name':'Adicione seu nome';
+  const conjNameFallback=isEN?'Add partner name':'Adicione o nome';
+  const conjObjMap={
+    dividas:{pt:'Sair das dívidas',en:'Pay off debt'},
+    reserva:{pt:'Reserva de emergência',en:'Emergency fund'},
+    imovel:{pt:'Comprar imóvel',en:'Buy property'},
+    viajar:{pt:'Viajar',en:'Travel'},
+    investir:{pt:'Investir',en:'Invest'},
+    outro:{pt:esc(p.objetivo_conjuge_outro||'Outro'),en:esc(p.objetivo_conjuge_outro||'Other')}
+  };
+  const conjObjKeys=(p.objetivo_conjuge||'').split(',').filter(Boolean);
+  const conjObjBadges=conjObjKeys.map(k=>conjObjMap[k]?(isEN?conjObjMap[k].en:conjObjMap[k].pt):'').filter(Boolean);
+  const editIcon=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
   const conjugeCard=estadoCivil==='casado'?`
-    <div class="profile-conjuge-card" onclick="event.stopPropagation();showConjugeEdit()">
-      <div class="profile-conjuge-avatar" style="background:${conjColor}">${conjInitials}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:700;color:var(--text)">${conjuge||'Cônjuge'}</div>
-        <div style="font-size:11px;color:#6b7280">${isEN?'Partner':'Parceiro(a)'}</div>
+  <div style="height:1px;background:rgba(255,255,255,0.07);margin:4px 0"></div>
+  <div class="profile-card" onclick="showConjugeEdit()">
+    <div class="profile-card-avatar" style="background:${conjColor}">${conjInitials}</div>
+    <div class="profile-card-info">
+      <div class="profile-card-name">${conjuge||conjNameFallback}</div>
+      <div class="profile-card-meta">
+        ${conjObjBadges.map(l=>`<span class="profile-card-obj">${l}</span>`).join('')}
       </div>
-      <div class="profile-card-edit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-    </div>`:'';
+    </div>
+    <div class="profile-card-edit">${editIcon}</div>
+  </div>`:'';
   wrap.innerHTML=`<div class="profile-card" onclick="showProfileEdit()">
     <div class="profile-card-avatar" style="background:${avatarColor}">${initials}</div>
     <div class="profile-card-info">
@@ -5831,6 +5982,7 @@ async function saveConjugeEdit(){
     conjuge_nome:conjugeNome||null,
     sexo_conjuge:_editConjugeSexo||null,
     objetivo_conjuge:_editObjetivosConjuge.join(',')||null,
+    objetivo_conjuge_outro:_editObjetivosConjuge.includes('outro')?objetivoOutro:null,
     avatar_color_conjuge:_cjAvatarColor||null
   };
   const btn=document.getElementById('cjSaveBtn');
@@ -5894,6 +6046,8 @@ function obFinish(){
   const conjugeNome=(document.getElementById('obConjugeNome')||{value:''}).value.trim();
   const objetivos=(window._obObjetivos||[]).join(',');
   const objetivoOutro=(document.getElementById('obOutroTexto')||{value:''}).value.trim();
+  const objetivosConjuge=(window._obObjetivosConjuge||[]).join(',');
+  const objetivoConjugeOutro=(document.getElementById('obConjOutroTexto')||{value:''}).value.trim();
   if(_user){
     const profileData={
       display_name:displayName||null,
@@ -5904,7 +6058,9 @@ function obFinish(){
       sexo_user:window._obSexo_user||null,
       sexo_conjuge:estadoCivil==='casado'?(window._obSexo_conjuge||null):null,
       avatar_color:window._obAvatarColor||null,
-      avatar_color_conjuge:estadoCivil==='casado'?(window._obAvatarColorConjuge||null):null
+      avatar_color_conjuge:estadoCivil==='casado'?(window._obAvatarColorConjuge||null):null,
+      objetivo_conjuge:estadoCivil==='casado'?(objetivosConjuge||null):null,
+      objetivo_conjuge_outro:estadoCivil==='casado'&&(window._obObjetivosConjuge||[]).includes('outro')?objetivoConjugeOutro:null
     };
     _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
     window._profile=Object.assign(window._profile||{},profileData);
@@ -6855,7 +7011,7 @@ function toggleMetaCheckin(metaId,weekIdx){
 // ── DÍVIDAS ───────────────────────────────────────────────────────
 async function saveDivida(d){
   if(!_user) return;
-  let payload={id:d.id,user_id:_user.id,name:d.name,total:d.total,remaining:d.remaining,juros:d.juros,min_payment:d.min_payment,frequencia:d.frequencia||'monthly',target_date:d.target_date||null,payments:d.payments||[],parcelas:d.parcelas||[]};
+  let payload={id:d.id,user_id:_user.id,name:d.name,total:d.total,remaining:d.remaining,juros:d.juros,min_payment:d.min_payment,frequencia:d.frequencia||'monthly',target_date:d.target_date||null,payments:d.payments||[],parcelas:d.parcelas||[],owner:d.owner||null};
   let {data,error}=await _supa.from('dividas').upsert(payload,{onConflict:'id'}).select();
   for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
@@ -6909,7 +7065,7 @@ function buildDividas(){
     card.innerHTML=`
       <div class="debt-header">
         <div>
-          <div class="debt-name">${esc(d.name)} <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--accent-dim);color:var(--accent);font-weight:500;margin-left:4px">${freqLabel}</span></div>
+          <div class="debt-name" style="display:flex;align-items:center;gap:4px">${d.owner?getOwnerAvatar(d.owner):''}${esc(d.name)} <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:var(--accent-dim);color:var(--accent);font-weight:500;margin-left:4px">${freqLabel}</span></div>
           <div class="debt-remaining">${fmt(d.remaining)}</div>
         </div>
         <div style="text-align:right">
@@ -6947,7 +7103,7 @@ function addDivida(){
   const frequencia=document.getElementById('dv-freq').value||'monthly';
   const target_date=document.getElementById('dv-date').value||null;
   if(!name||!total){alert(t('alert_fill_name_val'));return;}
-  const nd={id:newId(),name,total,remaining:total,juros,min_payment,frequencia,target_date,payments:[],parcelas:[]};
+  const nd={id:newId(),name,total,remaining:total,juros,min_payment,frequencia,target_date,payments:[],parcelas:[],owner:window._dividaOwner||'user'};
   nd.parcelas=generateDebtInstallments(nd);
   dividas.push(nd);
   saveDivida(nd);
