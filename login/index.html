@@ -1913,8 +1913,9 @@ body.dark .theme-pill-dark{color:#fff}
         <div style="font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:12px;text-align:center" id="ob-s5-conjuge-title">Sobre seu(sua) parceiro(a):</div>
         <div style="display:flex;flex-direction:column;align-items:center">
           <div class="ob-avatar" id="obConjugeAvatar" style="width:56px;height:56px;font-size:20px;margin-bottom:6px"><span id="obConjugeAvatarInitials">?</span></div>
-          <div class="color-picker-row" id="obColorPickerConjuge" style="margin-bottom:8px"></div>
-          <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" oninput="obConjugeUpdateAvatar()" style="text-align:center;margin-bottom:6px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:4px" id="ob-s5-color-conjuge-label">Cor do avatar</div>
+          <div class="color-picker-row" id="obColorPickerConjuge" style="margin-bottom:10px"></div>
+          <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do(a) parceiro(a)" oninput="obUpdateConjugeAvatar()" style="text-align:center;margin-bottom:6px">
           <div class="ob-sex-row" style="max-width:none">
             <span class="ob-sex-label" id="ob-s5-sexo-conjuge-label">Parceiro(a)</span>
             <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
@@ -5617,6 +5618,7 @@ function obApplyLang(){
   if(el('obCivilTitleCasado')) el('obCivilTitleCasado').textContent='Married/Partner';
   if(el('obCivilSubCasado')) el('obCivilSubCasado').textContent="We're two";
   if(el('ob-s5-conjuge-title')) el('ob-s5-conjuge-title').textContent='About your partner:';
+  if(el('ob-s5-color-conjuge-label')) el('ob-s5-color-conjuge-label').textContent='Avatar color';
   if(el('ob-s5-obj-conjuge-label')) el('ob-s5-obj-conjuge-label').textContent="Partner's goal";
   if(el('obConjObjLabel_dividas')) el('obConjObjLabel_dividas').textContent='Pay off debt';
   if(el('obConjObjLabel_reserva')) el('obConjObjLabel_reserva').textContent='Emergency fund';
@@ -5626,7 +5628,7 @@ function obApplyLang(){
   if(el('obConjObjLabel_outro')) el('obConjObjLabel_outro').textContent='Other';
   if(el('obConjOutroTexto')) el('obConjOutroTexto').placeholder='Describe goal';
   if(el('obDisplayName')) el('obDisplayName').placeholder='Your name';
-  if(el('obConjugeNome')) el('obConjugeNome').placeholder='Partner name';
+  if(el('obConjugeNome')) el('obConjugeNome').placeholder="Partner's name";
   if(el('ob-s5-sexo-user-label')) el('ob-s5-sexo-user-label').textContent='Your gender';
   if(el('obSexoUser_M')) el('obSexoUser_M').textContent='Male';
   if(el('obSexoUser_F')) el('obSexoUser_F').textContent='Female';
@@ -5890,11 +5892,11 @@ function obPickColor(c){
   if(av) av.style.background=c;
   buildColorPicker(c,'obPickColor','obColorPickerUser');
 }
-function obPickColorConjuge(c){
+function obSetConjugeColor(c){
   window._obAvatarColorConjuge=c;
   const avEl=document.getElementById('obConjugeAvatar');
   if(avEl) avEl.style.background=c;
-  buildColorPicker(c,'obPickColorConjuge','obColorPickerConjuge');
+  buildColorPicker(c,'obSetConjugeColor','obColorPickerConjuge');
 }
 function pePickColor(c){
   window._peAvatarColor=c;
@@ -5917,7 +5919,7 @@ function obSetEstadoCivil(v){
   const sec=document.getElementById('obConjugeSection');
   if(sec)sec.classList.toggle('open',v==='casado');
   if(v==='casado'){
-    buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obPickColorConjuge','obColorPickerConjuge');
+    buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obSetConjugeColor','obColorPickerConjuge');
     const cj=document.getElementById('obConjugeAvatar');
     if(cj)cj.style.background=window._obAvatarColorConjuge||'#2563eb';
   }
@@ -5951,7 +5953,7 @@ function obUpdateAvatar(){
   const avEl=document.getElementById('obAvatar');
   if(avEl) avEl.style.background=window._obAvatarColor||'#7c3aed';
 }
-function obConjugeUpdateAvatar(){
+function obUpdateConjugeAvatar(){
   const name=(document.getElementById('obConjugeNome')||{value:''}).value.trim();
   const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
   const av=document.getElementById('obConjugeAvatarInitials');
