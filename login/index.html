@@ -877,8 +877,11 @@ body.dark .confirm-delete{background:#dc2626}
 .ob-civil-card-icon{font-size:24px;margin-bottom:6px}
 .ob-civil-card-title{font-size:14px;font-weight:700;color:#fff!important}
 .ob-civil-card-sub{font-size:11px;color:rgba(255,255,255,0.6)!important;margin-top:2px}
-.ob-conjuge-section{overflow:hidden;max-height:0;transition:max-height .4s ease;border-top:0.5px solid rgba(255,255,255,0.07);margin-top:12px;padding-top:0;width:100%;max-width:320px}
-.ob-conjuge-section.open{max-height:620px;padding-top:14px}
+.ob-conjuge-section{overflow:hidden;max-height:0;transition:max-height .5s ease,padding .5s ease;padding-top:0;width:100%;max-width:320px}
+.ob-conjuge-section.open{max-height:600px;padding-top:20px}
+.ob-conjuge-divider{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.ob-conjuge-divider-line{flex:1;height:1px;background:rgba(255,255,255,0.1)}
+.ob-conjuge-divider-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#a78bfa}
 .ob-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .ob-goal-card{border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;background:transparent}
 .ob-goal-card.active{border-color:#7c3aed;background:rgba(124,58,237,0.12)}
@@ -1910,47 +1913,29 @@ body.dark .theme-pill-dark{color:#fff}
 
       <!-- Seção parceiro — expansão suave -->
       <div class="ob-conjuge-section" id="obConjugeSection">
-        <div style="font-size:12px;font-weight:600;color:#9ca3af;margin-bottom:12px;text-align:center" id="ob-s5-conjuge-title">Sobre seu(sua) parceiro(a):</div>
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div class="ob-avatar" id="obConjugeAvatar" style="width:56px;height:56px;font-size:20px;margin-bottom:6px"><span id="obConjugeAvatarInitials">?</span></div>
-          <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:4px" id="ob-s5-color-conjuge-label">Cor do avatar</div>
-          <div class="color-picker-row" id="obColorPickerConjuge" style="margin-bottom:10px"></div>
-          <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do(a) parceiro(a)" oninput="obUpdateConjugeAvatar()" style="text-align:center;margin-bottom:6px">
-          <div class="ob-sex-row" style="max-width:none">
-            <span class="ob-sex-label" id="ob-s5-sexo-conjuge-label">Parceiro(a)</span>
-            <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
-            <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')" style="flex:1;padding:7px 0;font-size:12px">Feminino</button>
+        <div class="ob-conjuge-divider">
+          <div class="ob-conjuge-divider-line"></div>
+          <span class="ob-conjuge-divider-label" id="ob-s5-conjuge-divider">Parceiro(a)</span>
+          <div class="ob-conjuge-divider-line"></div>
+        </div>
+        <div class="ob-profile-avatar-wrap">
+          <div class="ob-avatar" id="obConjugeAvatar" style="width:80px;height:80px;font-size:30px;margin-bottom:0;background:#2563eb"><span id="obConjugeAvatarInitials">?</span></div>
+          <div class="color-picker-row" id="obColorPickerConjuge">
+            <div class="ob-conjuge-color-dot" data-color="#7c3aed" onclick="obSetConjugeColor('#7c3aed')" style="width:24px;height:24px;border-radius:50%;background:#7c3aed;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#2563eb" onclick="obSetConjugeColor('#2563eb')" style="width:24px;height:24px;border-radius:50%;background:#2563eb;cursor:pointer;flex-shrink:0;border:2px solid #fff;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#059669" onclick="obSetConjugeColor('#059669')" style="width:24px;height:24px;border-radius:50%;background:#059669;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#d97706" onclick="obSetConjugeColor('#d97706')" style="width:24px;height:24px;border-radius:50%;background:#d97706;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#dc2626" onclick="obSetConjugeColor('#dc2626')" style="width:24px;height:24px;border-radius:50%;background:#dc2626;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#db2777" onclick="obSetConjugeColor('#db2777')" style="width:24px;height:24px;border-radius:50%;background:#db2777;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#0891b2" onclick="obSetConjugeColor('#0891b2')" style="width:24px;height:24px;border-radius:50%;background:#0891b2;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#65a30d" onclick="obSetConjugeColor('#65a30d')" style="width:24px;height:24px;border-radius:50%;background:#65a30d;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
           </div>
         </div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin:12px 0 4px" id="ob-s5-obj-conjuge-label">Objetivo do(a) parceiro(a)</div>
-        <div class="ob-goal-grid">
-          <div class="ob-goal-card" id="obConjObj_dividas" onclick="obConjSetObjetivo('dividas')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <div class="ob-goal-card-label" id="obConjObjLabel_dividas">Sair das dívidas</div>
-          </div>
-          <div class="ob-goal-card" id="obConjObj_reserva" onclick="obConjSetObjetivo('reserva')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <div class="ob-goal-card-label" id="obConjObjLabel_reserva">Reserva</div>
-          </div>
-          <div class="ob-goal-card" id="obConjObj_imovel" onclick="obConjSetObjetivo('imovel')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <div class="ob-goal-card-label" id="obConjObjLabel_imovel">Imóvel</div>
-          </div>
-          <div class="ob-goal-card" id="obConjObj_viajar" onclick="obConjSetObjetivo('viajar')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21 4 21 4s-2 0-3.5 1.5L14 9 5.8 6.2c-.5-.2-1 .1-1.2.5l-.5 1c-.2.5 0 1.1.5 1.3L11 11l-2 3H7l-1 1 3 2 2 3 1-1v-2l3-2 3.5 5.5c.3.5.9.6 1.3.3l1-.5c.5-.1.7-.7.5-1.1z"/></svg>
-            <div class="ob-goal-card-label" id="obConjObjLabel_viajar">Viajar</div>
-          </div>
-          <div class="ob-goal-card" id="obConjObj_investir" onclick="obConjSetObjetivo('investir')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            <div class="ob-goal-card-label" id="obConjObjLabel_investir">Investir</div>
-          </div>
-          <div class="ob-goal-card" id="obConjObj_outro" onclick="obConjSetObjetivo('outro')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 9.5-9.5z"/></svg>
-            <div class="ob-goal-card-label" id="obConjObjLabel_outro">Outro</div>
-          </div>
-        </div>
-        <div id="obConjOutroRow" style="display:none;width:100%;margin-top:8px">
-          <input class="ob-input" id="obConjOutroTexto" type="text" maxlength="80" placeholder="Descreva o objetivo">
+        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do(a) parceiro(a)" oninput="obUpdateConjugeAvatar()" style="text-align:center;font-size:16px;font-weight:500;margin-bottom:16px">
+        <div class="ob-sex-row">
+          <span class="ob-sex-label" id="ob-s5-sexo-conjuge-label">Sexo do(a) parceiro(a)</span>
+          <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
+          <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')" style="flex:1;padding:7px 0;font-size:12px">Feminino</button>
         </div>
       </div>
 
@@ -5627,9 +5612,7 @@ function obApplyLang(){
   if(el('obCivilSubSolteiro')) el('obCivilSubSolteiro').textContent='Just me';
   if(el('obCivilTitleCasado')) el('obCivilTitleCasado').textContent='Married/Partner';
   if(el('obCivilSubCasado')) el('obCivilSubCasado').textContent="We're two";
-  if(el('ob-s5-conjuge-title')) el('ob-s5-conjuge-title').textContent='About your partner:';
-  if(el('ob-s5-color-conjuge-label')) el('ob-s5-color-conjuge-label').textContent='Avatar color';
-  if(el('ob-s5-obj-conjuge-label')) el('ob-s5-obj-conjuge-label').textContent="Partner's goal";
+  if(el('ob-s5-conjuge-divider')) el('ob-s5-conjuge-divider').textContent='Partner';
   if(el('obConjObjLabel_dividas')) el('obConjObjLabel_dividas').textContent='Pay off debt';
   if(el('obConjObjLabel_reserva')) el('obConjObjLabel_reserva').textContent='Emergency fund';
   if(el('obConjObjLabel_imovel')) el('obConjObjLabel_imovel').textContent='Buy property';
@@ -5642,7 +5625,7 @@ function obApplyLang(){
   if(el('ob-s5-sexo-user-label')) el('ob-s5-sexo-user-label').textContent='Your gender';
   if(el('obSexoUser_M')) el('obSexoUser_M').textContent='Male';
   if(el('obSexoUser_F')) el('obSexoUser_F').textContent='Female';
-  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent='Partner';
+  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent="Partner's gender";
   if(el('obSexoConjuge_M')) el('obSexoConjuge_M').textContent='Male';
   if(el('obSexoConjuge_F')) el('obSexoConjuge_F').textContent='Female';
   if(el('ob-s5-obj-label')) el('ob-s5-obj-label').textContent="What's your main goal?";
@@ -5904,9 +5887,11 @@ function obPickColor(c){
 }
 function obSetConjugeColor(c){
   window._obAvatarColorConjuge=c;
-  const avEl=document.getElementById('obConjugeAvatar');
-  if(avEl) avEl.style.background=c;
-  buildColorPicker(c,'obSetConjugeColor','obColorPickerConjuge');
+  const av=document.getElementById('obConjugeAvatar');
+  if(av) av.style.background=c;
+  document.querySelectorAll('.ob-conjuge-color-dot').forEach(d=>{
+    d.style.border=d.dataset.color===c?'2px solid #fff':'2px solid transparent';
+  });
 }
 function pePickColor(c){
   window._peAvatarColor=c;
@@ -5939,9 +5924,12 @@ function obSetEstadoCivil(v){
   const sec=document.getElementById('obConjugeSection');
   if(sec)sec.classList.toggle('open',v==='casado');
   if(v==='casado'){
-    buildColorPicker(window._obAvatarColorConjuge||'#2563eb','obSetConjugeColor','obColorPickerConjuge');
+    const initColor=window._obAvatarColorConjuge||'#2563eb';
     const cj=document.getElementById('obConjugeAvatar');
-    if(cj)cj.style.background=window._obAvatarColorConjuge||'#2563eb';
+    if(cj) cj.style.background=initColor;
+    document.querySelectorAll('.ob-conjuge-color-dot').forEach(d=>{
+      d.style.border=d.dataset.color===initColor?'2px solid #fff':'2px solid transparent';
+    });
   }
 }
 
@@ -5975,11 +5963,9 @@ function obUpdateAvatar(){
 }
 function obUpdateConjugeAvatar(){
   const name=(document.getElementById('obConjugeNome')||{value:''}).value.trim();
-  const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const initials=name?name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
   const av=document.getElementById('obConjugeAvatarInitials');
   if(av) av.textContent=initials;
-  const avEl=document.getElementById('obConjugeAvatar');
-  if(avEl) avEl.style.background=window._obAvatarColorConjuge||'#2563eb';
 }
 function obConjSetObjetivo(v){
   if(!window._obObjetivosConjuge) window._obObjetivosConjuge=[];
