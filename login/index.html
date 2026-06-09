@@ -5416,8 +5416,10 @@ function initApp(){
   showTab('home');
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('home',true));
-  // Show onboarding for first-time users
+  // Show onboarding for first-time users (returns immediately if already done)
   obStart();
+  // Start tour for users who haven't done it yet and are not mid-onboarding
+  if(!obIsFirstTime()) setTimeout(()=>{ if(tourIsFirstTime()) tourStart(); },600);
   // Push notifications daily check
   initNotifications();
   // Show AI FAB
@@ -6350,7 +6352,6 @@ function obFinish(){
   }
   document.getElementById('onboardingScreen').style.display='none';
   initApp();
-  setTimeout(()=>{ if(tourIsFirstTime()) tourStart(); },600);
 }
 
 // ── APP TOUR ─────────────────────────────────────────────────────
