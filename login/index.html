@@ -877,11 +877,13 @@ body.dark .confirm-delete{background:#dc2626}
 .ob-civil-card-icon{font-size:24px;margin-bottom:6px}
 .ob-civil-card-title{font-size:14px;font-weight:700;color:#fff!important}
 .ob-civil-card-sub{font-size:11px;color:rgba(255,255,255,0.6)!important;margin-top:2px}
-.ob-conjuge-section{overflow:hidden;max-height:0;transition:max-height .5s ease,padding .5s ease;padding-top:0;width:100%;max-width:320px}
-.ob-conjuge-section.open{max-height:600px;padding-top:20px}
-.ob-conjuge-divider{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.ob-conjuge-divider-line{flex:1;height:1px;background:rgba(255,255,255,0.1)}
-.ob-conjuge-divider-label{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#a78bfa}
+.ob-duo-wrap{display:flex;gap:12px;width:100%;max-width:340px;margin-top:12px}
+.ob-duo-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ob-duo-col-label{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#a78bfa;margin-bottom:2px}
+.ob-duo-sex-label{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-top:2px}
+.ob-duo-sex-btns{display:flex;gap:6px;width:100%}
+.ob-duo-sex-btns .ob-civil-btn{flex:1;padding:6px 0;font-size:11px}
+.ob-duo-input{text-align:center!important;font-size:13px!important;padding:8px 6px!important;margin-bottom:0!important}
 .ob-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .ob-goal-card{border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:all .2s;background:transparent}
 .ob-goal-card.active{border-color:#7c3aed;background:rgba(124,58,237,0.12)}
@@ -1879,19 +1881,9 @@ body.dark .theme-pill-dark{color:#fff}
       <div class="ob-badge" id="ob-s5-badge">Perfil</div>
       <div class="ob-slide-title" id="ob-s5-title">Seu Perfil</div>
 
-      <!-- Avatar + cor + nome -->
-      <div class="ob-profile-avatar-wrap">
-        <div class="ob-avatar" id="obAvatar" style="width:80px;height:80px;font-size:30px;margin-bottom:0"><span id="obAvatarInitials">?</span></div>
-        <div class="color-picker-row" id="obColorPickerUser"></div>
-      </div>
-      <input class="ob-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()" style="text-align:center;font-size:16px;font-weight:500;margin-bottom:16px">
-
-      <!-- Divider -->
-      <div style="height:0.5px;background:rgba(255,255,255,0.07);width:100%;max-width:320px;margin-bottom:8px"></div>
-
-      <!-- Estado civil — cards visuais -->
-      <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;width:100%;max-width:320px;margin-bottom:2px" id="ob-s5-civil-label">Estado civil</div>
-      <div class="ob-civil-cards" style="width:100%;max-width:320px">
+      <!-- Estado civil — cards (topo) -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;width:100%;max-width:340px;margin-bottom:4px" id="ob-s5-civil-label">Estado civil</div>
+      <div class="ob-civil-cards" style="width:100%;max-width:340px">
         <div class="ob-civil-card active" id="obCivilCardSolteiro" onclick="obSetEstadoCivil('solteiro')">
           <div class="ob-civil-card-icon">👤</div>
           <div class="ob-civil-card-title" id="obCivilTitleSolteiro">Solteiro(a)</div>
@@ -1904,47 +1896,47 @@ body.dark .theme-pill-dark{color:#fff}
         </div>
       </div>
 
-      <!-- Sexo do usuário -->
-      <div class="ob-sex-row">
-        <span class="ob-sex-label" id="ob-s5-sexo-user-label">Seu sexo</span>
-        <button class="ob-civil-btn" id="obSexoUser_M" onclick="obSetSexo('user','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
-        <button class="ob-civil-btn" id="obSexoUser_F" onclick="obSetSexo('user','F')" style="flex:1;padding:7px 0;font-size:12px">Feminino</button>
-      </div>
-
-      <!-- Seção parceiro — expansão suave -->
-      <div class="ob-conjuge-section" id="obConjugeSection">
-        <div class="ob-conjuge-divider">
-          <div class="ob-conjuge-divider-line"></div>
-          <span class="ob-conjuge-divider-label" id="ob-s5-conjuge-divider">Parceiro(a)</span>
-          <div class="ob-conjuge-divider-line"></div>
-        </div>
-        <div class="ob-profile-avatar-wrap">
-          <div class="ob-avatar" id="obConjugeAvatar" style="width:80px;height:80px;font-size:30px;margin-bottom:0;background:#2563eb"><span id="obConjugeAvatarInitials">?</span></div>
-          <div class="color-picker-row" id="obColorPickerConjuge">
-            <div class="ob-conjuge-color-dot" data-color="#7c3aed" onclick="obSetConjugeColor('#7c3aed')" style="width:24px;height:24px;border-radius:50%;background:#7c3aed;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#2563eb" onclick="obSetConjugeColor('#2563eb')" style="width:24px;height:24px;border-radius:50%;background:#2563eb;cursor:pointer;flex-shrink:0;border:2px solid #fff;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#059669" onclick="obSetConjugeColor('#059669')" style="width:24px;height:24px;border-radius:50%;background:#059669;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#d97706" onclick="obSetConjugeColor('#d97706')" style="width:24px;height:24px;border-radius:50%;background:#d97706;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#dc2626" onclick="obSetConjugeColor('#dc2626')" style="width:24px;height:24px;border-radius:50%;background:#dc2626;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#db2777" onclick="obSetConjugeColor('#db2777')" style="width:24px;height:24px;border-radius:50%;background:#db2777;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#0891b2" onclick="obSetConjugeColor('#0891b2')" style="width:24px;height:24px;border-radius:50%;background:#0891b2;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
-            <div class="ob-conjuge-color-dot" data-color="#65a30d" onclick="obSetConjugeColor('#65a30d')" style="width:24px;height:24px;border-radius:50%;background:#65a30d;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+      <!-- Colunas lado a lado: usuário + cônjuge -->
+      <div class="ob-duo-wrap" id="ob-s5-duo">
+        <!-- Coluna usuário -->
+        <div class="ob-duo-col" id="ob-s5-user-col">
+          <div class="ob-duo-col-label" id="ob-s5-user-col-label" style="visibility:hidden">Você</div>
+          <div class="ob-avatar" id="obAvatar" style="width:68px;height:68px;font-size:24px;margin-bottom:0"><span id="obAvatarInitials">?</span></div>
+          <div class="color-picker-row" id="obColorPickerUser"></div>
+          <input class="ob-input ob-duo-input" id="obDisplayName" type="text" maxlength="40" placeholder="Seu nome" oninput="obUpdateAvatar()">
+          <div class="ob-duo-sex-label" id="ob-s5-sexo-user-label">Seu sexo</div>
+          <div class="ob-duo-sex-btns">
+            <button class="ob-civil-btn" id="obSexoUser_M" onclick="obSetSexo('user','M')">Masculino</button>
+            <button class="ob-civil-btn" id="obSexoUser_F" onclick="obSetSexo('user','F')">Feminino</button>
           </div>
         </div>
-        <input class="ob-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do(a) parceiro(a)" oninput="obUpdateConjugeAvatar()" style="text-align:center;font-size:16px;font-weight:500;margin-bottom:16px">
-        <div class="ob-sex-row">
-          <span class="ob-sex-label" id="ob-s5-sexo-conjuge-label">Sexo do(a) parceiro(a)</span>
-          <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')" style="flex:1;padding:7px 0;font-size:12px">Masculino</button>
-          <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')" style="flex:1;padding:7px 0;font-size:12px">Feminino</button>
+        <!-- Coluna cônjuge (oculta quando solteiro) -->
+        <div class="ob-duo-col" id="ob-s5-conjuge-col" style="display:none">
+          <div class="ob-duo-col-label" id="ob-s5-conjuge-col-label">Parceiro(a)</div>
+          <div class="ob-avatar" id="obConjugeAvatar" style="width:68px;height:68px;font-size:24px;margin-bottom:0;background:#2563eb"><span id="obConjugeAvatarInitials">?</span></div>
+          <div class="color-picker-row" id="obColorPickerConjuge">
+            <div class="ob-conjuge-color-dot" data-color="#7c3aed" onclick="obSetConjugeColor('#7c3aed')" style="width:20px;height:20px;border-radius:50%;background:#7c3aed;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#2563eb" onclick="obSetConjugeColor('#2563eb')" style="width:20px;height:20px;border-radius:50%;background:#2563eb;cursor:pointer;flex-shrink:0;border:2px solid #fff;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#059669" onclick="obSetConjugeColor('#059669')" style="width:20px;height:20px;border-radius:50%;background:#059669;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#d97706" onclick="obSetConjugeColor('#d97706')" style="width:20px;height:20px;border-radius:50%;background:#d97706;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#dc2626" onclick="obSetConjugeColor('#dc2626')" style="width:20px;height:20px;border-radius:50%;background:#dc2626;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#db2777" onclick="obSetConjugeColor('#db2777')" style="width:20px;height:20px;border-radius:50%;background:#db2777;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#0891b2" onclick="obSetConjugeColor('#0891b2')" style="width:20px;height:20px;border-radius:50%;background:#0891b2;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+            <div class="ob-conjuge-color-dot" data-color="#65a30d" onclick="obSetConjugeColor('#65a30d')" style="width:20px;height:20px;border-radius:50%;background:#65a30d;cursor:pointer;flex-shrink:0;border:2px solid transparent;box-sizing:border-box;transition:border-color .15s"></div>
+          </div>
+          <input class="ob-input ob-duo-input" id="obConjugeNome" type="text" maxlength="40" placeholder="Nome do(a) parceiro(a)" oninput="obUpdateConjugeAvatar()">
+          <div class="ob-duo-sex-label" id="ob-s5-sexo-conjuge-label">Sexo</div>
+          <div class="ob-duo-sex-btns">
+            <button class="ob-civil-btn" id="obSexoConjuge_M" onclick="obSetSexo('conjuge','M')">Masculino</button>
+            <button class="ob-civil-btn" id="obSexoConjuge_F" onclick="obSetSexo('conjuge','F')">Feminino</button>
+          </div>
         </div>
       </div>
 
-      <!-- Divider -->
-      <div style="height:0.5px;background:rgba(255,255,255,0.07);width:100%;max-width:320px;margin:16px 0 8px"></div>
-
-      <!-- Objetivos do usuário -->
-      <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;width:100%;max-width:320px;margin-bottom:4px" id="ob-s5-obj-label">Qual seu principal objetivo?</div>
-      <div class="ob-goal-grid" style="width:100%;max-width:320px">
+      <!-- Objetivos -->
+      <div style="height:0.5px;background:rgba(255,255,255,0.07);width:100%;max-width:340px;margin:16px 0 8px"></div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;width:100%;max-width:340px;margin-bottom:4px" id="ob-s5-obj-label">Qual seu principal objetivo?</div>
+      <div class="ob-goal-grid" style="width:100%;max-width:340px">
         <div class="ob-goal-card" id="obObj_dividas" onclick="obSetObjetivo('dividas')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           <div class="ob-goal-card-label" id="obObjLabel_dividas">Sair das dívidas</div>
@@ -1970,7 +1962,7 @@ body.dark .theme-pill-dark{color:#fff}
           <div class="ob-goal-card-label" id="obObjLabel_outro">Outro</div>
         </div>
       </div>
-      <div id="obOutroRow" style="display:none;width:100%;max-width:320px;margin-top:8px">
+      <div id="obOutroRow" style="display:none;width:100%;max-width:340px;margin-top:8px">
         <input class="ob-input" id="obOutroTexto" type="text" maxlength="80" placeholder="Descreva seu objetivo">
       </div>
 
@@ -5614,7 +5606,8 @@ function obApplyLang(){
   if(el('obCivilSubSolteiro')) el('obCivilSubSolteiro').textContent='Just me';
   if(el('obCivilTitleCasado')) el('obCivilTitleCasado').textContent='Married/Partner';
   if(el('obCivilSubCasado')) el('obCivilSubCasado').textContent="We're two";
-  if(el('ob-s5-conjuge-divider')) el('ob-s5-conjuge-divider').textContent='Partner';
+  if(el('ob-s5-user-col-label')) el('ob-s5-user-col-label').textContent='You';
+  if(el('ob-s5-conjuge-col-label')) el('ob-s5-conjuge-col-label').textContent='Partner';
   if(el('obConjObjLabel_dividas')) el('obConjObjLabel_dividas').textContent='Pay off debt';
   if(el('obConjObjLabel_reserva')) el('obConjObjLabel_reserva').textContent='Emergency fund';
   if(el('obConjObjLabel_imovel')) el('obConjObjLabel_imovel').textContent='Buy property';
@@ -5627,7 +5620,7 @@ function obApplyLang(){
   if(el('ob-s5-sexo-user-label')) el('ob-s5-sexo-user-label').textContent='Your gender';
   if(el('obSexoUser_M')) el('obSexoUser_M').textContent='Male';
   if(el('obSexoUser_F')) el('obSexoUser_F').textContent='Female';
-  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent="Partner's gender";
+  if(el('ob-s5-sexo-conjuge-label')) el('ob-s5-sexo-conjuge-label').textContent='Gender';
   if(el('obSexoConjuge_M')) el('obSexoConjuge_M').textContent='Male';
   if(el('obSexoConjuge_F')) el('obSexoConjuge_F').textContent='Female';
   if(el('ob-s5-obj-label')) el('ob-s5-obj-label').textContent="What's your main goal?";
@@ -5923,12 +5916,10 @@ function obSetEstadoCivil(v){
   const cc=document.getElementById('obCivilCardCasado');
   if(cs)cs.classList.toggle('active',v==='solteiro');
   if(cc)cc.classList.toggle('active',v==='casado');
-  const sec=document.getElementById('obConjugeSection');
-  if(sec){
-    sec.classList.toggle('open',v==='casado');
-    sec.style.maxHeight=v==='casado'?'600px':'0';
-    sec.style.paddingTop=v==='casado'?'20px':'0';
-  }
+  const conjCol=document.getElementById('ob-s5-conjuge-col');
+  const userLabel=document.getElementById('ob-s5-user-col-label');
+  if(conjCol) conjCol.style.display=v==='casado'?'flex':'none';
+  if(userLabel) userLabel.style.visibility=v==='casado'?'visible':'hidden';
   if(v==='casado'){
     const initColor=window._obAvatarColorConjuge||'#2563eb';
     const cj=document.getElementById('obConjugeAvatar');
