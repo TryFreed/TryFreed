@@ -875,8 +875,8 @@ body.dark .confirm-delete{background:#dc2626}
 .ob-civil-card{border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;background:transparent}
 .ob-civil-card.active{border-color:#7c3aed;background:rgba(124,58,237,0.12)}
 .ob-civil-card-icon{font-size:24px;margin-bottom:6px}
-.ob-civil-card-title{font-size:14px;font-weight:700;color:var(--text)}
-.ob-civil-card-sub{font-size:11px;color:#6b7280;margin-top:2px}
+.ob-civil-card-title{font-size:14px;font-weight:700;color:#fff!important}
+.ob-civil-card-sub{font-size:11px;color:rgba(255,255,255,0.6)!important;margin-top:2px}
 .ob-conjuge-section{overflow:hidden;max-height:0;transition:max-height .4s ease;border-top:0.5px solid rgba(255,255,255,0.07);margin-top:12px;padding-top:0;width:100%;max-width:320px}
 .ob-conjuge-section.open{max-height:620px;padding-top:14px}
 .ob-goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
@@ -2713,7 +2713,10 @@ body.dark .theme-pill-dark{color:#fff}
         <button class="ob-civil-btn" id="peCasado" onclick="peSetCivil('casado')">Casado(a) / Parceiro(a)</button>
       </div>
       <div id="peConjugeRow" style="display:none;width:100%;flex-direction:column;align-items:center">
-        <input class="ob-input" id="peConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" style="margin-bottom:.75rem">
+        <div class="ob-avatar" id="peConjugeAvatar" style="width:48px;height:48px;font-size:17px;margin-bottom:6px;margin-top:4px"><span id="peConjugeAvatarInitials">?</span></div>
+        <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peColorConjuge-label">Cor do(a) parceiro(a)</div>
+        <div class="color-picker-row" id="peColorPickerConjuge" style="margin-bottom:.5rem"></div>
+        <input class="ob-input" id="peConjugeNome" type="text" maxlength="40" placeholder="Nome do cônjuge" oninput="peUpdateConjugeAvatar()" style="margin-bottom:.75rem">
         <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peSexoUser-label">Seu sexo</div>
         <div class="ob-civil-btns" style="margin-bottom:.75rem">
           <button class="ob-civil-btn" id="peSexoUser_M" onclick="peSetSexo('user','M')">Masculino</button>
@@ -2724,8 +2727,6 @@ body.dark .theme-pill-dark{color:#fff}
           <button class="ob-civil-btn" id="peSexoConjuge_M" onclick="peSetSexo('conjuge','M')">Masculino</button>
           <button class="ob-civil-btn" id="peSexoConjuge_F" onclick="peSetSexo('conjuge','F')">Feminino</button>
         </div>
-        <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peColorConjuge-label">Cor do(a) parceiro(a)</div>
-        <div class="color-picker-row" id="peColorPickerConjuge" style="margin-bottom:.5rem"></div>
       </div>
       <div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem;align-self:flex-start" id="peObj-label">Objetivo financeiro</div>
       <div class="ob-obj-grid" style="margin-bottom:.75rem">
@@ -5915,7 +5916,17 @@ function pePickColor(c){
 }
 function pePickColorConjuge(c){
   window._peAvatarColorConjuge=c;
+  const avEl=document.getElementById('peConjugeAvatar');
+  if(avEl) avEl.style.background=c;
   buildColorPicker(c,'pePickColorConjuge','peColorPickerConjuge');
+}
+function peUpdateConjugeAvatar(){
+  const name=(document.getElementById('peConjugeNome')||{value:''}).value.trim();
+  const initials=name?name.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2):'?';
+  const av=document.getElementById('peConjugeAvatarInitials');
+  if(av) av.textContent=initials;
+  const avEl=document.getElementById('peConjugeAvatar');
+  if(avEl) avEl.style.background=window._peAvatarColorConjuge||'#2563eb';
 }
 
 // ── ONBOARDING PROFILE HELPERS ────────────────────────────────
@@ -6083,6 +6094,7 @@ function showProfileEdit(){
     const scu=document.getElementById('peSexoConjuge-label');if(scu)scu.textContent="Partner's gender";
     const pcl=document.getElementById('peColor-label');if(pcl)pcl.textContent='Avatar color';
     const pccl=document.getElementById('peColorConjuge-label');if(pccl)pccl.textContent="Partner's color";
+    const pccnl=document.getElementById('peConjugeNome-label');if(pccnl)pccnl.textContent="Partner's name";
     ['peSexoUser_M','peSexoConjuge_M'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Male';});
     ['peSexoUser_F','peSexoConjuge_F'].forEach(id=>{const b=document.getElementById(id);if(b)b.textContent='Female';});
   }
@@ -6093,7 +6105,7 @@ function showProfileEdit(){
   if(p.sexo_user) peSetSexo('user',p.sexo_user);
   if(p.sexo_conjuge) peSetSexo('conjuge',p.sexo_conjuge);
   // restore objetivo toggles
-  _peObjetivos.forEach(k=>_peToggleObjBtn(k,true));
+  ['dividas','reserva','imovel','viajar','investir','outro'].forEach(k=>_peToggleObjBtn(k));
   const r=document.getElementById('peOutroRow');if(r)r.style.display=_peObjetivos.includes('outro')?'block':'none';
   const otEl=document.getElementById('peOutroTexto');
   if(otEl) otEl.value=p.objetivo_outro||'';
@@ -6123,13 +6135,18 @@ function peSetCivil(v){
   if(bs){bs.style.background=v==='solteiro'?'#7c3aed':'transparent';bs.style.color=v==='solteiro'?'#fff':'#9ca3af';bs.classList.toggle('active',v==='solteiro');}
   if(bc){bc.style.background=v==='casado'?'#7c3aed':'transparent';bc.style.color=v==='casado'?'#fff':'#9ca3af';bc.classList.toggle('active',v==='casado');}
   const r=document.getElementById('peConjugeRow');if(r)r.style.display=v==='casado'?'flex':'none';
-  if(v==='casado') buildColorPicker(window._peAvatarColorConjuge||'#2563eb','pePickColorConjuge','peColorPickerConjuge');
+  if(v==='casado'){
+    buildColorPicker(window._peAvatarColorConjuge||'#2563eb','pePickColorConjuge','peColorPickerConjuge');
+    const avEl=document.getElementById('peConjugeAvatar');
+    if(avEl) avEl.style.background=window._peAvatarColorConjuge||'#2563eb';
+    peUpdateConjugeAvatar();
+  }
 }
 
 function _peToggleObjBtn(k,forceOn){
   const on=forceOn!=null?forceOn:_peObjetivos.includes(k);
   const b=document.getElementById('peObj_'+k);
-  if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
+  if(b){b.style.background=on?'rgba(124,58,237,0.15)':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
 }
 
 function peSetObjetivo(v){
@@ -6210,7 +6227,7 @@ function conjuToggleObj(k){
   ['dividas','reserva','imovel','viajar','investir','outro'].forEach(key=>{
     const on=_editObjetivosConjuge.includes(key);
     const b=document.getElementById('cjObj_'+key);
-    if(b){b.style.background=on?'#7c3aed':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
+    if(b){b.style.background=on?'rgba(124,58,237,0.15)':'transparent';b.style.color=on?'#fff':'#9ca3af';b.style.borderColor=on?'#7c3aed':'rgba(255,255,255,0.15)';b.classList.toggle('active',on);}
   });
   const r=document.getElementById('cjOutroRow');if(r)r.style.display=_editObjetivosConjuge.includes('outro')?'block':'none';
 }
