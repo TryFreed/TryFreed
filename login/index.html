@@ -838,6 +838,9 @@ body.dark .confirm-delete{background:#dc2626}
 .hd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;margin-left:6px}
 .hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
 .hd-see-all:hover{text-decoration:underline}
+.gcal-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.gcal-btn:hover{background:rgba(124,58,237,0.15);border-color:#7c3aed}
+.gcal-btn:disabled{opacity:.5;cursor:not-allowed}
 
 /* ── COLOR PICKER + CONJUGE CARD ─────────────────────────────── */
 .color-picker-row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;justify-content:center}
@@ -1534,6 +1537,7 @@ body.dark .theme-pill-dark{color:#fff}
 .ai-img-remove:hover{background:#dc2626}
 
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <!-- LOGIN SCREEN -->
@@ -3435,6 +3439,15 @@ function applyLang(){
     pwAB1:'pw_ab1',pwAB2:'pw_ab2',pwAB3:'pw_ab3',
     pwGuarantee:'pw_guarantee'};
   Object.entries(_pw).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=t(key);});
+  // Google Calendar section
+  const hdCalTitle=document.getElementById('hdCalTitle');
+  if(hdCalTitle) hdCalTitle.textContent='Google Calendar';
+  const hdCalSub=document.getElementById('hdCalSub');
+  if(hdCalSub) hdCalSub.textContent=lang==='en'?'Sync your expenses and income automatically':'Sincronize suas despesas e rendas automaticamente';
+  const gcalBillsLabel=document.getElementById('gcalBillsLabel');
+  if(gcalBillsLabel) gcalBillsLabel.textContent=lang==='en'?'Sync Expenses':'Sincronizar Despesas';
+  const gcalRendasLabel=document.getElementById('gcalRendasLabel');
+  if(gcalRendasLabel) gcalRendasLabel.textContent=lang==='en'?'Sync Income':'Sincronizar Rendas';
 }
 function _qry(sel,attr,val){const el=document.querySelector(sel);if(el)el[attr]=val;}
 
@@ -3467,6 +3480,7 @@ const CATS = {
 const SUPA_URL = 'https://nyicbxrbabudbwahrjzx.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55aWNieHJiYWJ1ZGJ3YWhyanp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMjg1MDYsImV4cCI6MjA5NDcwNDUwNn0.C8r8MdY3i12Q9fX1DSJTdopDf_mBepFp0ft9skluD4I';
 const _supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+const GCAL_CLIENT_ID = 'GOOGLE_CLIENT_ID_PLACEHOLDER';
 let _user = null;
 
 // ── Auth navigation ───────────────────────────────────────────────
@@ -5836,6 +5850,21 @@ function buildHomeDashboard(){
         <div class="hd-tx-right"><div class="hd-tx-val" style="color:${isIn?'#22c55e':'#ef4444'}">${isIn?'+':''}${fmt(tx.val)}</div><div class="hd-tx-date">${fd(tx.date)}</div></div>
       </div>`;
     }).join('')}
+</div>
+<div class="hd-section">
+  <div class="hd-section-title" id="hdCalTitle">${isEN?'Google Calendar':'Google Calendar'}</div>
+  <p style="font-size:12px;color:#6b7280;margin:0 0 12px" id="hdCalSub">${isEN?'Sync your expenses and income automatically':'Sincronize suas despesas e rendas automaticamente'}</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button onclick="gcalSync('bills')" class="gcal-btn" id="gcalBillsBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="gcalBillsLabel">${isEN?'Sync Expenses':'Sincronizar Despesas'}</span>
+    </button>
+    <button onclick="gcalSync('rendas')" class="gcal-btn" id="gcalRendasBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span id="gcalRendasLabel">${isEN?'Sync Income':'Sincronizar Rendas'}</span>
+    </button>
+  </div>
+  <div id="gcalStatus" style="font-size:11px;margin-top:10px;color:#6b7280"></div>
 </div>`;
 
   // Render chart after DOM update
@@ -6772,7 +6801,148 @@ async function loginWithGoogle(){
   }
 }
 
-// ── GOOGLE CALENDAR ───────────────────────────────────────────────
+// ── GOOGLE CALENDAR SYNC ─────────────────────────────────────────
+let _gcalTokenClient=null;
+let _gcalPendingType=null;
+
+function gcalSync(type){
+  const isEN=lang==='en';
+  const billsBtn=document.getElementById('gcalBillsBtn');
+  const rendasBtn=document.getElementById('gcalRendasBtn');
+  const status=document.getElementById('gcalStatus');
+  if(billsBtn) billsBtn.disabled=true;
+  if(rendasBtn) rendasBtn.disabled=true;
+  const labelId=type==='bills'?'gcalBillsLabel':'gcalRendasLabel';
+  const labelEl=document.getElementById(labelId);
+  if(labelEl) labelEl.textContent=isEN?'Syncing...':'Sincronizando...';
+  if(status) status.textContent='';
+  _gcalPendingType=type;
+  function _doLoad(){
+    if(typeof google==='undefined'||!google.accounts||!google.accounts.oauth2){
+      if(status) status.textContent=isEN?'❌ Google API not available. Try again.':'❌ API do Google indisponível. Tente novamente.';
+      _gcalResetBtns(type);
+      return;
+    }
+    _gcalTokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:GCAL_CLIENT_ID,
+      scope:'https://www.googleapis.com/auth/calendar.events',
+      callback:(token)=>{
+        if(token.error){
+          if(status) status.textContent=isEN?'❌ Authorization denied.':'❌ Autorização negada.';
+          _gcalResetBtns(type);
+          return;
+        }
+        gcalCreateEvents(type,token);
+      }
+    });
+    _gcalTokenClient.requestAccessToken();
+  }
+  if(typeof google!=='undefined'&&google.accounts&&google.accounts.oauth2){
+    _doLoad();
+  } else {
+    loadScript('https://accounts.google.com/gsi/client').then(_doLoad).catch(()=>{
+      if(status) status.textContent=isEN?'❌ Failed to load Google API.':'❌ Falha ao carregar API do Google.';
+      _gcalResetBtns(type);
+    });
+  }
+}
+
+function _gcalResetBtns(type){
+  const isEN=lang==='en';
+  const billsBtn=document.getElementById('gcalBillsBtn');
+  const rendasBtn=document.getElementById('gcalRendasBtn');
+  if(billsBtn) billsBtn.disabled=false;
+  if(rendasBtn) rendasBtn.disabled=false;
+  const billsLabel=document.getElementById('gcalBillsLabel');
+  if(billsLabel) billsLabel.textContent=isEN?'Sync Expenses':'Sincronizar Despesas';
+  const rendasLabel=document.getElementById('gcalRendasLabel');
+  if(rendasLabel) rendasLabel.textContent=isEN?'Sync Income':'Sincronizar Rendas';
+}
+
+async function gcalCreateEvents(type,token){
+  const isEN=lang==='en';
+  const status=document.getElementById('gcalStatus');
+  const today=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const toYMD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const endOf12m=new Date(today.getFullYear(),today.getMonth()+12,today.getDate());
+
+  // Build list of {date, name, val} events to create
+  const events=[];
+  const items=type==='bills'?bills:rendas;
+
+  items.forEach(item=>{
+    const name=item.name||'';
+    const val=Number(item.val)||0;
+    const itype=item.type||'monthly';
+
+    if(itype==='once'){
+      const d=item.day===99
+        ?new Date(item.year||today.getFullYear(),(item.month||today.getMonth()+1)-1,28)
+        :new Date(item.year||today.getFullYear(),(item.month||today.getMonth()+1)-1,item.day||1);
+      if(d>=today&&d<=endOf12m) events.push({date:d,name,val});
+
+    } else if(itype==='monthly'){
+      for(let i=0;i<13;i++){
+        const base=new Date(today.getFullYear(),today.getMonth()+i,1);
+        const maxDay=new Date(base.getFullYear(),base.getMonth()+1,0).getDate();
+        const day=item.day===99?maxDay:Math.min(item.day||1,maxDay);
+        const d=new Date(base.getFullYear(),base.getMonth(),day);
+        if(d>=today&&d<=endOf12m) events.push({date:d,name,val});
+      }
+
+    } else if(itype==='weekly'){
+      // bills.weekly uses day (0-6), rendas.weekly uses dow
+      const targetDow=type==='bills'?(item.day||0):(item.dow||0);
+      const cur=new Date(today);
+      const diff=(targetDow-cur.getDay()+7)%7;
+      cur.setDate(cur.getDate()+(diff===0?0:diff));
+      while(cur<=endOf12m){
+        events.push({date:new Date(cur),name,val});
+        cur.setDate(cur.getDate()+7);
+      }
+    }
+  });
+
+  if(events.length===0){
+    if(status) status.textContent=isEN?'No events to sync.':'Nenhum evento para sincronizar.';
+    _gcalResetBtns(type);
+    return;
+  }
+
+  if(status) status.textContent=isEN?`Syncing... 0/${events.length} events`:`Sincronizando... 0/${events.length} eventos`;
+
+  let created=0,failed=0;
+  for(const ev of events){
+    const dateStr=toYMD(ev.date);
+    const body={
+      summary:esc(ev.name)+(type==='bills'?' 💸':' 💰'),
+      description:`${fmt(ev.val)} — ${type==='bills'?(isEN?'Expense TryFreed':'Despesa TryFreed'):(isEN?'Income TryFreed':'Renda TryFreed')}`,
+      start:{date:dateStr},
+      end:{date:dateStr},
+      colorId:type==='bills'?'11':'2'
+    };
+    try{
+      const res=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+token.access_token,'Content-Type':'application/json'},
+        body:JSON.stringify(body)
+      });
+      if(res.ok) created++;
+      else failed++;
+    } catch(e){ failed++; }
+    if(status) status.textContent=isEN?`Syncing... ${created}/${events.length} events`:`Sincronizando... ${created}/${events.length} eventos`;
+  }
+
+  if(failed===0){
+    if(status) status.textContent=isEN?`✅ ${created} events created in Google Calendar!`:`✅ ${created} eventos criados no Google Calendar!`;
+  } else {
+    if(status) status.textContent=isEN?`✅ ${created} created, ❌ ${failed} failed.`:`✅ ${created} criados, ❌ ${failed} com erro.`;
+  }
+  _gcalResetBtns(type);
+}
+
+// ── GOOGLE CALENDAR (add single event) ────────────────────────────
 function addToGoogleCal(name,val,day,month,year){
   const now=new Date();
   const y=year||now.getFullYear();
