@@ -5313,13 +5313,7 @@ function showTab(tabId){
   });
   updateBnShape(tabId);
   if(tabId==='home'){
-    if(typeof Chart==='undefined'){
-      loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
-        .then(()=>buildHomeDashboard())
-        .catch(()=>{});
-    } else {
-      buildHomeDashboard();
-    }
+    buildHomeDashboard();
   }
   if(tabId==='relatorio' && typeof Chart==='undefined'){
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
@@ -5650,6 +5644,7 @@ function obReset(){
 
 // ── HOME DASHBOARD ────────────────────────────────────────────
 function buildHomeDashboard(){
+  console.log('[buildHomeDashboard] called');
   const wrap=document.getElementById('homeDashboard');
   if(!wrap) return;
   const isEN=lang==='en';
