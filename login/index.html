@@ -252,8 +252,10 @@ body.dark .gs-done{color:#a78bfa;border-color:rgba(167,139,250,.3)}
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:2rem;text-align:center;position:relative;
 }
-.ob-slide{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%}
+.ob-slide{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;position:relative}
 .ob-slide.active{display:flex}
+.ob-skip-btn{position:absolute;top:0;right:0;background:none;border:none;color:#6b7280;font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color .15s;z-index:1}
+.ob-skip-btn:hover{color:#9ca3af}
 .ob-badge{
   font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
   color:#a78bfa;background:rgba(124,58,237,0.15);
@@ -1752,6 +1754,7 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Slide 0: Splash -->
     <div class="ob-slide active" id="ob-slide-0">
+      <button class="ob-skip-btn" onclick="obFinish()">Pular / Skip</button>
       <svg width="110" height="110" viewBox="60 40 160 160" style="margin-bottom:1rem" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="obBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient>
@@ -1784,6 +1787,7 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Slide 1: Versículo -->
     <div class="ob-slide" id="ob-slide-1">
+      <button class="ob-skip-btn" onclick="obFinish()">Pular / Skip</button>
       <div class="ob-badge" id="ob-s1-badge">Fundamento</div>
       <div class="ob-quote" id="ob-s1-quote">"Pois onde estiver o seu tesouro, aí também estará o seu coração."</div>
       <div class="ob-quote-ref">— Mateus 6:21</div>
@@ -1805,6 +1809,7 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Slide 2: História -->
     <div class="ob-slide" id="ob-slide-2">
+      <button class="ob-skip-btn" onclick="obFinish()">Pular / Skip</button>
       <div class="ob-badge" id="ob-s2-badge">Nossa história</div>
       <div class="ob-slide-title" id="ob-s2-title">Nasceu de uma necessidade real</div>
       <div class="ob-slide-sub" id="ob-s2-sub">Criado por alguém que também se perdeu nos números no fim do mês. TryFreed nasceu para transformar caos financeiro em clareza — simples, honesto, sem enrolação.</div>
@@ -1825,6 +1830,7 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Slide 3: Missão -->
     <div class="ob-slide" id="ob-slide-3">
+      <button class="ob-skip-btn" onclick="obFinish()">Pular / Skip</button>
       <div class="ob-badge" id="ob-s3-badge">Missão</div>
       <div class="ob-slide-title" id="ob-s3-title">Liberdade com consciência</div>
       <div class="ob-slide-sub" id="ob-s3-sub">Não queremos que você pense em dinheiro o dia todo. Queremos que você pense nele o suficiente para parar de se preocupar — e viver livre.</div>
@@ -1845,6 +1851,7 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Slide 4: Ponto de início -->
     <div class="ob-slide" id="ob-slide-4">
+      <button class="ob-skip-btn" onclick="obFinish()">Pular / Skip</button>
       <div class="ob-badge" id="ob-s4-badge">Rastreamento</div>
       <div class="ob-slide-title" id="ob-s4-title">Quando você quer começar?</div>
       <div class="ob-slide-sub" id="ob-s4-sub">Escolha o ponto de início do seu histórico financeiro.</div>
@@ -1878,6 +1885,7 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Slide 5: Perfil (redesign) -->
     <div class="ob-slide" id="ob-slide-5">
+      <button class="ob-skip-btn" onclick="obFinish()">Pular / Skip</button>
       <div class="ob-badge" id="ob-s5-badge">Perfil</div>
       <div class="ob-slide-title" id="ob-s5-title">Seu Perfil</div>
 
