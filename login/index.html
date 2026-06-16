@@ -3670,15 +3670,22 @@ async function handleReset(){
 }
 
 async function handleLogout(){
-  closeDrawer();
-  await _supa.auth.signOut();
-  _user=null;rendas=[];bills=[];metas=[];dividas=[];initialBalance=0;
-  document.getElementById('userEmail').textContent='';
-  // Clear non-user-scoped keys so next user on this device gets a clean state
-  localStorage.removeItem('ai_consent_v1');
-  localStorage.removeItem('notifEnabled');
-  _aiConsentGiven=false;
-  showHome();
+  try{
+    closeDrawer();
+    await _supa.auth.signOut();
+  } catch(e){
+    console.error('logout error',e);
+  } finally{
+    _user=null;
+    _booted=false;
+    _appRunning=false;
+    localStorage.removeItem('tryfreed_lang');
+    ['homeScreen','loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen','appScreen'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.style.display='none';
+    });
+    showLogin();
+  }
 }
 
 // ── Supabase data sync ────────────────────────────────────────────
