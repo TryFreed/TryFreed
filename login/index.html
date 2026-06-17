@@ -3821,9 +3821,10 @@ async function saveRenda(r){
     payload={...payload};delete payload[col];
     ({data,error}=await _supa.from('rendas').upsert(payload,{onConflict:'id'}).select());
   }
-  if(error){console.error('[saveRenda]',error);_showToast('Erro ao salvar renda: '+error.message);}
-  else if(!data?.length) _showToast('⚠️ Renda não salva. Verifique as permissões.');
-  else _showToast('✓ Renda salva!','#10b981');
+  console.log('[SAVE] rendas',{payload,data,error});
+  if(error){console.error('[saveRenda]',error);_showToast('Erro ao salvar renda: '+error.message);return false;}
+  else if(!data?.length){_showToast('⚠️ Renda não salva. Verifique as permissões.');return false;}
+  else{_showToast('✓ Renda salva!','#10b981');return true;}
 }
 async function deleteRenda(id){
   if(!_user) return;
@@ -3840,9 +3841,10 @@ async function saveBill(b){
     payload={...payload};delete payload[col];
     ({data,error}=await _supa.from('bills').upsert(payload,{onConflict:'id'}).select());
   }
-  if(error){console.error('[saveBill]',error);_showToast('Erro ao salvar despesa: '+error.message);}
-  else if(!data?.length) _showToast('⚠️ Despesa não salva. Verifique as permissões.');
-  else _showToast('✓ Despesa salva!','#10b981');
+  console.log('[SAVE] bills',{payload,data,error});
+  if(error){console.error('[saveBill]',error);_showToast('Erro ao salvar despesa: '+error.message);return false;}
+  else if(!data?.length){_showToast('⚠️ Despesa não salva. Verifique as permissões.');return false;}
+  else{_showToast('✓ Despesa salva!','#10b981');return true;}
 }
 async function deleteBill(id){
   if(!_user) return;
@@ -3859,7 +3861,10 @@ async function saveMeta(m){
     payload={...payload};delete payload[col];
     ({data,error}=await _supa.from('metas').upsert(payload,{onConflict:'id'}).select());
   }
-  if(error){console.error('[saveMeta]',error);_showToast('Erro ao salvar meta: '+error.message);}
+  console.log('[SAVE] metas',{payload,data,error});
+  if(error){console.error('[saveMeta]',error);_showToast('Erro ao salvar meta: '+error.message);return false;}
+  else if(!data?.length){_showToast('⚠️ Meta não salva. Verifique as permissões.');return false;}
+  else{_showToast('✓ Meta salva!','#10b981');return true;}
 }
 async function deleteMeta(id){
   if(!_user) return;
@@ -4370,7 +4375,7 @@ function onRendaTypeChange(type){
   if(lbl) lbl.textContent=isBi?(lang==='en'?'1st payment':'1º pagamento'):(lang==='en'?'Day':'Dia');
 }
 
-function addRenda(){
+async function addRenda(){
   try{
   const name=document.getElementById('re-name').value.trim();
   const val=parseFloat(document.getElementById('re-val').value)||0;
@@ -4384,7 +4389,6 @@ function addRenda(){
   const day2=type==='biweekly'?(parseInt(document.getElementById('re-day2').value)||null):null;
   const nr={id:newId(),name,val,day,day2,month:mo-1,year:yr,type,locked:false,dow:5,owner:window._rendaOwner||'user'};
   rendas.push(nr);
-  saveRenda(nr);
   document.getElementById('re-name').value='';
   document.getElementById('re-val').value='';
   document.getElementById('re-day').value='';
@@ -4394,6 +4398,10 @@ function addRenda(){
   toggleForm('renda',false);
   buildRendaList();
   try{rebuild();}catch(e2){console.error('rebuild error after addRenda:',e2);}
+  await saveRenda(nr);
+  await loadFromSupabase();
+  buildRendaList();
+  try{rebuild();}catch(e2){console.error('rebuild error after addRenda sync:',e2);}
   }catch(e){console.error('addRenda error:',e);_showToast('Erro ao adicionar: '+e.message);}
 }
 
@@ -4648,7 +4656,7 @@ function removeBill(id){
   if(b?.locked){alert(t('alert_unlock_before_remove'));return;}
   openConfirm(b?.name||'',()=>{bills=bills.filter(x=>x.id!==id);deleteBill(id);renderBills();rebuild();});
 }
-function addBill(){
+async function addBill(){
   try{
   const name=document.getElementById('f-name').value.trim();
   const val=parseFloat(document.getElementById('f-val').value)||0;
@@ -4663,11 +4671,14 @@ function addBill(){
   const nb={id:newId(),name,val,day,type,locked:false,cat,owner:window._billOwner||'user'};
   if(type==='once'){nb.month=mo-1;nb.year=yr;}
   bills.push(nb);
-  saveBill(nb);
   document.getElementById('f-name').value='';document.getElementById('f-val').value='';document.getElementById('f-day').value='';
   toggleForm('bills',false);
   renderBills();
   try{rebuild();}catch(e2){console.error('rebuild error after addBill:',e2);}
+  await saveBill(nb);
+  await loadFromSupabase();
+  renderBills();
+  try{rebuild();}catch(e2){console.error('rebuild error after addBill sync:',e2);}
   }catch(e){console.error('addBill error:',e);_showToast('Erro ao adicionar: '+e.message);}
 }
 
@@ -4927,7 +4938,7 @@ function buildMetas(){
 }
 
 
-function addMeta(){
+async function addMeta(){
   const name=document.getElementById('m-name').value.trim();
   const val=parseFloat(document.getElementById('m-val').value)||0;
   const dv=document.getElementById('m-month').value;
@@ -4947,13 +4958,14 @@ function addMeta(){
   const billId=newId();
   const nb={id:billId,name:'Guardar — '+name,val:needPerWeek,day:5,type:'weekly',locked:false,cat:'outros',metaId,metaEnd:targetDate,note:`Save every Friday until ${mo}/${dy}/${yr}`};
   bills.push(nb);
-  saveBill(nb);
   const nm={id:metaId,name,val,day:dy,month:mo-1,year:yr,desc,done:false,billId,needPerWeek,weeksLeft,checkins:[],owner:window._metaOwner||'user'};
   nm.checkins=generateMetaCheckins(nm);
   metas.push(nm);
-  saveMeta(nm);
   document.getElementById('m-name').value='';document.getElementById('m-val').value='';document.getElementById('m-desc').value='';
   toggleForm('metas',false);
+  renderBills();buildMetas();rebuild();
+  await Promise.all([saveBill(nb),saveMeta(nm)]);
+  await loadFromSupabase();
   renderBills();buildMetas();rebuild();
 }
 function completeMeta(id){
@@ -7659,7 +7671,10 @@ async function saveDivida(d){
     payload={...payload};delete payload[col];
     ({data,error}=await _supa.from('dividas').upsert(payload,{onConflict:'id'}).select());
   }
-  if(error){console.error('[saveDivida]',error);_showToast('Erro ao salvar dívida: '+error.message);}
+  console.log('[SAVE] dividas',{payload,data,error});
+  if(error){console.error('[saveDivida]',error);_showToast('Erro ao salvar dívida: '+error.message);return false;}
+  else if(!data?.length){_showToast('⚠️ Dívida não salva. Verifique as permissões.');return false;}
+  else{_showToast('✓ Dívida salva!','#10b981');return true;}
 }
 async function deleteDividaDB(id){
   if(!_user) return;
@@ -7736,7 +7751,7 @@ function buildDividas(){
     if(btn) btn.textContent=lang==='en'?'Hide ▲':'Ocultar ▲';
   });
 }
-function addDivida(){
+async function addDivida(){
   const name=document.getElementById('dv-name').value.trim();
   const total=parseFloat(document.getElementById('dv-total').value)||0;
   const juros=parseFloat(document.getElementById('dv-juros').value)||0;
@@ -7747,7 +7762,6 @@ function addDivida(){
   const nd={id:newId(),name,total,remaining:total,juros,min_payment,frequencia,target_date,payments:[],parcelas:[],owner:window._dividaOwner||'user'};
   nd.parcelas=generateDebtInstallments(nd);
   dividas.push(nd);
-  saveDivida(nd);
   document.getElementById('dv-name').value='';
   document.getElementById('dv-total').value='';
   document.getElementById('dv-juros').value='';
@@ -7755,6 +7769,9 @@ function addDivida(){
   document.getElementById('dv-freq').value='monthly';
   document.getElementById('dv-date').value='';
   toggleForm('dividas',false);
+  buildDividas();
+  await saveDivida(nd);
+  await loadFromSupabase();
   buildDividas();
 }
 function removeDivida(id){
