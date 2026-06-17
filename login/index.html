@@ -2121,7 +2121,7 @@ body.dark .theme-pill-dark{color:#fff}
         <!-- populated by updateDrawerPinSection() -->
       </div>
       <div class="dr-sep"></div>
-      <div class="dr-item" onclick="openChangePassModal()">
+      <div class="dr-item" onclick="openResetPassConfirmModal()">
         <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <span class="dr-label" id="drawerChangePassBtn" style="color:var(--accent)">Mudar senha</span>
         <svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -2569,6 +2569,51 @@ body.dark .theme-pill-dark{color:#fff}
       </div>
     </div>
     <button class="debt-pay-confirm" onclick="submitChangePass()" id="cpSaveBtn">Salvar</button>
+  </div>
+</div>
+
+<!-- RESET PASSWORD CONFIRM MODAL -->
+<div id="resetPassConfirmModal" style="display:none;position:fixed;inset:0;z-index:1100;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);padding:1rem">
+  <div class="debt-pay-card">
+    <div class="debt-pay-header">
+      <span class="debt-pay-title" id="rpcTitle">Redefinir senha</span>
+      <button class="debt-pay-close" onclick="closeResetPassConfirmModal()">✕</button>
+    </div>
+    <p id="rpcBody" style="font-size:13px;color:var(--sub);line-height:1.6;margin:0 0 1.2rem"></p>
+    <div style="display:flex;gap:10px">
+      <button class="debt-pay-confirm" onclick="sendResetPasswordLink()" id="rpcSendBtn" style="flex:1">Enviar link</button>
+      <button onclick="closeResetPassConfirmModal()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--sub);font-size:14px;font-weight:600;cursor:pointer" id="rpcCancelBtn">Cancelar</button>
+    </div>
+    <div id="rpcStatus" style="font-size:12px;margin-top:10px;text-align:center"></div>
+  </div>
+</div>
+
+<!-- PASSWORD RECOVERY MODAL (link do email) -->
+<div id="passwordRecoveryModal" style="display:none;position:fixed;inset:0;z-index:1200;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);padding:1rem">
+  <div class="debt-pay-card">
+    <div class="debt-pay-header">
+      <span class="debt-pay-title" id="prmTitle">Criar nova senha</span>
+    </div>
+    <div style="margin-bottom:1rem">
+      <label style="font-size:11px;font-weight:500;color:var(--sub);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em" id="prmNewLabel">Nova senha</label>
+      <div style="position:relative">
+        <input id="recoveryPassword" type="password" autocomplete="new-password" placeholder="Mín. 8 caracteres" style="width:100%;font-size:16px;padding:10px 38px 10px 12px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);outline:none;box-sizing:border-box">
+        <button type="button" onclick="togglePassVis('recoveryPassword','prmNewEye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--sub);padding:2px" id="prmNewEye">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div style="margin-bottom:1.2rem">
+      <label style="font-size:11px;font-weight:500;color:var(--sub);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em" id="prmConfirmLabel">Confirmar senha</label>
+      <div style="position:relative">
+        <input id="recoveryPasswordConfirm" type="password" autocomplete="new-password" style="width:100%;font-size:16px;padding:10px 38px 10px 12px;border-radius:8px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text);outline:none;box-sizing:border-box">
+        <button type="button" onclick="togglePassVis('recoveryPasswordConfirm','prmConfirmEye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--sub);padding:2px" id="prmConfirmEye">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="prmError" style="font-size:12px;color:#ef4444;margin-bottom:8px;min-height:16px"></div>
+    <button class="debt-pay-confirm" onclick="saveRecoveryPassword()" id="prmSaveBtn">Salvar</button>
   </div>
 </div>
 
@@ -5531,6 +5576,13 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
 
 async function bootApp(){
   if(_appRunning) return; // onAuthStateChange (OAuth redirect) already initialised the app
+  // Detect password recovery link from email
+  const _hashParams=new URLSearchParams(window.location.hash.replace('#','?'));
+  if(_hashParams.get('type')==='recovery'){
+    _booted=true;
+    showPasswordRecoveryModal();
+    return;
+  }
   try {
     const {data:{session}}=await _supa.auth.getSession();
     _booted=true;
@@ -6635,7 +6687,104 @@ function pinUseEmail(){
   _supa.auth.signOut().then(()=>showLogin());
 }
 
-// ── CHANGE PASSWORD ────────────────────────────────────────────────
+// ── RESET PASSWORD VIA EMAIL ───────────────────────────────────────
+function openResetPassConfirmModal(){
+  closeDrawer();
+  const isEN=lang==='en';
+  const email=_user?.email||'';
+  document.getElementById('rpcTitle').textContent=isEN?'Reset password':'Redefinir senha';
+  document.getElementById('rpcBody').innerHTML=isEN
+    ?`We'll send a secure link to <strong>${esc(email)}</strong> for you to create a new password.`
+    :`Enviaremos um link seguro para <strong>${esc(email)}</strong> para você criar uma nova senha.`;
+  document.getElementById('rpcSendBtn').textContent=isEN?'Send link':'Enviar link';
+  document.getElementById('rpcCancelBtn').textContent=isEN?'Cancel':'Cancelar';
+  document.getElementById('rpcStatus').textContent='';
+  document.getElementById('rpcStatus').style.color='#6b7280';
+  document.getElementById('resetPassConfirmModal').style.display='flex';
+}
+
+function closeResetPassConfirmModal(){
+  document.getElementById('resetPassConfirmModal').style.display='none';
+}
+
+async function sendResetPasswordLink(){
+  const isEN=lang==='en';
+  const btn=document.getElementById('rpcSendBtn');
+  const status=document.getElementById('rpcStatus');
+  btn.disabled=true;
+  btn.textContent=isEN?'Sending...':'Enviando...';
+  status.textContent='';
+  const {error}=await _supa.auth.resetPasswordForEmail(_user.email,{
+    redirectTo:'https://tryfreed.com/login'
+  });
+  btn.disabled=false;
+  btn.textContent=isEN?'Send link':'Enviar link';
+  if(error){
+    status.style.color='#ef4444';
+    status.textContent='❌ '+translateSupabaseError(error.message);
+  } else {
+    status.style.color='#10b981';
+    status.textContent=isEN?'✅ Link sent! Check your email.':'✅ Link enviado! Verifique seu email.';
+    setTimeout(()=>closeResetPassConfirmModal(),3000);
+  }
+}
+
+function showPasswordRecoveryModal(){
+  const isEN=lang==='en';
+  // hide all screens, show recovery modal
+  ['homeScreen','loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen','appScreen'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  document.getElementById('prmTitle').textContent=isEN?'Create new password':'Criar nova senha';
+  document.getElementById('prmNewLabel').textContent=isEN?'New password':'Nova senha';
+  document.getElementById('prmConfirmLabel').textContent=isEN?'Confirm password':'Confirmar senha';
+  document.getElementById('prmSaveBtn').textContent=isEN?'Save':'Salvar';
+  document.getElementById('recoveryPassword').value='';
+  document.getElementById('recoveryPasswordConfirm').value='';
+  document.getElementById('prmError').textContent='';
+  document.getElementById('passwordRecoveryModal').style.display='flex';
+}
+
+async function saveRecoveryPassword(){
+  const isEN=lang==='en';
+  const pwd=document.getElementById('recoveryPassword').value;
+  const confirm=document.getElementById('recoveryPasswordConfirm').value;
+  const errEl=document.getElementById('prmError');
+  const btn=document.getElementById('prmSaveBtn');
+  errEl.textContent='';
+
+  if(pwd.length<8){
+    errEl.textContent=isEN?'Minimum 8 characters.':'Mínimo 8 caracteres.';return;
+  }
+  if(!/[A-Z]/.test(pwd)){
+    errEl.textContent=isEN?'Must contain an uppercase letter.':'Deve ter letra maiúscula.';return;
+  }
+  if(!/[0-9]/.test(pwd)){
+    errEl.textContent=isEN?'Must contain a number.':'Deve ter um número.';return;
+  }
+  if(pwd!==confirm){
+    errEl.textContent=isEN?'Passwords do not match.':'Senhas não coincidem.';return;
+  }
+
+  btn.disabled=true;
+  btn.textContent=isEN?'Saving...':'Salvando...';
+  const {error}=await _supa.auth.updateUser({password:pwd});
+  btn.disabled=false;
+  btn.textContent=isEN?'Save':'Salvar';
+  if(error){
+    errEl.textContent='❌ '+translateSupabaseError(error.message);
+  } else {
+    document.getElementById('passwordRecoveryModal').style.display='none';
+    _showToast(isEN?'✅ Password updated! Please sign in.':'✅ Senha atualizada! Faça login.','#10b981');
+    setTimeout(async()=>{
+      await _supa.auth.signOut();
+      _user=null;_booted=false;_appRunning=false;
+      showLogin();
+    },2000);
+  }
+}
+
+// ── CHANGE PASSWORD (legacy — kept for backward compat) ────────────
 function openChangePassModal(){
   closeDrawer();
   const isEN=lang==='en';
