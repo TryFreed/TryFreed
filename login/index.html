@@ -4138,7 +4138,7 @@ function buildTopCards(){
   const periodDays=proj.daily.filter(d=>d.date>=from&&d.date<=to);
   const periodIn=periodDays.reduce((s,d)=>s+d.in,0);
   const periodOut=periodDays.reduce((s,d)=>s+d.out,0);
-  const periodMargem=initialBalance+periodIn-periodOut;
+  const periodMargem=periodIn-periodOut;
   const periodLabel=fmtDate(from)+' – '+fmtDate(to);
 
   const rawMargem={weekly:wk-mo/4.33,monthly:wk*4.33-mo,yearly:wk*52-mo*12,period:periodMargem};
