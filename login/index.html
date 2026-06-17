@@ -299,73 +299,73 @@ body.dark .gs-done{color:#a78bfa;border-color:rgba(167,139,250,.3)}
 .ob-date-input:focus{outline:none;border-color:#7c3aed}
 
 /* ── TOUR ──────────────────────────────────────────────────────── */
-#tourOverlay{
-  position:fixed;inset:0;z-index:1300;
-  pointer-events:none;
+@keyframes tourPulse{
+  0%,100%{outline-color:rgba(124,58,237,0.6);outline-offset:2px}
+  50%{outline-color:rgba(124,58,237,1);outline-offset:4px}
 }
-#tourHighlight{
-  position:absolute;
-  border-radius:12px;
-  box-shadow:0 0 0 9999px rgba(0,0,0,0.72);
-  transition:all .35s cubic-bezier(.4,0,.2,1);
-  pointer-events:none;
-  border:2px solid rgba(124,58,237,0.7);
+.tour-highlight{
+  position:relative!important;z-index:9995!important;
+  outline:2px solid #7c3aed!important;
+  border-radius:8px!important;
+  animation:tourPulse 1.5s infinite!important;
 }
-#tourTooltip{
-  position:absolute;
-  background:#1a1025;
-  border:1px solid rgba(124,58,237,0.35);
-  border-radius:16px;
-  padding:16px 20px;
-  width:min(340px,90vw);
-  box-shadow:0 10px 32px rgba(0,0,0,0.45);
-  pointer-events:all;
-  transition:left .35s cubic-bezier(.4,0,.2,1),top .35s cubic-bezier(.4,0,.2,1),bottom .35s cubic-bezier(.4,0,.2,1),background .25s;
+.tour-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.75);
+  z-index:9990;
 }
-@media(min-width:641px){#tourTooltip{width:380px}}
+.tour-tooltip{
+  position:fixed;z-index:9999;
+  background:var(--card);
+  border:1px solid rgba(124,58,237,0.3);
+  border-radius:16px;padding:20px;
+  max-width:320px;width:calc(100vw - 32px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+  font-family:inherit;
+}
+.tour-progress{
+  height:3px;background:rgba(124,58,237,0.2);
+  border-radius:50px;margin-bottom:14px;overflow:hidden;
+}
+.tour-progress-fill{
+  height:100%;background:#7c3aed;
+  border-radius:50px;transition:width .3s ease;
+}
+.tour-step-badge{
+  display:inline-block;font-size:10px;font-weight:700;
+  background:rgba(124,58,237,0.15);color:#a78bfa;
+  padding:2px 8px;border-radius:50px;margin-bottom:8px;
+}
+.tour-text{font-size:13px;color:var(--text);line-height:1.6;margin:0 0 16px}
+.tour-btns{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.tour-btn-prev{
+  padding:8px 16px;border-radius:50px;
+  border:1.5px solid rgba(255,255,255,0.15);
+  background:transparent;color:#9ca3af;
+  font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+}
+.tour-btn-next{
+  padding:8px 20px;border-radius:50px;
+  border:none;background:#7c3aed;color:#fff;
+  font-size:12px;font-weight:700;cursor:pointer;
+  flex:1;font-family:inherit;
+}
+.tour-btn-close{
+  position:absolute;top:12px;right:12px;
+  background:none;border:none;cursor:pointer;
+  color:#6b7280;font-size:18px;line-height:1;
+  padding:4px;font-family:inherit;
+}
 @media(max-width:640px){
-  #tourTooltip{max-width:calc(100vw - 32px)!important;left:16px!important;width:calc(100vw - 32px)!important}
-  #tourDesc{font-size:13px!important}
-  #tourTitle{font-size:14px!important}
-  .tour-next-btn,.tour-skip-btn{min-height:44px;font-size:14px;padding:8px 16px}
-}
-#tourTooltip.tour-ai{background:linear-gradient(135deg,#3b1a6e 0%,#5b21b6 52%,#1d4ed8 100%);border-color:rgba(167,139,250,0.45)}
-#tourTooltip.tour-ai #tourTitle{color:#fff}
-#tourTooltip.tour-ai #tourDesc{color:rgba(255,255,255,0.78)}
-#tourTooltip.tour-ai #tourBullets{color:rgba(255,255,255,0.78)}
-#tourTooltip.tour-ai #tourEmoji{font-size:30px;margin-bottom:10px}
-#tourBullets{display:none;flex-direction:column;gap:3px;margin-top:8px;font-size:11.5px;color:#9ca3af;line-height:1.5}
-.tour-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.tour-counter{font-size:11px;color:#6b7280;white-space:nowrap}
-.tour-btns{display:flex;gap:8px;flex-shrink:0}
-.tour-skip-btn{padding:7px 13px;border-radius:9px;border:0.5px solid rgba(124,58,237,0.25);background:transparent;color:#8b85aa;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .12s}
-.tour-skip-btn:hover{background:rgba(124,58,237,0.08)}
-.tour-next-btn{padding:7px 16px;border-radius:9px;border:none;background:#7c3aed;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:opacity .12s}
-.tour-next-btn:hover{opacity:.88}
-#tourTooltip.tour-ai .tour-skip-btn{color:rgba(255,255,255,0.55);border-color:rgba(255,255,255,0.2)}
-#tourTooltip.tour-ai .tour-skip-btn:hover{background:rgba(255,255,255,0.08)}
-#tourTooltip.tour-ai .tour-counter{color:rgba(255,255,255,0.4)}
-#tourTooltip.tour-ai .tour-next-btn{background:rgba(255,255,255,0.15);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3)}
-#tourArrow{position:absolute;width:0;height:0;transition:left .35s cubic-bezier(.4,0,.2,1)}
-#tourArrow.up{
-  top:-10px;
-  border-left:9px solid transparent;border-right:9px solid transparent;
-  border-bottom:10px solid rgba(124,58,237,0.35);
-}
-#tourArrow.up::after{
-  content:'';position:absolute;top:2px;left:-8px;
-  border-left:8px solid transparent;border-right:8px solid transparent;
-  border-bottom:9px solid #1a1025;
-}
-#tourArrow.down{
-  bottom:-10px;
-  border-left:9px solid transparent;border-right:9px solid transparent;
-  border-top:10px solid rgba(124,58,237,0.35);
-}
-#tourArrow.down::after{
-  content:'';position:absolute;bottom:2px;left:-8px;
-  border-left:8px solid transparent;border-right:8px solid transparent;
-  border-top:9px solid #1a1025;
+  .tour-tooltip{
+    position:fixed!important;
+    bottom:90px!important;
+    left:16px!important;
+    right:16px!important;
+    top:auto!important;
+    max-width:none;
+    width:calc(100vw - 32px);
+  }
 }
 
 /* ── WEEK NOTIFICATIONS BANNER ─────────────────────────────────── */
@@ -2017,24 +2017,7 @@ body.dark .theme-pill-dark{color:#fff}
 </div>
 
 <!-- TOUR OVERLAY -->
-<div id="tourOverlay" style="display:none">
-  <div id="tourHighlight"></div>
-  <div id="tourTooltip">
-    <div id="tourArrow" class="up"></div>
-    <div id="tourEmoji" style="font-size:22px;margin-bottom:5px"></div>
-    <div id="tourTitle" style="font-size:14px;font-weight:700;color:#f9fafb;margin-bottom:4px"></div>
-    <div id="tourDesc" style="font-size:12px;color:#9ca3af;line-height:1.55;margin-bottom:0"></div>
-    <div id="tourBullets"></div>
-    <div style="height:12px" id="tourSpacer"></div>
-    <div class="tour-footer">
-      <div id="tourCounter" class="tour-counter"></div>
-      <div class="tour-btns">
-        <button onclick="tourSkip()" class="tour-skip-btn" id="tourSkipBtn">Pular tour</button>
-        <button onclick="tourNext()" class="tour-next-btn" id="tourNextBtn">Próximo →</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- tour: overlay e tooltip criados dinamicamente por showTourStep() -->
 
 <!-- SIDE DRAWER -->
 <div id="drawerOverlay" onclick="closeDrawer()"></div>
@@ -6437,22 +6420,51 @@ function obFinish(){
 }
 
 // ── APP TOUR ─────────────────────────────────────────────────────
+// ── TOUR GUIADO ───────────────────────────────────────────────────
 let _tourStep=0;
-const TOUR_STEPS=[
-  {tab:null,        emoji:'👋', dSel:'.app-logo',           mSel:'.app-logo',     tk:'tour_1'},
-  {tab:'renda',     emoji:'👤', dSel:'#profileCardWrap',    mSel:'#profileCardWrap', tk:'tour_profile'},
-  {tab:'renda',     emoji:'📊', dSel:'.cards',              mSel:'.cards',         tk:'tour_2'},
-  {tab:'renda',     emoji:'💵', dSel:'#tab-btn-renda',      mSel:'#bn-renda',      tk:'tour_3'},
-  {tab:'renda',     emoji:'👥', dSel:null,                  mSel:null,             tk:'tour_owner'},
-  {tab:'bills',     emoji:'📋', dSel:'#tab-btn-bills',      mSel:'#bn-bills',      tk:'tour_4'},
-  {tab:'dividas',   emoji:'💳', dSel:'#tab-btn-dividas',    mSel:'#bn-dividas',    tk:'tour_5'},
-  {tab:'metas',     emoji:'🎯', dSel:'#tab-btn-metas',      mSel:'#bn-metas',      tk:'tour_6'},
-  {tab:'cal',       emoji:'📅', dSel:'#tab-btn-cal',        mSel:'#bn-cal',        tk:'tour_7'},
-  {tab:'semana',    emoji:'📆', dSel:'#tab-btn-semana',     mSel:'#bn-semana',     tk:'tour_8'},
-  {tab:'relatorio', emoji:'📈', dSel:'#tab-btn-relatorio',  mSel:'#bn-relatorio',  tk:'tour_9'},
-  {tab:null,        emoji:'🔐', dSel:'.hamburger',          mSel:'.hamburger',     tk:'tour_10'},
-  {tab:null,        emoji:'✨', dSel:null,                  mSel:null,             tk:'tour_11', special:true},
-  {tab:'renda',     emoji:'🎉', dSel:null,                  mSel:null,             tk:'tour_12'},
+const _tourSteps=[
+  {tab:'home',      sel:'#homeDashboard',
+   pt:'Bem-vindo ao TryFreed! 🎉 Este é seu dashboard principal. Aqui você vê sua saúde financeira, saldo, metas e próximos vencimentos — tudo de um jeito rápido.',
+   en:'Welcome to TryFreed! 🎉 This is your main dashboard. Here you see your financial health, balance, goals and upcoming bills — all at a glance.'},
+  {tab:null,        sel:'#homeDashboard .hd-section',
+   pt:'Este é seu perfil. Clique para editar seu nome, cor do avatar e objetivos financeiros. Se for casado(a), adicione seu(sua) parceiro(a) aqui também.',
+   en:'This is your profile. Click to edit your name, avatar color and financial goals. If married, add your partner here too.'},
+  {tab:null,        sel:'.hd-health-bar-bg',
+   pt:'Sua saúde financeira é calculada automaticamente. Quanto mais verde, melhor! Ela considera sua margem, metas, dívidas e saldo.',
+   en:'Your financial health score is calculated automatically. The greener, the better! It considers your margin, goals, debts and balance.'},
+  {tab:'renda',     sel:'#bn-renda',
+   pt:"Na aba Renda você registra tudo que entra — salário, freelances, renda passiva. Clique em '+ Adicionar renda' para começar.",
+   en:"In the Income tab you register everything coming in — salary, freelance, passive income. Click '+ Add income' to start."},
+  {tab:null,        sel:'#rendaToggleBtn',
+   pt:"Se você é casado(a), pode atribuir cada renda ou despesa a um perfil — seu ou do(a) seu(sua) parceiro(a). Assim você sabe exatamente quem ganha e gasta o quê.",
+   en:"If married, you can assign each income or expense to a profile — yours or your partner's. This way you know exactly who earns and spends what."},
+  {tab:'bills',     sel:'#bn-bills',
+   pt:'Na aba Despesas você registra contas, assinaturas e gastos fixos. Organize por categorias e nunca perca um vencimento.',
+   en:'In the Expenses tab you register bills, subscriptions and fixed costs. Organize by categories and never miss a due date.'},
+  {tab:'dividas',   sel:'#bn-dividas',
+   pt:'Na aba Dívidas você controla empréstimos e cartões. O app calcula juros e te mostra quanto falta para quitar cada dívida.',
+   en:'In the Debts tab you track loans and credit cards. The app calculates interest and shows how much is left to pay off each debt.'},
+  {tab:'semana',    sel:'#bn-semana',
+   pt:'A vista Semanal mostra seus compromissos financeiros da semana — rendas previstas e contas a vencer. Navegue entre semanas com as setas.',
+   en:'The Weekly view shows your financial commitments for the week — expected income and bills due. Navigate between weeks with the arrows.'},
+  {tab:'cal',       sel:'#bn-cal',
+   pt:'O Calendário mostra tudo por data. Veja o mês inteiro de uma vez e identifique semanas mais pesadas financeiramente.',
+   en:'The Calendar shows everything by date. See the whole month at once and identify financially heavier weeks.'},
+  {tab:'metas',     sel:'#bn-metas',
+   pt:'Em Metas você define objetivos financeiros — comprar algo, juntar reserva, viajar. O app acompanha seu progresso automaticamente.',
+   en:'In Goals you set financial objectives — buy something, build a reserve, travel. The app tracks your progress automatically.'},
+  {tab:'relatorio', sel:'#bn-relatorio',
+   pt:'O Relatório mostra gráficos detalhados de receitas vs despesas. Exporte para Excel ou PDF para ter um controle completo.',
+   en:'The Report shows detailed charts of income vs expenses. Export to Excel or PDF for complete control.'},
+  {tab:null,        sel:'#aiFab',
+   pt:'O Fredy é seu assistente financeiro com IA! Ele conhece seus dados e dá sugestões personalizadas. Use voz, imagens ou texto para interagir.',
+   en:'Fredy is your AI financial assistant! He knows your data and gives personalized suggestions. Use voice, images or text to interact.'},
+  {tab:'home',      sel:'.gcal-btn',
+   pt:'Sincronize suas despesas e rendas com o Google Calendar automaticamente! Assim você recebe lembretes das suas contas no celular.',
+   en:'Sync your expenses and income with Google Calendar automatically! Get bill reminders directly on your phone.'},
+  {tab:null,        sel:null,    last:true,
+   pt:'Última dica! 🔐 Configure um PIN de acesso rápido para abrir o TryFreed com segurança sem precisar digitar sua senha toda vez.',
+   en:'Last tip! 🔐 Set up a quick access PIN to open TryFreed securely without typing your password every time.'},
 ];
 
 function tourIsFirstTime(){
@@ -6461,8 +6473,7 @@ function tourIsFirstTime(){
 
 function tourStart(){
   _tourStep=0;
-  document.getElementById('tourOverlay').style.display='block';
-  tourShow();
+  showTourStep(0);
 }
 
 function tourReset(){
@@ -6471,109 +6482,118 @@ function tourReset(){
   tourStart();
 }
 
-function tourShow(){
-  if(_tourStep>=TOUR_STEPS.length){tourSkip();return;}
-  const step=TOUR_STEPS[_tourStep];
-  const isMobile=window.innerWidth<641;
+function _tourCleanDOM(){
+  document.getElementById('tourOverlay')?.remove();
+  document.getElementById('tourTooltip')?.remove();
+  document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight'));
+}
+
+function showTourStep(idx){
+  _tourCleanDOM();
+  if(idx>=_tourSteps.length){endTour();return;}
+  const step=_tourSteps[idx];
+  const isEN=lang==='en';
+  const text=isEN?step.en:step.pt;
+  const total=_tourSteps.length;
+  const pct=Math.round((idx+1)/total*100);
+  const isFirst=idx===0;
+  const isLast=!!step.last;
+
   if(step.tab) showTab(step.tab);
-  const sel=isMobile?step.mSel:step.dSel;
-  const el=sel?document.querySelector(sel):null;
-  if(sel&&!el){_tourStep++;tourShow();return;}
 
-  const hl=document.getElementById('tourHighlight');
-  const tt=document.getElementById('tourTooltip');
-  const ar=document.getElementById('tourArrow');
-  // bottom nav: position:fixed; bottom:20px; height:65px → top edge at 85px from screen bottom
-  const BN_CLEAR=20+65+15; // 100px — safe clearance above bottom nav
-  const pad=8;
-  // On mobile: fixed left:16, width:vw-32 (matches CSS override)
-  const mobileLeft=16;
-  const mobileW=window.innerWidth-32;
-  const desktopW=Math.min(380,window.innerWidth-24);
-  const ttW=isMobile?mobileW:desktopW;
+  setTimeout(()=>{
+    const el=step.sel?document.querySelector(step.sel):null;
 
-  if(el){
-    const r=el.getBoundingClientRect();
-    hl.style.display='block';
-    hl.style.left=(r.left-pad)+'px';
-    hl.style.top=(r.top-pad)+'px';
-    hl.style.width=(r.width+pad*2)+'px';
-    hl.style.height=(r.height+pad*2)+'px';
+    // Overlay
+    const overlay=document.createElement('div');
+    overlay.className='tour-overlay';
+    overlay.id='tourOverlay';
+    document.body.appendChild(overlay);
 
-    const elCx=r.left+r.width/2;
-    ar.style.display='';
-
-    if(isMobile){
-      // Fixed left:16, arrow offset relative to that fixed left
-      tt.style.left=mobileLeft+'px';
-      tt.style.width=mobileW+'px';
-      const arLeft=Math.min(Math.max(elCx-mobileLeft-9,12),mobileW-30);
-      ar.style.left=arLeft+'px';
-      ar.className='down';
-      tt.style.top='auto';
-      tt.style.bottom=BN_CLEAR+'px';
-    } else {
-      // Anchor tooltip below element, arrow pointing up; flip up if not enough space
-      const ttLeft=Math.min(Math.max(elCx-ttW/2,12),window.innerWidth-ttW-12);
-      const arLeft=Math.min(Math.max(elCx-ttLeft-9,12),ttW-30);
-      tt.style.left=ttLeft+'px';
-      tt.style.width='';
-      ar.style.left=arLeft+'px';
-      ar.className='up';
-      tt.style.bottom='auto';
-      const ttTop=r.bottom+pad+12;
-      tt.style.top=(ttTop+260>window.innerHeight?r.top-pad-260:ttTop)+'px';
+    // Highlight
+    if(el){
+      el.classList.add('tour-highlight');
+      el.scrollIntoView({behavior:'smooth',block:'center'});
     }
+
+    // Tooltip
+    const tooltip=document.createElement('div');
+    tooltip.className='tour-tooltip';
+    tooltip.id='tourTooltip';
+
+    const navBtns=isLast
+      ?`<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+          <button class="tour-btn-next" onclick="startPinSetup();endTour()" style="width:100%">
+            ${isEN?'Set up PIN now':'Configurar PIN agora'} 🔐
+          </button>
+          <button class="tour-btn-prev" onclick="endTour()" style="width:100%;text-align:center">
+            ${isEN?'Do it later':'Fazer depois'}
+          </button>
+        </div>`
+      :`<div class="tour-btns">
+          ${!isFirst?`<button class="tour-btn-prev" onclick="tourPrev()">← ${isEN?'Back':'Anterior'}</button>`:'<span></span>'}
+          <button class="tour-btn-next" onclick="tourNext()">${isEN?'Next':'Próximo'} →</button>
+        </div>`;
+
+    tooltip.innerHTML=`
+      <button class="tour-btn-close" onclick="endTour()">×</button>
+      <div class="tour-progress"><div class="tour-progress-fill" style="width:${pct}%"></div></div>
+      <div class="tour-step-badge">${idx+1} / ${total}</div>
+      <div class="tour-text">${esc(text)}</div>
+      ${navBtns}`;
+    document.body.appendChild(tooltip);
+
+    _tourPositionTooltip(tooltip, el);
+  }, 380);
+}
+
+function _tourPositionTooltip(tooltip, el){
+  if(window.innerWidth<=640) return; // CSS handles mobile (bottom fixed)
+  if(!el){
+    tooltip.style.top='50%';
+    tooltip.style.left='50%';
+    tooltip.style.transform='translate(-50%,-50%)';
+    return;
+  }
+  const rect=el.getBoundingClientRect();
+  const tw=320, th=220;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  // Try right
+  if(rect.right+tw+16<vw){
+    tooltip.style.left=(rect.right+12)+'px';
+    tooltip.style.top=Math.max(16,Math.min(rect.top,vh-th-16))+'px';
+  // Try left
+  } else if(rect.left-tw-16>0){
+    tooltip.style.left=(rect.left-tw-12)+'px';
+    tooltip.style.top=Math.max(16,Math.min(rect.top,vh-th-16))+'px';
+  // Try below
+  } else if(rect.bottom+th+16<vh){
+    tooltip.style.top=(rect.bottom+12)+'px';
+    tooltip.style.left=Math.max(16,Math.min(rect.left,vw-tw-16))+'px';
+  // Above
   } else {
-    // Centered card — no highlight or arrow
-    hl.style.display='none';
-    ar.style.display='none';
-    tt.style.bottom='auto';
-    if(isMobile){
-      tt.style.left=mobileLeft+'px';
-      tt.style.width=mobileW+'px';
-    } else {
-      const ttLeft=Math.max(12,Math.round((window.innerWidth-ttW)/2));
-      tt.style.left=ttLeft+'px';
-      tt.style.width='';
-    }
-    // Vertically: center but ensure it stays above bottom nav
-    const maxBottom=window.innerHeight-BN_CLEAR;
-    const idealTop=Math.round(window.innerHeight/2-120);
-    tt.style.top=Math.min(Math.max(idealTop,60),maxBottom-240)+'px';
+    tooltip.style.top=Math.max(16,rect.top-th-12)+'px';
+    tooltip.style.left=Math.max(16,Math.min(rect.left,vw-tw-16))+'px';
   }
-
-  const isLast=_tourStep===TOUR_STEPS.length-1;
-  document.getElementById('tourEmoji').textContent=step.emoji;
-  document.getElementById('tourTitle').textContent=t(step.tk+'_title');
-  document.getElementById('tourDesc').textContent=t(step.tk+'_body');
-  document.getElementById('tourCounter').textContent=(_tourStep+1)+' / '+TOUR_STEPS.length;
-  document.getElementById('tourNextBtn').textContent=isLast?t('tour_finish'):t('tour_next');
-  document.getElementById('tourSkipBtn').textContent=t('tour_skip');
-  // Bullets (optional per-step)
-  const bulletsEl=document.getElementById('tourBullets');
-  const spacerEl=document.getElementById('tourSpacer');
-  const bKey=step.tk+'_bullets';
-  const bVal=t(bKey);
-  if(bulletsEl){
-    if(bVal!==bKey){bulletsEl.innerHTML=bVal;bulletsEl.style.display='flex';if(spacerEl)spacerEl.style.height='8px';}
-    else{bulletsEl.innerHTML='';bulletsEl.style.display='none';if(spacerEl)spacerEl.style.height='12px';}
-  }
-  // Special gradient style for AI step
-  document.getElementById('tourTooltip').classList.toggle('tour-ai',!!step.special);
 }
 
 function tourNext(){
-  if(_tourStep>=TOUR_STEPS.length-1){tourSkip();return;}
-  _tourStep++;tourShow();
+  _tourStep++;
+  showTourStep(_tourStep);
 }
 
-function tourSkip(){
-  document.getElementById('tourOverlay').style.display='none';
-  document.getElementById('tourHighlight').style.display='none';
-  showTab('renda');
-  if(_user) localStorage.setItem('tour_done_v2_'+_user.id,'1');
+function tourPrev(){
+  if(_tourStep>0){_tourStep--;showTourStep(_tourStep);}
 }
+
+function endTour(){
+  _tourCleanDOM();
+  if(_user) localStorage.setItem('tour_done_v2_'+_user.id,'1');
+  showTab('home');
+}
+
+// alias for legacy callers
+function tourSkip(){endTour();}
 
 // ── INLINE NAME EDITING ──────────────────────────────────────────
 function startInlineEdit(el, type, id){
