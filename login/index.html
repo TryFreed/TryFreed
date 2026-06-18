@@ -1535,11 +1535,17 @@ body.dark .theme-pill-dark{color:#fff}
 .ai-attach-name{font-size:9px;color:var(--sub);max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;text-align:center}
 .ai-img-remove{position:absolute;top:-5px;right:-5px;width:18px;height:18px;background:#ef4444;border:none;border-radius:50%;font-size:10px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .ai-img-remove:hover{background:#dc2626}
+@keyframes tfSpin{to{transform:rotate(360deg)}}
 
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" style="position:fixed;inset:0;background:#080808;display:flex;align-items:center;justify-content:center;z-index:99998;flex-direction:column;gap:14px;transition:opacity .3s">
+  <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="rgba(124,58,237,0.25)" stroke-width="4"/><path d="M22 4a18 18 0 0 1 18 18" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" style="animation:tfSpin .8s linear infinite;transform-origin:22px 22px"/></svg>
+  <span style="color:#6b7280;font-size:13px;font-family:'Inter',sans-serif;letter-spacing:.02em">TryFreed</span>
+</div>
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" style="display:none">
   <div class="dp-container" id="dpContainer">
@@ -3520,10 +3526,17 @@ const INVITED_EMAILS = [
 // Set to true to allow anyone to sign up, false for invite-only
 const OPEN_SIGNUP = false;
 
+function _hideLoading(){
+  const el=document.getElementById('loadingScreen');
+  if(!el||el.style.display==='none') return;
+  el.style.opacity='0';
+  setTimeout(()=>el.style.display='none',300);
+}
 function showHome(){
   showLogin();
 }
 function showLogin(){
+  _hideLoading();
   ['loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display='none';
@@ -5483,6 +5496,7 @@ function initApp(){
   ovFrom=new Date(START);ovTo=new Date(END);
   buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   if(_user) setUserUI(_user);
+  _hideLoading();
   showTab('home');
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('home',true));
@@ -5530,6 +5544,7 @@ async function fetchProfile(userId){
 }
 
 function showPaywall(){
+  _hideLoading();
   ['loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen']
     .forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   applyLang(); // update paywall text for current language
@@ -6707,6 +6722,7 @@ let _pinBuf=[], _pinSetupStep=1, _pinSetupFirst=null, _pinSetupMode='create';
 function getStoredPin(){ return _user?.user_metadata?.pin || null; }
 
 function showPinScreen(){
+  _hideLoading();
   ['loginScreen','resetScreen','pinSetupScreen'].forEach(id=>document.getElementById(id).style.display='none');
   document.getElementById('pinScreen').style.display='flex';
   _pinBuf=[];
@@ -8505,8 +8521,8 @@ async function _checkVersion(){
 }
 // Checa ao voltar para a aba
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_checkVersion();});
-// Checa a cada 3 minutos
-setInterval(_checkVersion,3*60*1000);
+// Checa a cada 30 segundos
+setInterval(_checkVersion,30*1000);
 // Primeira checagem após o boot (5s de delay)
 setTimeout(_checkVersion,5000);
 </script>
