@@ -8481,6 +8481,34 @@ if(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.pr
   _pb.style.cssText='position:fixed;bottom:8px;left:8px;font-size:10px;opacity:0.3;background:none;border:none;color:#6b7280;cursor:pointer;z-index:9999';
   document.body.appendChild(_pb);
 }
+
+// ── AUTO-UPDATE ───────────────────────────────────────────────────
+// Verifica se foi deployada uma nova versão do app.
+// version.txt é atualizado pelo deploy.sh a cada push.
+// O ?nc= garante bypass do cache do Cloudflare.
+let _appVersion=null;
+let _updatePending=false;
+async function _checkVersion(){
+  if(_updatePending) return;
+  try{
+    const r=await fetch('/login/version.txt?nc='+Date.now(),{cache:'no-store'});
+    if(!r.ok) return;
+    const v=(await r.text()).trim();
+    if(!_appVersion){_appVersion=v;return;}
+    if(v!==_appVersion){
+      _updatePending=true;
+      const msg=lang==='en'?'New version available. Updating in 3s...':'Nova versão disponível. Atualizando em 3s...';
+      _showToast(msg,'#7c3aed');
+      setTimeout(()=>location.reload(true),3000);
+    }
+  }catch(e){}
+}
+// Checa ao voltar para a aba
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_checkVersion();});
+// Checa a cada 3 minutos
+setInterval(_checkVersion,3*60*1000);
+// Primeira checagem após o boot (5s de delay)
+setTimeout(_checkVersion,5000);
 </script>
 </body>
 </html>
