@@ -3739,6 +3739,17 @@ async function handleLogout(){
 }
 
 // ── Supabase data sync ────────────────────────────────────────────
+// Retorna true e faz logout se o erro for de token expirado/inválido
+async function _handleAuthError(error){
+  if(error?.status===400||error?.message?.includes('JWT')||error?.message?.includes('refresh_token')){
+    console.warn('[AUTH] Token inválido ou expirado. Verificando sessão...');
+    try{
+      const {data:{session}}=await _supa.auth.getSession();
+      if(!session){handleLogout();return true;}
+    }catch(e){handleLogout();return true;}
+  }
+  return false;
+}
 async function loadFromSupabase(){
   if(!_user) return;
   const uid = _user.id;
@@ -3758,6 +3769,7 @@ async function loadFromSupabase(){
   }
   if(r.error||b.error||m.error||dv.error){
     const errs=[r.error,b.error,m.error,dv.error].filter(Boolean);
+    if(await _handleAuthError(errs[0])) return;
     console.error('[load] ERROS nas queries:',errs);
     _showToast('Erro ao carregar dados: '+errs[0]?.message);
   }
@@ -3822,7 +3834,7 @@ async function saveRenda(r){
     ({data,error}=await _supa.from('rendas').upsert(payload,{onConflict:'id'}).select());
   }
   console.log('[SAVE] rendas',{payload,data,error});
-  if(error){console.error('[saveRenda]',error);_showToast('Erro ao salvar renda: '+error.message);return false;}
+  if(error){if(await _handleAuthError(error))return false;console.error('[saveRenda]',error);_showToast('Erro ao salvar renda: '+error.message);return false;}
   else if(!data?.length){_showToast('⚠️ Renda não salva. Verifique as permissões.');return false;}
   else{_showToast('✓ Renda salva!','#10b981');return true;}
 }
@@ -3842,7 +3854,7 @@ async function saveBill(b){
     ({data,error}=await _supa.from('bills').upsert(payload,{onConflict:'id'}).select());
   }
   console.log('[SAVE] bills',{payload,data,error});
-  if(error){console.error('[saveBill]',error);_showToast('Erro ao salvar despesa: '+error.message);return false;}
+  if(error){if(await _handleAuthError(error))return false;console.error('[saveBill]',error);_showToast('Erro ao salvar despesa: '+error.message);return false;}
   else if(!data?.length){_showToast('⚠️ Despesa não salva. Verifique as permissões.');return false;}
   else{_showToast('✓ Despesa salva!','#10b981');return true;}
 }
@@ -3862,7 +3874,7 @@ async function saveMeta(m){
     ({data,error}=await _supa.from('metas').upsert(payload,{onConflict:'id'}).select());
   }
   console.log('[SAVE] metas',{payload,data,error});
-  if(error){console.error('[saveMeta]',error);_showToast('Erro ao salvar meta: '+error.message);return false;}
+  if(error){if(await _handleAuthError(error))return false;console.error('[saveMeta]',error);_showToast('Erro ao salvar meta: '+error.message);return false;}
   else if(!data?.length){_showToast('⚠️ Meta não salva. Verifique as permissões.');return false;}
   else{_showToast('✓ Meta salva!','#10b981');return true;}
 }
@@ -5561,6 +5573,8 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
     setUserUI(_user);
     await checkSubAndLaunch(false);
     if(_appRunning&&!_user.user_metadata?.pin) setTimeout(showPinOffer,800);
+  } else if(event==='TOKEN_REFRESHED'){
+    console.log('[AUTH] Token refreshed');
   } else if(event==='SIGNED_OUT'){
     _appRunning=false;
     _user=null;
@@ -7672,7 +7686,7 @@ async function saveDivida(d){
     ({data,error}=await _supa.from('dividas').upsert(payload,{onConflict:'id'}).select());
   }
   console.log('[SAVE] dividas',{payload,data,error});
-  if(error){console.error('[saveDivida]',error);_showToast('Erro ao salvar dívida: '+error.message);return false;}
+  if(error){if(await _handleAuthError(error))return false;console.error('[saveDivida]',error);_showToast('Erro ao salvar dívida: '+error.message);return false;}
   else if(!data?.length){_showToast('⚠️ Dívida não salva. Verifique as permissões.');return false;}
   else{_showToast('✓ Dívida salva!','#10b981');return true;}
 }
