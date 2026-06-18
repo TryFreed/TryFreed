@@ -5535,17 +5535,26 @@ function showPaywall(){
 
 // checkSubAndLaunch: fetches profile, shows paywall or proceeds to app
 // skipOnboarding=true for PIN users who already completed onboarding
+let _launching=false;
 async function checkSubAndLaunch(skipOnboarding=false){
+  if(_launching) return; // evitar execução dupla (race condition SIGNED_IN + bootApp)
+  _launching=true;
   try {
     const subscribed=await fetchProfile(_user.id);
     if(!subscribed){showPaywall();return;}
     if(!skipOnboarding&&obIsFirstTime()){
-      obStart();loadFromSupabase();_appRunning=true;return;
+      obStart();await loadFromSupabase();_appRunning=true;return;
     }
-    await loadFromSupabase();initApp();_appRunning=true;
+    await loadFromSupabase();
+    initApp();
+    _appRunning=true;
+    rebuild();
+    showTab('home');
   } catch(e){
     console.error('[SUB CHECK] checkSubAndLaunch error',e);
-    showPaywall(); // fail-safe: always show paywall on unexpected error
+    showPaywall();
+  } finally {
+    _launching=false;
   }
 }
 
