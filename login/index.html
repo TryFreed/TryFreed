@@ -5441,6 +5441,7 @@ function updateBnShape(tabId,instant){
 }
 function showTab(tabId){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.sec').forEach(s=>s.style.display='');
   document.getElementById('tab-'+tabId).classList.add('on');
   document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['home','renda','bills','dividas','semana','cal','metas','relatorio'][i]===tabId));
   // sync bottom nav
