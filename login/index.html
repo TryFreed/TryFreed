@@ -5650,10 +5650,9 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
 });
 
 async function bootApp(){
-  if(_booted) return; // já inicializado — evitar re-entrada
-  _booted=true; // marcar antes de qualquer await para bloquear chamadas concorrentes
+  if(_booted) return;
+  _booted=true;
   clearTimeout(window._gsTimeout);
-  // Detect password recovery link from email
   const _hashParams=new URLSearchParams(window.location.hash.replace('#','?'));
   if(_hashParams.get('type')==='recovery'){
     _hideLoading();
@@ -5661,17 +5660,20 @@ async function bootApp(){
     return;
   }
   try {
-    const {data:{session}}=await Promise.race([
+    // Tenta pegar sessão com timeout de 5s
+    const sessionResult = await Promise.race([
       _supa.auth.getSession(),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('getSession timeout')),15000))
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('getSession timeout')),5000))
     ]).catch(e=>{
-      console.error('[bootApp] getSession falhou:',e.message);
-      localStorage.clear();
-      return {data:{session:null}};
+      console.warn('[bootApp] getSession lento ou falhou:',e.message);
+      return null;
     });
+
+    const session = sessionResult?.data?.session;
+
     if(session?.user){
-      if(_appRunning){_hideLoading();return;}
       _user=session.user;
+      if(_appRunning){_hideLoading();return;}
       if(session.user.user_metadata?.pin){
         showPinScreen();
       } else {
@@ -5679,7 +5681,15 @@ async function bootApp(){
         await checkSubAndLaunch(false);
       }
     } else {
-      showHome();
+      // Sem sessão — tenta refresh silencioso uma vez
+      const {data,error} = await _supa.auth.refreshSession().catch(()=>({data:null,error:true}));
+      if(data?.session?.user){
+        _user=data.session.user;
+        setUserUI(_user);
+        await checkSubAndLaunch(false);
+      } else {
+        showHome();
+      }
     }
   } catch(e) {
     console.error('[bootApp] error:',e);
