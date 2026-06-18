@@ -5250,7 +5250,7 @@ function rebuild(){
   buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   const homeEl=document.getElementById('tab-home');
   if(homeEl&&homeEl.classList.contains('on')){
-    try{buildHomeDashboard();}catch(e){console.error('[rebuild home] ERRO:',e);alert('buildHomeDashboard erro: '+e.message);}
+    try{buildHomeDashboard();}catch(e){console.error('[home]',e);}
   }
 }
 
@@ -5451,7 +5451,7 @@ function showTab(tabId){
   updateBnShape(tabId);
   if(tabId==='home'){
     document.getElementById('tab-home').style.display='block';
-    try{buildHomeDashboard();}catch(e){console.error('[showTab home] ERRO:',e);alert('buildHomeDashboard erro: '+e.message);}
+    try{buildHomeDashboard();}catch(e){console.error('[home]',e);}
   }
   if(tabId==='relatorio' && typeof Chart==='undefined'){
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
@@ -5538,7 +5538,6 @@ function initApp(){
   buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   if(_user) setUserUI(_user);
   showTab('home');
-  setTimeout(()=>{ try{buildHomeDashboard();}catch(e){console.error('[initApp delayed build]',e);} }, 300);
   _hideLoading();
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('home',true));
