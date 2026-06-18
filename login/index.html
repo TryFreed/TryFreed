@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>TryFreed</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='60 40 160 160'><defs><linearGradient id='iBg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%237c3aed'/><stop offset='100%25' stop-color='%234c1d95'/></linearGradient><linearGradient id='iArr' x1='0%25' y1='0%25' x2='100%25' y2='0%25'><stop offset='0%25' stop-color='rgba(255,255,255,0.4)'/><stop offset='100%25' stop-color='white'/></linearGradient></defs><rect x='60' y='40' width='160' height='160' rx='32' fill='url(%23iBg)'/><rect x='78' y='158' width='22' height='22' rx='4' fill='rgba(255,255,255,0.22)'/><rect x='108' y='138' width='22' height='42' rx='4' fill='rgba(255,255,255,0.35)'/><rect x='138' y='118' width='22' height='62' rx='4' fill='rgba(255,255,255,0.48)'/><path d='M89 152 Q130 190 168 110' fill='none' stroke='url(%23iArr)' stroke-width='4' stroke-linecap='round'/><path d='M157 112 L169 106 L175 118' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/><line x1='178' y1='52' x2='178' y2='88' stroke='white' stroke-width='7' stroke-linecap='round'/><line x1='160' y1='64' x2='196' y2='64' stroke='white' stroke-width='7' stroke-linecap='round'/></svg>">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -813,22 +816,27 @@ body.dark .confirm-delete{background:#dc2626}
 
 /* ── HOME DASHBOARD ──────────────────────────────────────────── */
 .hd-section{background:var(--card);border:0.5px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px;margin-bottom:14px}
+body:not(.dark) .hd-section{border-color:var(--border);box-shadow:var(--shadow)}
 .hd-section-title{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
 .hd-health-bar-bg{height:8px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;margin-bottom:6px}
+body:not(.dark) .hd-health-bar-bg{background:rgba(0,0,0,0.07)}
 .hd-health-bar-fill{height:100%;border-radius:50px;transition:width 0.8s ease}
 .hd-health-row{display:flex;justify-content:space-between;align-items:center}
 .hd-health-score{font-size:13px;font-weight:700;color:var(--text)}
 .hd-health-label{font-size:12px;font-weight:600}
 .hd-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .hd-mini-card{background:var(--card);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 12px}
+body:not(.dark) .hd-mini-card{border-color:var(--border);box-shadow:var(--shadow)}
 .hd-mini-label{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin-bottom:4px}
 .hd-mini-value{font-size:18px;font-weight:800;color:var(--text)}
 .hd-goal-item{margin-bottom:12px}
 .hd-goal-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;display:flex;justify-content:space-between}
 .hd-goal-bar-bg{height:6px;background:rgba(255,255,255,0.08);border-radius:50px;overflow:hidden;margin-bottom:3px}
+body:not(.dark) .hd-goal-bar-bg{background:rgba(0,0,0,0.07)}
 .hd-goal-bar-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa);border-radius:50px;transition:width .6s ease}
 .hd-goal-sub{font-size:11px;color:#6b7280}
 .hd-tx-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)}
+body:not(.dark) .hd-tx-item{border-bottom-color:var(--row-border)}
 .hd-tx-item:last-child{border-bottom:none}
 .hd-tx-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .hd-tx-name{flex:1;font-size:13px;color:var(--text);font-weight:500}
@@ -839,6 +847,7 @@ body.dark .confirm-delete{background:#dc2626}
 .hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
 .hd-see-all:hover{text-decoration:underline}
 .gcal-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+body:not(.dark) .gcal-btn{border-color:var(--border);background:transparent}
 .gcal-btn:hover{background:rgba(124,58,237,0.15);border-color:#7c3aed}
 .gcal-btn:disabled{opacity:.5;cursor:not-allowed}
 
@@ -3774,16 +3783,23 @@ async function loadFromSupabase(){
   const uid = _user.id;
   let r,b,m,dv,prof;
   try {
-    [r,b,m,dv,prof] = await Promise.all([
-      _supa.from('rendas').select('*').eq('user_id',uid),
-      _supa.from('bills').select('*').eq('user_id',uid),
-      _supa.from('metas').select('*').eq('user_id',uid),
-      _supa.from('dividas').select('*').eq('user_id',uid),
-      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge,objetivo_conjuge_outro').eq('user_id',uid).maybeSingle(),
+    const uid = _user.id;
+    console.log('[load] iniciando queries para', uid);
+    const withTimeout = (p, name) => Promise.race([
+      p.then(r => { console.log('[load] ok:', name); return r; }),
+      new Promise((_,rej) => setTimeout(()=>rej(new Error(name+' TIMEOUT 8s')),8000))
     ]);
+    [r,b,m,dv,prof] = await Promise.all([
+      withTimeout(_supa.from('rendas').select('*').eq('user_id',uid), 'rendas'),
+      withTimeout(_supa.from('bills').select('*').eq('user_id',uid), 'bills'),
+      withTimeout(_supa.from('metas').select('*').eq('user_id',uid), 'metas'),
+      withTimeout(_supa.from('dividas').select('*').eq('user_id',uid), 'dividas'),
+      withTimeout(_supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge,objetivo_conjuge_outro').eq('user_id',uid).maybeSingle(), 'profiles'),
+    ]);
+    console.log('[load] todas as queries ok');
   } catch(e) {
-    console.error('[load] network error:',e);
-    _showToast('Erro de rede ao carregar dados.');
+    console.error('[load] erro ou timeout:', e.message);
+    _showToast('Erro ao carregar: '+e.message);
     return;
   }
   if(r.error||b.error||m.error||dv.error){
@@ -5215,7 +5231,7 @@ function rebuild(){
   buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   const homeEl=document.getElementById('tab-home');
   if(homeEl&&homeEl.classList.contains('on')){
-    try{buildHomeDashboard();}catch(e){console.error('[rebuild home]',e);}
+    try{buildHomeDashboard();}catch(e){console.error('[rebuild home] ERRO:',e);alert('buildHomeDashboard erro: '+e.message);}
   }
 }
 
@@ -5416,7 +5432,7 @@ function showTab(tabId){
   updateBnShape(tabId);
   if(tabId==='home'){
     document.getElementById('tab-home').style.display='block';
-    try{buildHomeDashboard();}catch(e){console.error('[showTab home]',e);}
+    try{buildHomeDashboard();}catch(e){console.error('[showTab home] ERRO:',e);alert('buildHomeDashboard erro: '+e.message);}
   }
   if(tabId==='relatorio' && typeof Chart==='undefined'){
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
@@ -5503,6 +5519,7 @@ function initApp(){
   buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   if(_user) setUserUI(_user);
   showTab('home');
+  setTimeout(()=>{ try{buildHomeDashboard();}catch(e){console.error('[initApp delayed build]',e);} }, 300);
   _hideLoading();
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('home',true));
@@ -5624,7 +5641,14 @@ async function bootApp(){
     return;
   }
   try {
-    const {data:{session}}=await _supa.auth.getSession();
+    const {data:{session}}=await Promise.race([
+      _supa.auth.getSession(),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('getSession timeout')),8000))
+    ]).catch(e=>{
+      console.error('[bootApp] getSession falhou:',e.message);
+      localStorage.clear();
+      return {data:{session:null}};
+    });
     if(session?.user){
       if(_appRunning){_hideLoading();return;}
       _user=session.user;
