@@ -5502,8 +5502,8 @@ function initApp(){
   ovFrom=new Date(START);ovTo=new Date(END);
   buildRendaList();renderBills();buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   if(_user) setUserUI(_user);
-  _hideLoading();
   showTab('home');
+  _hideLoading();
   // Init bottom-nav dip position
   requestAnimationFrame(()=>updateBnShape('home',true));
   // Show onboarding for first-time users (returns immediately if already done)
@@ -5557,31 +5557,19 @@ function showPaywall(){
   document.getElementById('paywallScreen').style.display='flex';
 }
 
-// checkSubAndLaunch: fetches profile, shows paywall or proceeds to app
+// checkSubAndLaunch: loads data, checks subscription, shows app or paywall
 // skipOnboarding=true for PIN users who already completed onboarding
 async function checkSubAndLaunch(skipOnboarding=false){
-  if(_appRunning){_hideLoading();return;} // app já rodando — skip
+  if(_appRunning){_hideLoading();return;}
   try {
-    const subscribed=await fetchProfile(_user.id);
-    if(!subscribed){showPaywall();return;}
-    if(_appRunning){_hideLoading();return;} // recheck após fetchProfile (pode ter demorado)
+    await loadFromSupabase(); // single round-trip: data + profile (incl. subscribed)
+    if(_appRunning){_hideLoading();return;}
+    if(!window._profile?.subscribed){showPaywall();return;}
     if(!skipOnboarding&&obIsFirstTime()){
-      _hideLoading();obStart();await loadFromSupabase();_appRunning=true;return;
+      _hideLoading();obStart();_appRunning=true;return;
     }
-    await loadFromSupabase();
-    if(_appRunning){_hideLoading();return;} // recheck após loadFromSupabase
-    initApp();
+    initApp(); // builds all content, then _hideLoading(), then showTab('home')
     _appRunning=true;
-    rebuild();
-    showTab('home');
-    // Safety: se homeDashboard ainda vazio após 1.5s, reconstruir
-    setTimeout(()=>{
-      const hd=document.getElementById('homeDashboard');
-      if(hd&&!hd.innerHTML.trim()&&_appRunning){
-        console.warn('[SAFETY] homeDashboard vazio — reconstruindo');
-        try{buildHomeDashboard();}catch(e2){console.error('[SAFETY]',e2);}
-      }
-    },1500);
   } catch(e){
     console.error('[checkSubAndLaunch] erro:',e);
     showPaywall();
