@@ -5629,7 +5629,7 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
   if(session?.user) _user=session.user; // manter _user atualizado sempre
   if(event==='INITIAL_SESSION'){
     // Supabase restaurou a sessão — inicializar app se ainda não foi feito
-    if(!_booted) await bootApp();
+    if(!_booted) await bootApp(session);
     return;
   }
   if(!_booted) return; // bloquear outros eventos antes do boot completar
@@ -5650,7 +5650,7 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
   }
 });
 
-async function bootApp(){
+async function bootApp(knownSession){
   if(_booted) return;
   _booted=true;
   clearTimeout(window._gsTimeout);
@@ -5661,17 +5661,7 @@ async function bootApp(){
     return;
   }
   try {
-    // Tenta pegar sessão com timeout de 5s
-    const sessionResult = await Promise.race([
-      _supa.auth.getSession(),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('getSession timeout')),5000))
-    ]).catch(e=>{
-      console.warn('[bootApp] getSession lento ou falhou:',e.message);
-      return null;
-    });
-
-    const session = sessionResult?.data?.session;
-
+    const session = knownSession || null;
     if(session?.user){
       _user=session.user;
       if(_appRunning){_hideLoading();return;}
@@ -5682,15 +5672,7 @@ async function bootApp(){
         await checkSubAndLaunch(false);
       }
     } else {
-      // Sem sessão — tenta refresh silencioso uma vez
-      const {data,error} = await _supa.auth.refreshSession().catch(()=>({data:null,error:true}));
-      if(data?.session?.user){
-        _user=data.session.user;
-        setUserUI(_user);
-        await checkSubAndLaunch(false);
-      } else {
-        showHome();
-      }
+      showHome();
     }
   } catch(e) {
     console.error('[bootApp] error:',e);
