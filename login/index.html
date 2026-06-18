@@ -3532,6 +3532,12 @@ function _hideLoading(){
   el.style.opacity='0';
   setTimeout(()=>el.style.display='none',300);
 }
+function _showLoading(){
+  const el=document.getElementById('loadingScreen');
+  if(!el) return;
+  el.style.display='flex';
+  el.style.opacity='1';
+}
 function showHome(){
   showLogin();
 }
@@ -5605,6 +5611,7 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
   if(!_booted) return; // bloquear outros eventos antes do boot completar
   if(event==='SIGNED_IN'){
     if(_appRunning) return; // app já rodando — só manter _user atualizado
+    _showLoading();
     setUserUI(_user);
     await checkSubAndLaunch(false);
     if(_appRunning&&!_user.user_metadata?.pin) setTimeout(showPinOffer,800);
@@ -6751,6 +6758,7 @@ function pinKey(k){
 async function pinSubmit(){
   const entered=_pinBuf.join(''), stored=getStoredPin();
   if(entered===stored){
+    _showLoading();
     document.getElementById('pinScreen').style.display='none';
     setUserUI(_user);
     await checkSubAndLaunch(true); // PIN users already completed onboarding
