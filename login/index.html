@@ -5451,7 +5451,6 @@ function showTab(tabId){
   });
   updateBnShape(tabId);
   if(tabId==='home'){
-    document.getElementById('tab-home').style.display='block';
     try{buildHomeDashboard();}catch(e){console.error('[home]',e);}
   }
   if(tabId==='relatorio' && typeof Chart==='undefined'){
