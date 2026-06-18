@@ -3806,7 +3806,7 @@ async function loadFromSupabase(){
     console.log('[load] iniciando queries para', uid);
     const withTimeout = (p, name) => Promise.race([
       p.then(r => { console.log('[load] ok:', name); return r; }),
-      new Promise((_,rej) => setTimeout(()=>rej(new Error(name+' TIMEOUT 8s')),8000))
+      new Promise((_,rej) => setTimeout(()=>rej(new Error(name+' TIMEOUT 20s')),20000))
     ]);
     [r,b,m,dv,prof] = await Promise.all([
       withTimeout(_supa.from('rendas').select('*').eq('user_id',uid), 'rendas'),
