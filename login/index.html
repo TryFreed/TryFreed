@@ -5633,7 +5633,8 @@ _supa.auth.onAuthStateChange(async (event, session)=>{
   }
   if(!_booted) return; // bloquear outros eventos antes do boot completar
   if(event==='SIGNED_IN'){
-    if(_appRunning) return; // app já rodando — só manter _user atualizado
+    if(_appRunning) return;
+    if(_booted && document.getElementById('loginScreen').style.display==='none' && document.getElementById('paywallScreen').style.display!=='flex') return;
     _showLoading();
     setUserUI(_user);
     await checkSubAndLaunch(false);
