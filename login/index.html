@@ -5554,16 +5554,16 @@ function showPaywall(){
 // checkSubAndLaunch: fetches profile, shows paywall or proceeds to app
 // skipOnboarding=true for PIN users who already completed onboarding
 async function checkSubAndLaunch(skipOnboarding=false){
-  if(_appRunning) return; // app já rodando — skip
+  if(_appRunning){_hideLoading();return;} // app já rodando — skip
   try {
     const subscribed=await fetchProfile(_user.id);
     if(!subscribed){showPaywall();return;}
-    if(_appRunning) return; // recheck após fetchProfile (pode ter demorado)
+    if(_appRunning){_hideLoading();return;} // recheck após fetchProfile (pode ter demorado)
     if(!skipOnboarding&&obIsFirstTime()){
-      obStart();await loadFromSupabase();_appRunning=true;return;
+      _hideLoading();obStart();await loadFromSupabase();_appRunning=true;return;
     }
     await loadFromSupabase();
-    if(_appRunning) return; // recheck após loadFromSupabase
+    if(_appRunning){_hideLoading();return;} // recheck após loadFromSupabase
     initApp();
     _appRunning=true;
     rebuild();
@@ -5624,13 +5624,14 @@ async function bootApp(){
   // Detect password recovery link from email
   const _hashParams=new URLSearchParams(window.location.hash.replace('#','?'));
   if(_hashParams.get('type')==='recovery'){
+    _hideLoading();
     showPasswordRecoveryModal();
     return;
   }
   try {
     const {data:{session}}=await _supa.auth.getSession();
     if(session?.user){
-      if(_appRunning) return;
+      if(_appRunning){_hideLoading();return;}
       _user=session.user;
       if(session.user.user_metadata?.pin){
         showPinScreen();
@@ -8490,6 +8491,8 @@ setTimeout(()=>{
     document.body.innerHTML+='<div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#080808;z-index:99999"><button onclick="location.reload()" style="background:#7c3aed;color:#fff;border:none;padding:14px 28px;border-radius:50px;font-size:16px;cursor:pointer">Recarregar app</button></div>';
   }
 },10000);
+// Fallback: esconder loading screen após 8s caso algum caminho não chame _hideLoading()
+setTimeout(()=>_hideLoading(),8000);
 if(location.hostname==='localhost'||location.hostname==='127.0.0.1'||location.protocol==='file:'){
   const _pb=document.createElement('button');
   _pb.onclick=showOnboarding;
