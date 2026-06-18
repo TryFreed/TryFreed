@@ -3533,7 +3533,15 @@ const CATS = {
 // ── Supabase setup ────────────────────────────────────────────────
 const SUPA_URL = 'https://nyicbxrbabudbwahrjzx.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55aWNieHJiYWJ1ZGJ3YWhyanp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkxMjg1MDYsImV4cCI6MjA5NDcwNDUwNn0.C8r8MdY3i12Q9fX1DSJTdopDf_mBepFp0ft9skluD4I';
-const _supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+const _supa = supabase.createClient(SUPA_URL, SUPA_KEY, {
+  auth: {
+    persistSession: true,
+    storageKey: 'tryfreed-auth',
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 const GCAL_CLIENT_ID = '874539733124-dmtbgmu7tn24egg7uugpkf0s4989s7kr.apps.googleusercontent.com';
 let _user = null;
 
