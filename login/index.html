@@ -5195,7 +5195,9 @@ function rebuild(){
   _computeFullDirty=true;
   buildTopCards();buildPeriodRow();buildNotifBanner();buildWeek();buildCal();buildMetas();buildDividas();buildRelatorio();buildProfileCard();
   const homeEl=document.getElementById('tab-home');
-  if(homeEl&&homeEl.classList.contains('on')) buildHomeDashboard();
+  if(homeEl&&homeEl.classList.contains('on')){
+    try{buildHomeDashboard();}catch(e){console.error('[rebuild home]',e);}
+  }
 }
 
 // ── NOTIFICATIONS ────────────────────────────────────────────────
@@ -5394,7 +5396,8 @@ function showTab(tabId){
   });
   updateBnShape(tabId);
   if(tabId==='home'){
-    buildHomeDashboard();
+    document.getElementById('tab-home').style.display='block';
+    try{buildHomeDashboard();}catch(e){console.error('[showTab home]',e);}
   }
   if(tabId==='relatorio' && typeof Chart==='undefined'){
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
@@ -5535,26 +5538,32 @@ function showPaywall(){
 
 // checkSubAndLaunch: fetches profile, shows paywall or proceeds to app
 // skipOnboarding=true for PIN users who already completed onboarding
-let _launching=false;
 async function checkSubAndLaunch(skipOnboarding=false){
-  if(_launching) return; // evitar execução dupla (race condition SIGNED_IN + bootApp)
-  _launching=true;
+  if(_appRunning) return; // app já rodando — skip
   try {
     const subscribed=await fetchProfile(_user.id);
     if(!subscribed){showPaywall();return;}
+    if(_appRunning) return; // recheck após fetchProfile (pode ter demorado)
     if(!skipOnboarding&&obIsFirstTime()){
       obStart();await loadFromSupabase();_appRunning=true;return;
     }
     await loadFromSupabase();
+    if(_appRunning) return; // recheck após loadFromSupabase
     initApp();
     _appRunning=true;
     rebuild();
     showTab('home');
+    // Safety: se homeDashboard ainda vazio após 1.5s, reconstruir
+    setTimeout(()=>{
+      const hd=document.getElementById('homeDashboard');
+      if(hd&&!hd.innerHTML.trim()&&_appRunning){
+        console.warn('[SAFETY] homeDashboard vazio — reconstruindo');
+        try{buildHomeDashboard();}catch(e2){console.error('[SAFETY]',e2);}
+      }
+    },1500);
   } catch(e){
-    console.error('[SUB CHECK] checkSubAndLaunch error',e);
+    console.error('[checkSubAndLaunch] erro:',e);
     showPaywall();
-  } finally {
-    _launching=false;
   }
 }
 
