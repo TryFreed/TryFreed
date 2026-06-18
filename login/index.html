@@ -5597,7 +5597,8 @@ function showPaywall(){
 async function checkSubAndLaunch(skipOnboarding=false){
   if(_appRunning){_hideLoading();return;}
   try {
-    await new Promise(r=>setTimeout(r,500)); // deixa o Supabase client estabilizar
+    // Espera o cliente Supabase terminar de inicializar (evita conflito com _recoverAndRefresh)
+    await _supa.auth.getSession().catch(()=>{});
     await loadFromSupabase(); // single round-trip: data + profile (incl. subscribed)
     if(_appRunning){_hideLoading();return;}
     if(!window._profile?.subscribed){showPaywall();return;}
