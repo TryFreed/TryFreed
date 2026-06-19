@@ -5607,7 +5607,8 @@ function showPaywall(){
 // checkSubAndLaunch: loads data, checks subscription, shows app or paywall
 // skipOnboarding=true for PIN users who already completed onboarding
 async function checkSubAndLaunch(skipOnboarding=false){
-  if(_appRunning){_hideLoading();return;}
+  if(_appRunning||_launching){_hideLoading();return;}
+  _launching=true;
   try {
     const loaded = await loadFromSupabase(); // single round-trip: data + profile (incl. subscribed)
     if(!loaded){
@@ -5626,11 +5627,14 @@ async function checkSubAndLaunch(skipOnboarding=false){
     console.error('[checkSubAndLaunch] erro:',e);
     _hideLoading();
     _showToast('Erro ao iniciar. Recarregue a página.');
+  } finally {
+    _launching=false;
   }
 }
 
 let _booted = false;
 let _appRunning = false;
+let _launching = false;
 
 // Re-verifica subscription quando a aba volta ao foco
 document.addEventListener('visibilitychange', async()=>{
