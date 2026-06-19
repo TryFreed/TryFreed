@@ -4588,7 +4588,7 @@ function onDayEditTypeChange(itemType,id,newType){
   _dayEdit.type=newType;
   _renderDayArea(newType,item,lang==='en',itemType);
 }
-function saveDayEdit(){
+async function saveDayEdit(){
   if(!_dayEdit)return;
   const{itemType,id,type}=_dayEdit;
   const item=itemType==='renda'?rendas.find(x=>x.id===id):bills.find(x=>x.id===id);
@@ -4612,8 +4612,8 @@ function saveDayEdit(){
   const catEl=document.getElementById('dei-cat');
   if(catEl&&itemType==='bill') item.cat=catEl.value;
   item.owner=window._editOwner||item.owner||'user';
-  if(itemType==='renda'){saveRenda(item);buildRendaList();}
-  else{saveBill(item);renderBills();}
+  if(itemType==='renda'){await saveRenda(item);buildRendaList();}
+  else{await saveBill(item);renderBills();}
   rebuild();
   closeDayEditModal();
 }
@@ -4646,7 +4646,7 @@ function openMetaEditModal(id){
   if(sd)sd.innerHTML=buildOwnerSelector(initOwner,setMetaEditOwner);
   document.getElementById('metaEditModal').style.display='flex';
 }
-function saveMetaEdit(){
+async function saveMetaEdit(){
   const meta=metas.find(x=>x.id===_metaEditId);
   if(!meta)return;
   const name=document.getElementById('mel-name').value.trim();
@@ -4657,7 +4657,7 @@ function saveMetaEdit(){
   const[yr,mo,dy]=dv.split('-').map(Number);
   meta.name=name;meta.val=val;meta.year=yr;meta.month=mo-1;meta.day=dy;meta.desc=desc;
   meta.owner=window._metaEditOwner||meta.owner||'user';
-  saveMeta(meta);buildMetas();rebuild();
+  await saveMeta(meta);buildMetas();rebuild();
   closeMetaEditModal();
 }
 function closeMetaEditModal(){
@@ -4694,7 +4694,7 @@ function openDividaEditModal(id){
   if(sd)sd.innerHTML=buildOwnerSelector(initOwner,setDividaEditOwner);
   document.getElementById('dividaEditModal').style.display='flex';
 }
-function saveDividaEdit(){
+async function saveDividaEdit(){
   const d=dividas.find(x=>x.id===_dividaEditId);
   if(!d)return;
   const name=document.getElementById('del-name').value.trim();
@@ -4707,7 +4707,7 @@ function saveDividaEdit(){
   d.name=name;d.remaining=remaining;d.juros=juros;d.min_payment=min_payment;
   d.frequencia=frequencia;d.target_date=target_date;
   d.owner=window._dividaEditOwner||d.owner||'user';
-  saveDivida(d);buildDividas();
+  await saveDivida(d);buildDividas();
   closeDividaEditModal();
 }
 function closeDividaEditModal(){
