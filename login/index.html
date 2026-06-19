@@ -5032,12 +5032,12 @@ async function addMeta(){
   await loadFromSupabase();
   renderBills();buildMetas();rebuild();
 }
-function completeMeta(id){
+async function completeMeta(id){
   const m=metas.find(x=>x.id===id);
   if(!m)return;
   m.done=true;
   if(m.billId){bills=bills.filter(b=>b.id!==m.billId);deleteBill(m.billId);renderBills();}
-  saveMeta(m);buildMetas();rebuild();
+  await saveMeta(m);buildMetas();rebuild();
 }
 function removeMeta(id){
   const m=metas.find(x=>x.id===id);
@@ -7579,21 +7579,21 @@ function getBillsDueOnDay(year,month,day){
     return false;
   });
 }
-function payBillOnDay(billId,year,month,day){
+async function payBillOnDay(billId,year,month,day){
   const b=bills.find(x=>x.id===billId);
   if(!b) return;
   if(!b.pagamentos) b.pagamentos=[];
   b.pagamentos=b.pagamentos.filter(p=>!(p.year===year&&p.month===month&&p.day===day));
   b.pagamentos.push({year,month,day,paid:true,paid_date:new Date().toISOString()});
-  saveBill(b);
+  await saveBill(b);
   if(_calDayOpen) renderCalDayPanel(_calDayOpen.year,_calDayOpen.month,_calDayOpen.day);
   buildCal();buildNotifBanner();
 }
-function unPayBillOnDay(billId,year,month,day){
+async function unPayBillOnDay(billId,year,month,day){
   const b=bills.find(x=>x.id===billId);
   if(!b) return;
   b.pagamentos=(b.pagamentos||[]).filter(p=>!(p.year===year&&p.month===month&&p.day===day));
-  saveBill(b);
+  await saveBill(b);
   if(_calDayOpen) renderCalDayPanel(_calDayOpen.year,_calDayOpen.month,_calDayOpen.day);
   buildCal();buildNotifBanner();
 }
@@ -7765,14 +7765,14 @@ function toggleCheckinBody(metaId){
   const open=el.classList.toggle('open');
   if(btn){btn.textContent=open?t('meta_checkin_hide')+' ▲':t('meta_checkin_toggle')+' ▼';}
 }
-function toggleMetaCheckin(metaId,weekIdx){
+async function toggleMetaCheckin(metaId,weekIdx){
   const meta=metas.find(x=>x.id===metaId);
   if(!meta) return;
   if(!meta.checkins||!meta.checkins.length) meta.checkins=generateMetaCheckins(meta);
   if(meta.checkins[weekIdx]===undefined) return;
   meta.checkins[weekIdx].done=!meta.checkins[weekIdx].done;
   const openIds=metas.filter(m=>document.getElementById('checkin-body-'+m.id)?.classList.contains('open')).map(m=>m.id);
-  saveMeta(meta);buildMetas();
+  await saveMeta(meta);buildMetas();
   openIds.forEach(id=>{
     const el=document.getElementById('checkin-body-'+id);
     const btn=document.getElementById('checkin-toggle-'+id);
@@ -7975,7 +7975,7 @@ function toggleDebtInstallments(debtId){
   const open=el.classList.toggle('open');
   if(btn) btn.textContent=open?(lang==='en'?'Hide ▲':'Ocultar ▲'):t('dividas_inst_toggle');
 }
-function toggleDebtInstallment(debtId,idx){
+async function toggleDebtInstallment(debtId,idx){
   const d=dividas.find(x=>x.id===debtId);
   if(!d) return;
   if(!d.parcelas||!d.parcelas.length) d.parcelas=generateDebtInstallments(d);
@@ -7992,7 +7992,7 @@ function toggleDebtInstallment(debtId,idx){
     d.payments=d.payments.filter(p=>p.installment_idx!==idx);
   }
   const openIds=dividas.filter(x=>document.getElementById('debt-inst-body-'+x.id)?.classList.contains('open')).map(x=>x.id);
-  saveDivida(d);buildDividas();
+  await saveDivida(d);buildDividas();
   openIds.forEach(id=>{
     const el=document.getElementById('debt-inst-body-'+id);
     const btn=document.getElementById('debt-inst-toggle-'+id);
@@ -8026,7 +8026,7 @@ function updateDebtPayInfo(){
      ${t('dividas_pay_principal')} <b>${fmt(principal)}</b><br>
      ${t('dividas_pay_new_remaining')} <b style="color:var(--red)">${fmt(newRemaining)}</b>`;
 }
-function confirmDebtPayment(){
+async function confirmDebtPayment(){
   const d=dividas.find(x=>x.id===_debtPayId);
   if(!d) return;
   const amt=parseFloat(document.getElementById('debtPayAmt').value)||0;
@@ -8034,7 +8034,7 @@ function confirmDebtPayment(){
   const interestDue=Math.round(d.remaining*(d.juros/100));
   d.remaining=Math.max(0,d.remaining+interestDue-amt);
   d.payments.push({date:new Date().toISOString(),amount:amt,interest:interestDue,principal:Math.max(0,amt-interestDue)});
-  saveDivida(d);
+  await saveDivida(d);
   closeDebtPayModal();
   buildDividas();
 }
