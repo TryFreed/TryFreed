@@ -148,7 +148,7 @@ body.dark .toggle-dot{transform:translateX(18px);background:#000}
 .period-btns{display:none}
 .pbtn{display:none}
 /* TABS */
-.tabs{display:flex;gap:2px;flex:1}
+.tabs{display:flex;gap:2px;justify-content:center}
 .tab{padding:6px 14px;border-radius:6px;border:none;background:transparent;cursor:pointer;font-size:13px;font-weight:500;color:rgba(240,238,255,0.5);transition:all .15s}
 .tab.on{color:#b47bff;background:rgba(124,58,237,0.15);font-weight:600}
 .tab:hover:not(.on){background:rgba(255,255,255,0.06);color:rgba(240,238,255,0.8)}
@@ -1255,16 +1255,16 @@ body:not(.dark) .tab:hover:not(.on){color:rgba(60,40,100,0.8);background:rgba(12
 body:not(.dark) .tab.on{color:#7c3aed}
 .app-header-inner{
   max-width:1100px;margin:0 auto;padding:0 1.25rem;
-  height:56px;display:flex;align-items:center;gap:0;
+  height:56px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:0;
 }
 .app-logo{
   font-size:17px;font-weight:800;letter-spacing:-0.5px;
   background:linear-gradient(135deg,#b47bff,#9d5cf6);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  flex-shrink:0;margin-right:24px;
+  flex-shrink:0;
 }
 .header-actions{
-  display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0;
+  display:flex;align-items:center;gap:10px;justify-content:flex-end;
 }
 
 @media(max-width:640px){
