@@ -3985,12 +3985,24 @@ function esc(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/
 
 function getOwnerAvatar(owner){
   const p=window._profile||{};
-  if(!owner) return '';
-  const isConjuge=owner==='conjuge';
-  const color=isConjuge?(p.avatar_color_conjuge||'#ec4899'):(p.avatar_color||'#7c3aed');
-  const name=esc(isConjuge?(p.conjuge_nome||'?'):(p.display_name||'?'));
-  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
-  return `<div style="width:20px;height:20px;border-radius:50%;background:${color};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-right:4px">${initials}</div>`;
+  if(!owner||owner==='user') {
+    const color=p.avatar_color||'#7c3aed';
+    const name=esc(p.display_name||'?');
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+    return `<div style="width:20px;height:20px;border-radius:50%;background:${color};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-right:4px">${initials}</div>`;
+  }
+  if(owner==='conjuge'){
+    const color=p.avatar_color_conjuge||'#ec4899';
+    const name=esc(p.conjuge_nome||'?');
+    const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+    return `<div style="width:20px;height:20px;border-radius:50%;background:${color};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-right:4px">${initials}</div>`;
+  }
+  if(owner==='both'){
+    const uColor=p.avatar_color||'#7c3aed';
+    const cColor=p.avatar_color_conjuge||'#ec4899';
+    return `<div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,${uColor} 50%,${cColor} 50%);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-right:4px">★</div>`;
+  }
+  return '';
 }
 
 function buildOwnerSelector(currentOwner, setFn){
@@ -4003,16 +4015,22 @@ function buildOwnerSelector(currentOwner, setFn){
   const cColor=p.avatar_color_conjuge||'#ec4899';
   const uInit=userName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
   const cInit=conjName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  const bothLabel=isEN?'Both':'Ambos';
+  const bothGrad=`linear-gradient(135deg,${uColor} 50%,${cColor} 50%)`;
   return `<div style="margin:10px 0">
     <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#6b7280;margin-bottom:6px">${isEN?'Assign to':'Atribuir a'}</div>
     <div class="owner-selector">
-      <button type="button" onclick="(${setFn})('user')" id="ownerBtnUser" class="owner-btn ${currentOwner!=='conjuge'?'active':''}">
+      <button type="button" onclick="(${setFn})('user')" id="ownerBtnUser" class="owner-btn ${currentOwner==='user'||!currentOwner?'active':''}">
         <div style="width:20px;height:20px;border-radius:50%;background:${uColor};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">${uInit}</div>
         ${esc(userName)}
       </button>
       <button type="button" onclick="(${setFn})('conjuge')" id="ownerBtnConjuge" class="owner-btn ${currentOwner==='conjuge'?'active':''}">
         <div style="width:20px;height:20px;border-radius:50%;background:${cColor};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">${cInit}</div>
         ${esc(conjName)}
+      </button>
+      <button type="button" onclick="(${setFn})('both')" id="ownerBtnBoth" class="owner-btn ${currentOwner==='both'?'active':''}">
+        <div style="width:20px;height:20px;border-radius:50%;background:${bothGrad};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">★</div>
+        ${bothLabel}
       </button>
     </div>
   </div>`;
@@ -4023,48 +4041,21 @@ window._billOwner='user';
 window._metaOwner='user';
 window._dividaOwner='user';
 
-function setRendaOwner(v){
-  window._rendaOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
+function _syncOwnerBtns(v){
+  const ub=document.getElementById('ownerBtnUser');
+  const cb=document.getElementById('ownerBtnConjuge');
+  const bb=document.getElementById('ownerBtnBoth');
+  if(ub)ub.classList.toggle('active',v==='user'||!v);
   if(cb)cb.classList.toggle('active',v==='conjuge');
+  if(bb)bb.classList.toggle('active',v==='both');
 }
-function setBillOwner(v){
-  window._billOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
-  if(cb)cb.classList.toggle('active',v==='conjuge');
-}
-function setMetaOwner(v){
-  window._metaOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
-  if(cb)cb.classList.toggle('active',v==='conjuge');
-}
-function setDividaOwner(v){
-  window._dividaOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
-  if(cb)cb.classList.toggle('active',v==='conjuge');
-}
-function setEditOwner(v){
-  window._editOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
-  if(cb)cb.classList.toggle('active',v==='conjuge');
-}
-function setMetaEditOwner(v){
-  window._metaEditOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
-  if(cb)cb.classList.toggle('active',v==='conjuge');
-}
-function setDividaEditOwner(v){
-  window._dividaEditOwner=v;
-  const ub=document.getElementById('ownerBtnUser');const cb=document.getElementById('ownerBtnConjuge');
-  if(ub)ub.classList.toggle('active',v!=='conjuge');
-  if(cb)cb.classList.toggle('active',v==='conjuge');
-}
+function setRendaOwner(v){window._rendaOwner=v;_syncOwnerBtns(v);}
+function setBillOwner(v){window._billOwner=v;_syncOwnerBtns(v);}
+function setMetaOwner(v){window._metaOwner=v;_syncOwnerBtns(v);}
+function setDividaOwner(v){window._dividaOwner=v;_syncOwnerBtns(v);}
+function setEditOwner(v){window._editOwner=v;_syncOwnerBtns(v);}
+function setMetaEditOwner(v){window._metaEditOwner=v;_syncOwnerBtns(v);}
+function setDividaEditOwner(v){window._dividaEditOwner=v;_syncOwnerBtns(v);}
 
 function translateSupabaseError(msg){
   if(!msg) return msg;
