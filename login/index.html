@@ -2089,6 +2089,10 @@ body.dark .theme-pill-dark{color:#fff}
             <input id="drawerAge" type="number" class="dr-input" placeholder="Idade" inputmode="numeric" min="1" max="120" style="flex:1">
           </div>
           <button onclick="saveAccountInfo()" class="dr-save-btn" style="width:100%;justify-content:center" id="drawerAccountSaveBtn">✓ Salvar</button>
+          <div style="border-top:0.5px solid var(--border);margin-top:4px;padding-top:8px;display:flex;flex-direction:column;gap:6px">
+            <button onclick="showProfileEdit();closeDrawer()" class="dr-save-btn" style="width:100%;justify-content:center;background:var(--accent);color:#fff;border:none" id="drawerEditProfileBtn">Editar perfil completo</button>
+            <button onclick="showConjugeEdit();closeDrawer()" class="dr-save-btn" style="width:100%;justify-content:center" id="drawerEditConjugeBtn">Editar cônjuge</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2878,7 +2882,7 @@ const TRANSLATIONS = {
     bn_cal:'Calendário', bn_metas:'Metas', bn_relatorio:'Relatório',
     // Header / drawer
     theme_light:'Claro', theme_dark:'Escuro',
-    drawer_account:'Minha conta', drawer_gender_ph:'Sexo', drawer_gender_m:'Masculino', drawer_gender_f:'Feminino', drawer_gender_o:'Prefiro não dizer', drawer_age_ph:'Idade', drawer_account_save:'Salvar', drawer_security:'Segurança',
+    drawer_account:'Minha conta', drawer_gender_ph:'Sexo', drawer_gender_m:'Masculino', drawer_gender_f:'Feminino', drawer_gender_o:'Prefiro não dizer', drawer_age_ph:'Idade', drawer_account_save:'Salvar', drawer_edit_profile:'Editar perfil completo', drawer_edit_conjuge:'Editar cônjuge', drawer_security:'Segurança',
     drawer_appearance:'Aparência / Appearance',
     drawer_initial_balance:'Saldo inicial / Initial balance',
     drawer_ib_hint:'Quanto você já tem guardado hoje?',
@@ -3109,7 +3113,7 @@ const TRANSLATIONS = {
     bn_home:'Home', bn_renda:'Income', bn_bills:'Expenses', bn_semana:'Week',
     bn_cal:'Calendar', bn_metas:'Goals', bn_relatorio:'Report',
     theme_light:'Light', theme_dark:'Dark',
-    drawer_account:'My account', drawer_gender_ph:'Gender', drawer_gender_m:'Male', drawer_gender_f:'Female', drawer_gender_o:'Prefer not to say', drawer_age_ph:'Age', drawer_account_save:'Save', drawer_security:'Security',
+    drawer_account:'My account', drawer_gender_ph:'Gender', drawer_gender_m:'Male', drawer_gender_f:'Female', drawer_gender_o:'Prefer not to say', drawer_age_ph:'Age', drawer_account_save:'Save', drawer_edit_profile:'Edit full profile', drawer_edit_conjuge:'Edit spouse', drawer_security:'Security',
     drawer_appearance:'Appearance',
     drawer_initial_balance:'Initial balance',
     drawer_ib_hint:'How much do you already have saved today?',
@@ -3453,6 +3457,8 @@ function applyLang(){
   if(dsl[1]) dsl[1].textContent=t('drawer_appearance');
   if(dsl[2]) dsl[2].textContent=t('drawer_lang');
   const dal=document.getElementById('drawerAccountLabel');if(dal) dal.textContent=t('drawer_account');
+  const dep=document.getElementById('drawerEditProfileBtn');if(dep) dep.textContent=t('drawer_edit_profile');
+  const dec=document.getElementById('drawerEditConjugeBtn');if(dec) dec.textContent=t('drawer_edit_conjuge');
   const dsl2=document.getElementById('drawerSecurityLabel');if(dsl2) dsl2.textContent=t('drawer_security');
   const dsp=document.getElementById('drawerGenderPlaceholder');if(dsp) dsp.textContent=t('drawer_gender_ph');
   const dgm=document.getElementById('drawerGenderM');if(dgm) dgm.textContent=t('drawer_gender_m');
