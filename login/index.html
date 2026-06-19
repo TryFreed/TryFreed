@@ -6477,7 +6477,10 @@ function _dateToStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padSta
 async function _saveStartDate(d){
   START=d;
   _computeFullDirty=true;
-  if(_user) _supa.from('profiles').upsert({user_id:_user.id,start_date:_dateToStr(d)},{onConflict:'user_id'});
+  if(_user){
+    const {error}=await _supa.from('profiles').upsert({user_id:_user.id,start_date:_dateToStr(d)},{onConflict:'user_id'});
+    if(error) console.error('[saveStartDate] erro:',error);
+  }
 }
 function obPickStart(mode){
   document.querySelectorAll('.ob-start-option').forEach(b=>b.classList.remove('selected'));
