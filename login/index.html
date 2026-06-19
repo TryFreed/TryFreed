@@ -4000,7 +4000,7 @@ function getOwnerAvatar(owner){
   if(owner==='both'){
     const uColor=p.avatar_color||'#7c3aed';
     const cColor=p.avatar_color_conjuge||'#ec4899';
-    return `<div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,${uColor} 50%,${cColor} 50%);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff;flex-shrink:0;margin-right:4px">♥</div>`;
+    return `<div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,${uColor},${cColor});display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;flex-shrink:0;margin-right:4px">&#10084;</div>`;
   }
   return '';
 }
@@ -4029,7 +4029,7 @@ function buildOwnerSelector(currentOwner, setFn){
         ${esc(conjName)}
       </button>
       <button type="button" onclick="(${setFn})('both')" id="ownerBtnBoth" class="owner-btn ${currentOwner==='both'?'active':''}">
-        <div style="width:20px;height:20px;border-radius:50%;background:${bothGrad};display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">♥</div>
+        <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,${uColor},${cColor});display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">&#10084;</div>
         ${bothLabel}
       </button>
     </div>
