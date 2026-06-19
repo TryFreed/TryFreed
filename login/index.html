@@ -3797,7 +3797,8 @@ async function _handleAuthError(error){
   return false;
 }
 async function loadFromSupabase(){
-  if(!_user) return;
+  if(!_user) return false;
+  await _supa.auth.getSession();
   const uid = _user.id;
   let r,b,m,dv,prof;
   try {
