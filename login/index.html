@@ -4413,17 +4413,17 @@ function makeRendaRow(r){
   return row;
 }
 
-function updateRenda(id,field,val){
+async function updateRenda(id,field,val){
   const r=rendas.find(x=>x.id===id);if(!r)return;
   if(field==='val') r.val=parseFloat(val)||0;
   if(field==='day') r.day=parseInt(val)||1;
   if(field==='day2') r.day2=parseInt(val)||null;
   if(field==='dow') r.dow=parseInt(val);
-  saveRenda(r);buildRendaList();rebuild();
+  await saveRenda(r);buildRendaList();rebuild();
 }
-function toggleRendaLock(id){
+async function toggleRendaLock(id){
   const r=rendas.find(x=>x.id===id);if(!r)return;
-  r.locked=!r.locked;saveRenda(r);buildRendaList();
+  r.locked=!r.locked;await saveRenda(r);buildRendaList();
 }
 function removeRenda(id){
   const r=rendas.find(x=>x.id===id);
@@ -4526,8 +4526,8 @@ function makeBillRow(b){
     </div>`;
   return row;
 }
-function toggleLock(id){const b=bills.find(x=>x.id===id);if(b){b.locked=!b.locked;saveBill(b);renderBills();}}
-function updateBill(id,f,v){const b=bills.find(x=>x.id===id);if(!b)return;if(f==='val')b.val=parseFloat(v)||0;if(f==='day')b.day=parseInt(v)||1;saveBill(b);rebuild();}
+async function toggleLock(id){const b=bills.find(x=>x.id===id);if(b){b.locked=!b.locked;await saveBill(b);renderBills();}}
+async function updateBill(id,f,v){const b=bills.find(x=>x.id===id);if(!b)return;if(f==='val')b.val=parseFloat(v)||0;if(f==='day')b.day=parseInt(v)||1;await saveBill(b);rebuild();}
 
 // Day edit bottom sheet
 let _dayEdit=null;
