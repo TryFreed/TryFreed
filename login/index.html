@@ -857,6 +857,12 @@ body:not(.dark) .hd-tx-item{border-bottom-color:var(--row-border)}
 .hd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;margin-left:6px}
 .hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
 .hd-see-all:hover{text-decoration:underline}
+.hd-pov-card{background:var(--panel);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px;display:flex;align-items:center;gap:14px}
+body:not(.dark) .hd-pov-card{border-color:var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.hd-pov-stats{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.hd-pov-stat{display:flex;flex-direction:column}
+.hd-pov-label{font-size:10px;color:#6b7280;font-weight:500;letter-spacing:.3px}
+.hd-pov-val{font-size:13px;font-weight:700;color:var(--text)}
 .gcal-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
 body:not(.dark) .gcal-btn{border-color:var(--border);background:transparent}
 .gcal-btn:hover{background:rgba(124,58,237,0.15);border-color:#7c3aed}
@@ -5897,6 +5903,98 @@ function obReset(){
   obStart();
 }
 
+function _povStats(ownerKey){
+  const wk=4.33;
+  const forUser = r => !r.owner||r.owner==='user'||r.owner==='both';
+  const forConj = r => r.owner==='conjuge'||r.owner==='both';
+  const filter = ownerKey==='combined' ? ()=>true : ownerKey==='user' ? forUser : forConj;
+  let income=0;
+  rendas.filter(filter).forEach(r=>{
+    if(r.type==='monthly') income+=r.val;
+    else if(r.type==='weekly') income+=r.val*wk;
+    else if(r.type==='biweekly') income+=r.val*2;
+  });
+  let expenses=0;
+  bills.filter(filter).forEach(b=>{
+    if(b.type==='monthly'||b.type==='extra') expenses+=b.val;
+    else if(b.type==='weekly') expenses+=b.val*wk;
+  });
+  const activeMetas=metas.filter(m=>!m.done&&filter(m)).length;
+  const totalDebt=dividas.filter(filter).reduce((s,d)=>s+(d.remaining||0),0);
+  return {income,expenses,margin:income-expenses,activeMetas,totalDebt};
+}
+
+function _povDonut(income,expenses){
+  const r=28,cx=36,cy=36,sw=7;
+  const circ=2*Math.PI*r;
+  const pct=income>0?Math.min(1,expenses/income):1;
+  const expArc=circ*pct;
+  const margin=income-expenses;
+  const mc=margin>=0?'#22c55e':'#ef4444';
+  const fmtK=v=>Math.abs(v)>=1000?(Math.round(Math.abs(v)/100)/10)+'k':Math.round(Math.abs(v));
+  return `<svg width="72" height="72" viewBox="0 0 72 72" style="flex-shrink:0">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e5e7eb" stroke-width="${sw}"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#22c55e" stroke-width="${sw}" stroke-dasharray="${circ}" stroke-dashoffset="0" transform="rotate(-90 ${cx} ${cy})" opacity="0.9"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ef4444" stroke-width="${sw}" stroke-dasharray="${expArc} ${circ}" stroke-dashoffset="0" transform="rotate(-90 ${cx} ${cy})" opacity="0.9"/>
+    <text x="${cx}" y="${cy-1}" text-anchor="middle" font-size="9" font-weight="800" fill="${mc}">${margin>=0?'+':'−'}$${fmtK(margin)}</text>
+    <text x="${cx}" y="${cy+9}" text-anchor="middle" font-size="7" fill="#9ca3af">${income>0?Math.round(expenses/income*100):0}%</text>
+  </svg>`;
+}
+
+function _buildProfileOverview(isEN){
+  const p=window._profile||{};
+  const isCasado=p.estado_civil==='casado';
+  const uColor=p.avatar_color||'#7c3aed';
+  const cColor=p.avatar_color_conjuge||'#ec4899';
+  const uName=_capitalize(p.display_name||(_user?.email?.split('@')[0]||''));
+  const cName=_capitalize(p.conjuge_nome||'');
+  const uInit=uName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  const cInit=cName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
+  const lbl=(k)=>({
+    income:isEN?'Monthly income':'Renda mensal',
+    expenses:isEN?'Expenses':'Despesas',
+    margin:isEN?'Margin':'Margem',
+    goals:isEN?'Active goals':'Metas ativas',
+    debt:isEN?'Total debt':'Dívidas',
+    none:isEN?'None':'Nenhuma',
+    both:isEN?'Together':'Juntos',
+    overview:isEN?'Profile Overview':'Visão por Perfil',
+  })[k];
+
+  function card(ownerKey, color, initials, name, gradient){
+    const s=_povStats(ownerKey);
+    const mColor=s.margin>=0?'#22c55e':'#ef4444';
+    const fmtS=v=>Math.abs(v)>=1000?(Math.round(Math.abs(v)/100)/10)+'k':'$'+Math.round(Math.abs(v));
+    const avatar=gradient
+      ?`<div style="width:40px;height:40px;border-radius:50%;background:${gradient};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff">&#10084;</div>`
+      :`<div style="width:40px;height:40px;border-radius:50%;background:${color};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff">${initials}</div>`;
+    return `<div class="hd-pov-card">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        ${avatar}
+        <div style="font-size:10px;font-weight:700;color:var(--text);text-align:center;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</div>
+        ${_povDonut(s.income,s.expenses)}
+      </div>
+      <div class="hd-pov-stats">
+        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('income')}</span><span class="hd-pov-val" style="color:#22c55e">$${fmtS(s.income)}</span></div>
+        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('expenses')}</span><span class="hd-pov-val" style="color:#ef4444">$${fmtS(s.expenses)}</span></div>
+        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('margin')}</span><span class="hd-pov-val" style="color:${mColor}">${s.margin>=0?'+':'−'}$${fmtS(s.margin)}</span></div>
+        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('goals')}</span><span class="hd-pov-val">${s.activeMetas||lbl('none')}</span></div>
+        ${s.totalDebt>0?`<div class="hd-pov-stat" style="grid-column:1/-1"><span class="hd-pov-label">${lbl('debt')}</span><span class="hd-pov-val" style="color:#f59e0b">$${fmtS(s.totalDebt)}</span></div>`:''}
+      </div>
+    </div>`;
+  }
+
+  const bothGrad=`linear-gradient(135deg,${uColor},${cColor})`;
+  let html=`<div class="hd-section"><div class="hd-section-title">${lbl('overview')}</div><div style="display:flex;flex-direction:column;gap:10px">`;
+  html+=card('user',uColor,uInit,uName,null);
+  if(isCasado){
+    html+=card('conjuge',cColor,cInit,cName,null);
+    html+=card('combined',null,null,lbl('both'),bothGrad);
+  }
+  html+=`</div></div>`;
+  return html;
+}
+
 // ── HOME DASHBOARD ────────────────────────────────────────────
 function buildHomeDashboard(){
   console.log('[buildHomeDashboard] called');
@@ -6030,6 +6128,7 @@ function buildHomeDashboard(){
     <div class="hd-mini-value" style="color:${projMargem>=0?'var(--green)':'var(--red)'}">${projMargem>0?'+':''}${fmt(projMargem)}</div>
   </div>
 </div>
+${_buildProfileOverview(isEN)}
 <div class="hd-section">
   <div class="hd-section-title">${isEN?'Income vs Expenses':'Receita vs Despesa'}</div>
   <canvas id="hdChartReceita" height="160"></canvas>
