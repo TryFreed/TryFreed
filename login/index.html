@@ -7167,6 +7167,7 @@ function _gcalResetBtns(type){
 async function gcalCreateEvents(type,token){
   const isEN=lang==='en';
   const status=document.getElementById('gcalStatus');
+  try{
   const today=new Date();
   const pad=n=>String(n).padStart(2,'0');
   const toYMD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -7245,6 +7246,11 @@ async function gcalCreateEvents(type,token){
     if(status) status.textContent=isEN?`✅ ${created} created, ❌ ${failed} failed.`:`✅ ${created} criados, ❌ ${failed} com erro.`;
   }
   _gcalResetBtns(type);
+  }catch(e){
+    console.error('[gcal] Erro inesperado:',e);
+    if(status) status.textContent=isEN?'❌ Unexpected error. Try again.':'❌ Erro inesperado. Tente novamente.';
+    _gcalResetBtns(type);
+  }
 }
 
 // ── GOOGLE CALENDAR (add single event) ────────────────────────────
