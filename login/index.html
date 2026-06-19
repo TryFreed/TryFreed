@@ -3879,7 +3879,7 @@ async function saveRenda(r){
   if(!_user) return;
   let payload={id:r.id,user_id:_user.id,name:r.name,val:r.val,type:r.type,dow:r.dow,day:r.day,day2:r.day2??null,month:r.month,year:r.year,locked:r.locked,owner:r.owner||null};
   let {data,error}=await _supa.from('rendas').upsert(payload,{onConflict:'id'}).select();
-  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
+  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<3;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
     if(!col||!(col in payload))break;
     payload={...payload};delete payload[col];
@@ -3899,7 +3899,7 @@ async function saveBill(b){
   if(!_user) return;
   let payload={id:b.id,user_id:_user.id,name:b.name,val:b.val,type:b.type,day:b.day,month:b.month??null,year:b.year??null,cat:b.cat,note:b.note||null,locked:b.locked,meta_id:b.metaId||null,meta_end:b.metaEnd||null,pagamentos:b.pagamentos||[],owner:b.owner||null};
   let {data,error}=await _supa.from('bills').upsert(payload,{onConflict:'id'}).select();
-  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
+  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<3;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
     if(!col||!(col in payload))break;
     payload={...payload};delete payload[col];
@@ -3919,7 +3919,7 @@ async function saveMeta(m){
   if(!_user) return;
   let payload={id:m.id,user_id:_user.id,name:m.name,val:m.val,day:m.day,month:m.month,year:m.year,descricao:m.desc||null,done:m.done,bill_id:m.billId||null,need_per_week:m.needPerWeek,weeks_left:m.weeksLeft,checkins:m.checkins||[],owner:m.owner||null};
   let {data,error}=await _supa.from('metas').upsert(payload,{onConflict:'id'}).select();
-  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
+  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<3;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
     if(!col||!(col in payload))break;
     payload={...payload};delete payload[col];
@@ -7786,7 +7786,7 @@ async function saveDivida(d){
   if(!_user) return;
   let payload={id:d.id,user_id:_user.id,name:d.name,total:d.total,remaining:d.remaining,juros:d.juros,min_payment:d.min_payment,frequencia:d.frequencia||'monthly',target_date:d.target_date||null,payments:d.payments||[],parcelas:d.parcelas||[],owner:d.owner||null};
   let {data,error}=await _supa.from('dividas').upsert(payload,{onConflict:'id'}).select();
-  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
+  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<3;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
     if(!col||!(col in payload))break;
     payload={...payload};delete payload[col];
