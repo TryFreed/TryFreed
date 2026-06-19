@@ -2155,14 +2155,23 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Segurança -->
     <div class="dr-card">
-      <div id="drawerPinSection" class="dr-pin-section">
-        <!-- populated by updateDrawerPinSection() -->
-      </div>
-      <div class="dr-sep"></div>
-      <div class="dr-item" onclick="openResetPassConfirmModal()">
-        <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        <span class="dr-label" id="drawerChangePassBtn" style="color:var(--accent)">Mudar senha</span>
+      <div class="dr-item" onclick="drToggle('drSecurityExpand',this)">
+        <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span class="dr-label" id="drawerSecurityLabel">Segurança</span>
         <svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="dr-expand" id="drSecurityExpand">
+        <div class="dr-expand-inner" style="padding:0">
+          <div id="drawerPinSection" class="dr-pin-section">
+            <!-- populated by updateDrawerPinSection() -->
+          </div>
+          <div class="dr-sep"></div>
+          <div class="dr-item" onclick="openResetPassConfirmModal()">
+            <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <span class="dr-label" id="drawerChangePassBtn" style="color:var(--accent)">Mudar senha</span>
+            <svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2869,7 +2878,7 @@ const TRANSLATIONS = {
     bn_cal:'Calendário', bn_metas:'Metas', bn_relatorio:'Relatório',
     // Header / drawer
     theme_light:'Claro', theme_dark:'Escuro',
-    drawer_account:'Minha conta', drawer_gender_ph:'Sexo', drawer_gender_m:'Masculino', drawer_gender_f:'Feminino', drawer_gender_o:'Prefiro não dizer', drawer_age_ph:'Idade', drawer_account_save:'Salvar',
+    drawer_account:'Minha conta', drawer_gender_ph:'Sexo', drawer_gender_m:'Masculino', drawer_gender_f:'Feminino', drawer_gender_o:'Prefiro não dizer', drawer_age_ph:'Idade', drawer_account_save:'Salvar', drawer_security:'Segurança',
     drawer_appearance:'Aparência / Appearance',
     drawer_initial_balance:'Saldo inicial / Initial balance',
     drawer_ib_hint:'Quanto você já tem guardado hoje?',
@@ -3100,7 +3109,7 @@ const TRANSLATIONS = {
     bn_home:'Home', bn_renda:'Income', bn_bills:'Expenses', bn_semana:'Week',
     bn_cal:'Calendar', bn_metas:'Goals', bn_relatorio:'Report',
     theme_light:'Light', theme_dark:'Dark',
-    drawer_account:'My account', drawer_gender_ph:'Gender', drawer_gender_m:'Male', drawer_gender_f:'Female', drawer_gender_o:'Prefer not to say', drawer_age_ph:'Age', drawer_account_save:'Save',
+    drawer_account:'My account', drawer_gender_ph:'Gender', drawer_gender_m:'Male', drawer_gender_f:'Female', drawer_gender_o:'Prefer not to say', drawer_age_ph:'Age', drawer_account_save:'Save', drawer_security:'Security',
     drawer_appearance:'Appearance',
     drawer_initial_balance:'Initial balance',
     drawer_ib_hint:'How much do you already have saved today?',
@@ -3444,6 +3453,7 @@ function applyLang(){
   if(dsl[1]) dsl[1].textContent=t('drawer_appearance');
   if(dsl[2]) dsl[2].textContent=t('drawer_lang');
   const dal=document.getElementById('drawerAccountLabel');if(dal) dal.textContent=t('drawer_account');
+  const dsl2=document.getElementById('drawerSecurityLabel');if(dsl2) dsl2.textContent=t('drawer_security');
   const dsp=document.getElementById('drawerGenderPlaceholder');if(dsp) dsp.textContent=t('drawer_gender_ph');
   const dgm=document.getElementById('drawerGenderM');if(dgm) dgm.textContent=t('drawer_gender_m');
   const dgf=document.getElementById('drawerGenderF');if(dgf) dgf.textContent=t('drawer_gender_f');
