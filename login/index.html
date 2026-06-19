@@ -8345,7 +8345,7 @@ function _aiMsg(role, text, cls='', imageUrls=[], sheetNames=[]){
   el.appendChild(span);
   msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
 }
-function _aiHandleResponse(raw){
+async function _aiHandleResponse(raw){
   let parsed;
   try{
     const clean=raw.replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,'').trim();
@@ -8360,7 +8360,7 @@ function _aiHandleResponse(raw){
     _aiShowConfirmation(actions,reply);
     return;
   }
-  const results=_aiDoActions(actions);
+  const results=await _aiDoActions(actions);
   let msg=reply;
   if(results.length) msg+=(msg?'\n\n':'')+results.join('\n');
   _aiMsg('ai',msg.trim(),'ok');
@@ -8402,20 +8402,20 @@ function _aiMsgConfirm(text){
   el.appendChild(row);
   msgs.appendChild(el);msgs.scrollTop=msgs.scrollHeight;
 }
-function aiConfirmActions(confirmed){
+async function aiConfirmActions(confirmed){
   if(!_aiPendingActions) return;
   const {actions,reply}=_aiPendingActions;
   _aiPendingActions=null;
   if(!confirmed){_aiMsg('ai',lang==='en'?'Cancelled. Nothing was changed.':'Cancelado. Nada foi alterado.');return;}
-  const results=_aiDoActions(actions);
+  const results=await _aiDoActions(actions);
   let msg=reply;
   if(results.length) msg+=(msg?'\n\n':'')+results.join('\n');
   _aiMsg('ai',msg.trim(),'ok');
 }
-function _aiDoActions(actions){
+async function _aiDoActions(actions){
   const results=[];
   const now=new Date();
-  actions.forEach(a=>{
+  for(const a of actions){
     const op=a.op||'insert';
     const tbl=a.table;
     const d=a.data||{};
@@ -8448,7 +8448,7 @@ function _aiDoActions(actions){
           if(r){
             if(d.name!=null)r.name=d.name;if(d.val!=null)r.val=Number(d.val);
             if(d.type!=null)r.type=d.type;if(d.day!=null)r.day=Number(d.day);if(d.dow!=null)r.dow=Number(d.dow);
-            saveRenda(r);results.push(`✓ ${lang==='en'?'Updated':'Atualizado'}: ${r.name} — $${r.val}`);
+            await saveRenda(r);results.push(`✓ ${lang==='en'?'Updated':'Atualizado'}: ${r.name} — $${r.val}`);
           }
         } else if(tbl==='bills'){
           const b=bills.find(x=>x.name.toLowerCase().includes(q));
@@ -8456,14 +8456,14 @@ function _aiDoActions(actions){
             if(d.name!=null)b.name=d.name;if(d.val!=null)b.val=Number(d.val);
             if(d.type!=null)b.type=d.type;if(d.day!=null)b.day=Number(d.day);
             if(d.cat!=null)b.cat=d.cat;if(d.note!=null)b.note=d.note;
-            saveBill(b);results.push(`✓ ${lang==='en'?'Updated':'Atualizada'}: ${b.name} — $${b.val}`);
+            await saveBill(b);results.push(`✓ ${lang==='en'?'Updated':'Atualizada'}: ${b.name} — $${b.val}`);
           }
         } else if(tbl==='metas'){
           const m=metas.find(x=>x.name.toLowerCase().includes(q));
           if(m){
             if(d.name!=null)m.name=d.name;if(d.val!=null)m.val=Number(d.val);
             if(d.descricao!=null)m.desc=d.descricao;
-            saveMeta(m);results.push(`✓ ${lang==='en'?'Updated':'Atualizada'}: ${m.name}`);
+            await saveMeta(m);results.push(`✓ ${lang==='en'?'Updated':'Atualizada'}: ${m.name}`);
           }
         } else if(tbl==='dividas'){
           const dv=dividas.find(x=>x.name.toLowerCase().includes(q));
@@ -8471,7 +8471,7 @@ function _aiDoActions(actions){
             if(d.name!=null)dv.name=d.name;if(d.total!=null)dv.total=Number(d.total);
             if(d.remaining!=null)dv.remaining=Number(d.remaining);if(d.juros!=null)dv.juros=Number(d.juros);
             if(d.min_payment!=null)dv.min_payment=Number(d.min_payment);if(d.target_date!=null)dv.target_date=d.target_date;
-            saveDivida(dv);results.push(`✓ ${lang==='en'?'Updated':'Atualizada'}: ${dv.name}`);
+            await saveDivida(dv);results.push(`✓ ${lang==='en'?'Updated':'Atualizada'}: ${dv.name}`);
           }
         }
       } else { // insert
@@ -8480,14 +8480,14 @@ function _aiDoActions(actions){
             day:Number(d.day)||1,day2:d.day2?Number(d.day2):null,
             month:now.getMonth(),year:now.getFullYear(),locked:false,
             dow:d.dow!=null?Number(d.dow):5};
-          rendas.push(nr);saveRenda(nr);
+          rendas.push(nr);await saveRenda(nr);
           results.push(`✓ ${nr.name} — $${nr.val} (${nr.type})`);
         } else if(tbl==='bills'){
           const nb={id:newId(),name:d.name||'Despesa',val:Number(d.val)||0,
             type:d.type||'monthly',day:Number(d.day)||1,locked:false,
             cat:d.cat||'outros',note:d.note||null};
           if(nb.type==='once'){nb.month=d.month!=null?Number(d.month)-1:now.getMonth();nb.year=Number(d.year)||now.getFullYear();}
-          bills.push(nb);saveBill(nb);
+          bills.push(nb);await saveBill(nb);
           results.push(`✓ ${nb.name} — $${nb.val} (${nb.type})`);
         } else if(tbl==='metas'){
           const tDay=Number(d.day)||1,tMo=Number(d.month)||(now.getMonth()+2),tYr=Number(d.year)||(now.getFullYear()+1);
@@ -8498,22 +8498,22 @@ function _aiDoActions(actions){
           const metaId=newId(),billId=newId();
           const nb={id:billId,name:'Guardar — '+d.name,val:npw,day:5,type:'weekly',locked:false,cat:'outros',
             metaId,metaEnd:tDate,note:`Save every Friday until ${tMo}/${tDay}/${tYr}`};
-          bills.push(nb);saveBill(nb);
+          bills.push(nb);await saveBill(nb);
           const nm={id:metaId,name:d.name||'Meta',val:Number(d.val)||0,day:tDay,month:tMo-1,year:tYr,
             desc:d.descricao||'',done:false,billId,needPerWeek:npw,weeksLeft:wl,checkins:[]};
-          nm.checkins=generateMetaCheckins(nm);metas.push(nm);saveMeta(nm);
+          nm.checkins=generateMetaCheckins(nm);metas.push(nm);await saveMeta(nm);
           results.push(`✓ ${nm.name} — $${nm.val} (meta)`);
         } else if(tbl==='dividas'){
           const tot=Number(d.total)||0;
           const nd={id:newId(),name:d.name||'Dívida',total:tot,remaining:Number(d.remaining)||tot,
             juros:Number(d.juros)||0,min_payment:Number(d.min_payment)||Math.ceil(tot/12),
             frequencia:d.frequencia||'monthly',target_date:d.target_date||null,payments:[],parcelas:[]};
-          nd.parcelas=generateDebtInstallments(nd);dividas.push(nd);saveDivida(nd);
+          nd.parcelas=generateDebtInstallments(nd);dividas.push(nd);await saveDivida(nd);
           results.push(`✓ ${nd.name} — $${nd.total} (${lang==='en'?'debt':'dívida'})`);
         }
       }
     } catch(e){console.error('[AI action]',op,tbl,e);}
-  });
+  }
   buildRendaList();renderBills();buildMetas();buildDividas();rebuild();
   return results;
 }
