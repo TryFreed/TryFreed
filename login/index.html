@@ -5521,6 +5521,7 @@ if(savedTheme==='dark'){
 applyLang();
 
 function initApp(){
+  if(_appRunning) return;
   document.querySelector('.sub').innerHTML=`${t('starting_balance_label')} ${fmt(initialBalance)}`;
   applyLang();
   // Update report year options
