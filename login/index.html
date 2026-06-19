@@ -857,12 +857,9 @@ body:not(.dark) .hd-tx-item{border-bottom-color:var(--row-border)}
 .hd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;margin-left:6px}
 .hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
 .hd-see-all:hover{text-decoration:underline}
-.hd-pov-card{border-radius:18px;overflow:hidden;margin-bottom:0;box-shadow:0 2px 16px rgba(0,0,0,0.07)}
-body.dark .hd-pov-card{box-shadow:0 2px 20px rgba(0,0,0,0.3)}
-.hd-pov-head{padding:14px 16px;display:flex;align-items:center;gap:12px}
-.hd-pov-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-.hd-pov-name{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
-.hd-pov-sub{font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px}
+.hd-pov-card{border-radius:16px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,0.06);border:0.5px solid var(--border)}
+body.dark .hd-pov-card{box-shadow:0 2px 16px rgba(0,0,0,0.25)}
+.hd-pov-avatar{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.15)}
 .hd-pov-body{background:var(--card);padding:14px 16px}
 body:not(.dark) .hd-pov-body{background:#fff}
 .hd-pov-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-bottom:12px}
@@ -5959,27 +5956,25 @@ function _buildProfileOverview(isEN){
     const pct=s.income>0?Math.min(100,Math.round(s.expenses/s.income*100)):0;
     const mColor=s.margin>=0?'#22c55e':'#ef4444';
     const barColor=pct<=70?'#22c55e':pct<=90?'#f59e0b':'#ef4444';
-    const headBg=gradient||color;
     const avatarInner=gradient
-      ?`<span style="font-size:18px">&#10084;</span>`
-      :`<span style="font-weight:800;font-size:16px">${initials}</span>`;
-    const subLabel=ownerKey==='combined'?(isEN?'Combined view':'Visão combinada'):'';
-    const goalPill=s.activeMetas>0?`<span class="hd-pov-pill">🎯 ${s.activeMetas} ${T.goals}</span>`:`<span class="hd-pov-pill">${T.noGoals}</span>`;
-    const debtPill=s.totalDebt>0?`<span class="hd-pov-pill" style="color:#f59e0b">⚠ ${fmtK(s.totalDebt)} ${T.debt}</span>`:`<span class="hd-pov-pill" style="color:#22c55e">✓ ${T.noDebt}</span>`;
+      ?`<span style="font-size:16px">&#10084;</span>`
+      :`<span style="font-weight:800;font-size:14px">${initials}</span>`;
+    const avatarBg=gradient||color;
+    const goalPill=s.activeMetas>0?`<span class="hd-pov-pill">🎯 ${s.activeMetas} ${T.goals}</span>`:'';
+    const debtPill=s.totalDebt>0?`<span class="hd-pov-pill" style="color:#f59e0b">⚠ ${fmtK(s.totalDebt)} ${T.debt}</span>`:'';
     return `<div class="hd-pov-card">
-      <div class="hd-pov-head" style="background:${headBg}">
-        <div class="hd-pov-avatar" style="background:rgba(255,255,255,0.2)">${avatarInner}</div>
-        <div>
-          <div class="hd-pov-name">${esc(name)}</div>
-          ${subLabel?`<div class="hd-pov-sub">${subLabel}</div>`:''}
-        </div>
-        <div style="margin-left:auto;text-align:right">
-          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:2px">${T.margin}</div>
-          <div style="font-size:18px;font-weight:900;color:#fff">${s.margin>=0?'+':''}${fmtK(s.margin)}</div>
-        </div>
-      </div>
       <div class="hd-pov-body">
-        <div class="hd-pov-nums">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div class="hd-pov-avatar" style="background:${avatarBg}">${avatarInner}</div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(name)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:10px;color:#9ca3af;margin-bottom:1px">${T.margin}</div>
+            <div style="font-size:16px;font-weight:800;color:${mColor}">${s.margin>=0?'+':''}${fmtK(s.margin)}</div>
+          </div>
+        </div>
+        <div class="hd-pov-nums" style="margin-bottom:10px">
           <div class="hd-pov-num">
             <span class="hd-pov-num-label">${T.income}</span>
             <span class="hd-pov-num-val" style="color:#22c55e">${fmtK(s.income)}</span>
@@ -5989,14 +5984,14 @@ function _buildProfileOverview(isEN){
             <span class="hd-pov-num-val" style="color:#ef4444">${fmtK(s.expenses)}</span>
           </div>
           <div class="hd-pov-num">
-            <span class="hd-pov-num-label">${isEN?'Used':'Comprometido'}</span>
+            <span class="hd-pov-num-label">${isEN?'Used':'Gasto'}</span>
             <span class="hd-pov-num-val" style="color:${barColor}">${pct}%</span>
           </div>
         </div>
         <div class="hd-pov-bar-bg">
           <div class="hd-pov-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#22c55e,${barColor})"></div>
         </div>
-        <div class="hd-pov-footer">${goalPill}${debtPill}</div>
+        ${goalPill||debtPill?`<div class="hd-pov-footer" style="margin-top:8px">${goalPill}${debtPill}</div>`:''}
       </div>
     </div>`;
   }
