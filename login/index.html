@@ -3770,7 +3770,6 @@ async function handleLogout(){
     console.error('logout error',e);
   } finally{
     _user=null;
-    _booted=false;
     _appRunning=false;
     _launching=false;
     if(_paywallPollInterval){clearInterval(_paywallPollInterval);_paywallPollInterval=null;}
