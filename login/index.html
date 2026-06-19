@@ -3897,7 +3897,7 @@ async function deleteRenda(id){
 }
 async function saveBill(b){
   if(!_user) return;
-  let payload={id:b.id,user_id:b.user_id||_user.id,name:b.name,val:b.val,type:b.type,day:b.day,month:b.month??null,year:b.year??null,cat:b.cat,note:b.note||null,locked:b.locked,meta_id:b.metaId||null,meta_end:b.metaEnd||null,pagamentos:b.pagamentos||[],owner:b.owner||null};
+  let payload={id:b.id,user_id:_user.id,name:b.name,val:b.val,type:b.type,day:b.day,month:b.month??null,year:b.year??null,cat:b.cat,note:b.note||null,locked:b.locked,meta_id:b.metaId||null,meta_end:b.metaEnd||null,pagamentos:b.pagamentos||[],owner:b.owner||null};
   let {data,error}=await _supa.from('bills').upsert(payload,{onConflict:'id'}).select();
   for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<8;i++){
     const col=error.message?.match(/["']([\w]+)["']/)?.[1];
