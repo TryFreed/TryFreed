@@ -2163,18 +2163,6 @@ body.dark .theme-pill-dark{color:#fff}
 
     <!-- Ferramentas -->
     <div class="dr-card">
-      <div class="dr-item" onclick="exportExcel();closeDrawer()">
-        <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-        <span class="dr-label" id="drawerExportBtn">Exportar Excel / Export Excel</span>
-        <svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="dr-sep"></div>
-      <div class="dr-item" onclick="exportPDF();closeDrawer()">
-        <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-        <span class="dr-label" id="drawerExportPDFBtn">Exportar PDF / Export PDF</span>
-        <svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-      <div class="dr-sep"></div>
       <div class="dr-item" onclick="tourReset()">
         <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
         <span class="dr-label" id="drawerTourBtn">Ver tour</span>
@@ -3435,10 +3423,6 @@ function applyLang(){
   if(btnEN){btnEN.style.fontWeight=lang==='en'?'700':'400';btnEN.style.color=lang==='en'?'var(--blue)':'var(--sub)';}
   const dtb=document.getElementById('drawerTourBtn');
   if(dtb) dtb.textContent=t('tour_replay');
-  const deb=document.getElementById('drawerExportBtn');
-  if(deb) deb.textContent=lang==='en'?'Export Excel':'Exportar Excel';
-  const depb=document.getElementById('drawerExportPDFBtn');
-  if(depb) depb.textContent=lang==='en'?'Export PDF':'Exportar PDF';
   const dcpb=document.getElementById('drawerChangePassBtn');
   if(dcpb) dcpb.textContent=t('drawer_change_pass');
   const dnsl=document.getElementById('drawerNotifSectionLabel');
