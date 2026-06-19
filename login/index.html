@@ -2216,11 +2216,6 @@ body.dark .theme-pill-dark{color:#fff}
       <button class="tab" onclick="showTab('relatorio')" id="tab-btn-relatorio">Relatório</button>
     </div>
     <div class="header-actions">
-      <div class="user-bar desktop-user-bar"><span id="userEmail"></span><button class="logout-btn" onclick="handleLogout()">Sair</button></div>
-      <div class="theme-toggle desktop-user-bar" onclick="toggleTheme()" title="Alternar tema">
-        <span id="themeLabel">Light</span>
-        <div class="toggle-track"><div class="toggle-dot"></div></div>
-      </div>
       <div style="display:flex;align-items:center;gap:0;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:50px;padding:2px">
         <button onclick="setLang('pt')" id="headerLangPT" style="padding:3px 10px;border-radius:50px;border:none;cursor:pointer;font-size:11px;font-weight:600;background:rgba(255,255,255,0.15);color:#fff;transition:all .2s">PT</button>
         <button onclick="setLang('en')" id="headerLangEN" style="padding:3px 10px;border-radius:50px;border:none;cursor:pointer;font-size:11px;background:transparent;color:#6b7280;transition:all .2s">EN</button>
@@ -5387,7 +5382,7 @@ function toggleTheme(){
   dark=!dark;
   document.body.classList.toggle('dark',dark);
   const label=dark?t('theme_dark'):t('theme_light');
-  document.getElementById('themeLabel').textContent=label;
+  const _tl=document.getElementById('themeLabel');if(_tl)_tl.textContent=label;
   const dl=document.getElementById('drawerThemeLabel');
   if(dl) dl.textContent=label;
   // DP theme toggle
@@ -5514,7 +5509,7 @@ const savedTheme=localStorage.getItem('theme');
 if(savedTheme==='dark'){
   dark=true;
   document.body.classList.add('dark');
-  document.getElementById('themeLabel').textContent=t('theme_dark');
+  const _tl2=document.getElementById('themeLabel');if(_tl2)_tl2.textContent=t('theme_dark');
   const dl=document.getElementById('drawerThemeLabel');
   if(dl) dl.textContent=t('theme_dark');
   const hti=document.getElementById('dpThemeIcon');
@@ -5562,7 +5557,7 @@ function initApp(){
 function setUserUI(user){
   const p=window._profile||{};
   const displayVal=p.display_name?_capitalize(p.display_name):user.email;
-  document.getElementById('userEmail').textContent=displayVal;
+  const _uel=document.getElementById('userEmail');if(_uel)_uel.textContent=displayVal;
   const de=document.getElementById('drawerEmail');
   if(de) de.textContent=user.email;
   ['loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen']
