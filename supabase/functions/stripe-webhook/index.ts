@@ -5,7 +5,6 @@ const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-// Stripe signature verification
 async function verifyStripeSignature(payload: string, sig: string, secret: string): Promise<boolean> {
   const parts = sig.split(',').reduce((acc: any, part: string) => {
     const [key, value] = part.split('=')
@@ -30,8 +29,39 @@ async function verifyStripeSignature(payload: string, sig: string, secret: strin
   return expectedSig === signature
 }
 
+async function findUserByEmail(supabase: any, email: string): Promise<any | null> {
+  let page = 1
+  const perPage = 1000
+  while (true) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage })
+    if (error) { console.error('[WEBHOOK] listUsers error:', error); break }
+    if (!data?.users?.length) break
+    const user = data.users.find((u: any) => u.email === email)
+    if (user) return user
+    if (data.users.length < perPage) break // última página
+    page++
+  }
+  return null
+}
+
+async function activateSubscription(email: string): Promise<void> {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+  const user = await findUserByEmail(supabase, email)
+  if (!user) {
+    console.log('[WEBHOOK] User not found for email:', email)
+    return
+  }
+  const { error: updateErr } = await supabase
+    .from('profiles')
+    .upsert({ user_id: user.id, subscribed: true }, { onConflict: 'user_id' })
+  if (updateErr) {
+    console.error('[WEBHOOK] Error updating profile:', updateErr)
+    return
+  }
+  console.log('[WEBHOOK] Subscription activated for:', email)
+}
+
 serve(async (req) => {
-  // CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*' } })
   }
@@ -44,74 +74,55 @@ serve(async (req) => {
       return new Response('No signature', { status: 400 })
     }
 
-    // Verify signature
     const valid = await verifyStripeSignature(body, sig, STRIPE_WEBHOOK_SECRET)
     if (!valid) {
-      console.error('Invalid Stripe signature')
+      console.error('[WEBHOOK] Invalid Stripe signature')
       return new Response('Invalid signature', { status: 400 })
     }
 
     const event = JSON.parse(body)
-    console.log('Stripe event:', event.type)
+    console.log('[WEBHOOK] evento recebido:', event.type)
+    console.log('[WEBHOOK] payment_status:', event.data.object.payment_status)
 
-    // Handle checkout.session.completed
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
-      const customerEmail = session.customer_email || session.customer_details?.email
-
-      if (!customerEmail) {
-        console.error('No email in checkout session')
-        return new Response('No email', { status: 400 })
+      // Apple Pay às vezes tem payment_status='paid' em vez de status='complete'
+      if (session.payment_status === 'paid' || session.status === 'complete') {
+        const customerEmail = session.customer_email || session.customer_details?.email
+        if (!customerEmail) {
+          console.error('[WEBHOOK] No email in checkout session')
+          return new Response('No email', { status: 400 })
+        }
+        await activateSubscription(customerEmail)
+      } else {
+        console.log('[WEBHOOK] Skipping — payment_status:', session.payment_status, 'status:', session.status)
       }
-
-      console.log('Activating subscription for:', customerEmail)
-
-      // Init Supabase with service role (bypass RLS)
-      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-
-      // Find user by email
-      const { data: users, error: userErr } = await supabase.auth.admin.listUsers()
-      if (userErr) {
-        console.error('Error listing users:', userErr)
-        return new Response('Error', { status: 500 })
-      }
-
-      const user = users.users.find((u: any) => u.email === customerEmail)
-      if (!user) {
-        console.log('User not found for email:', customerEmail)
-        // Store email for later activation when they sign up
-        return new Response('User not found, will activate on signup', { status: 200 })
-      }
-
-      // Update profile
-      const { error: updateErr } = await supabase
-        .from('profiles')
-        .upsert({ user_id: user.id, subscribed: true }, { onConflict: 'user_id' })
-
-      if (updateErr) {
-        console.error('Error updating profile:', updateErr)
-        return new Response('Update error', { status: 500 })
-      }
-
-      console.log('Subscription activated for:', customerEmail)
     }
 
-    // Handle customer.subscription.deleted (cancelamento)
+    // Fallback para Apple Pay: payment_intent.succeeded pode chegar antes ou sem checkout.session
+    if (event.type === 'payment_intent.succeeded') {
+      const pi = event.data.object
+      const email = pi.receipt_email
+      if (email) {
+        console.log('[WEBHOOK] payment_intent.succeeded fallback para:', email)
+        await activateSubscription(email)
+      } else {
+        console.log('[WEBHOOK] payment_intent.succeeded sem receipt_email, ignorando')
+      }
+    }
+
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object
       const customerEmail = subscription.customer_email
-
       if (customerEmail) {
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        const { data: users } = await supabase.auth.admin.listUsers()
-        const user = users?.users?.find((u: any) => u.email === customerEmail)
-
+        const user = await findUserByEmail(supabase, customerEmail)
         if (user) {
           await supabase
             .from('profiles')
             .update({ subscribed: false })
             .eq('user_id', user.id)
-          console.log('Subscription deactivated for:', customerEmail)
+          console.log('[WEBHOOK] Subscription deactivated for:', customerEmail)
         }
       }
     }
@@ -122,7 +133,7 @@ serve(async (req) => {
     })
 
   } catch (err) {
-    console.error('Webhook error:', err)
+    console.error('[WEBHOOK] Webhook error:', err)
     return new Response('Webhook error', { status: 500 })
   }
 })
