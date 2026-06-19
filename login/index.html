@@ -5580,12 +5580,28 @@ async function fetchProfile(userId){
   }
 }
 
+let _paywallPollInterval=null;
 function showPaywall(){
   _hideLoading();
   ['loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen']
     .forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   applyLang(); // update paywall text for current language
   document.getElementById('paywallScreen').style.display='flex';
+  // Polling: detecta automaticamente quando o webhook do Stripe confirma o pagamento
+  if(_user && !_paywallPollInterval){
+    _paywallPollInterval=setInterval(async()=>{
+      if(document.getElementById('paywallScreen')?.style.display!=='flex'){
+        clearInterval(_paywallPollInterval);_paywallPollInterval=null;return;
+      }
+      const {data}=await _supa.from('profiles').select('subscribed').eq('user_id',_user.id).single();
+      if(data?.subscribed){
+        clearInterval(_paywallPollInterval);_paywallPollInterval=null;
+        _showLoading();
+        _appRunning=false;
+        await checkSubAndLaunch(false);
+      }
+    },5000);
+  }
 }
 
 // checkSubAndLaunch: loads data, checks subscription, shows app or paywall
@@ -5616,12 +5632,24 @@ async function checkSubAndLaunch(skipOnboarding=false){
 let _booted = false;
 let _appRunning = false;
 
-// Re-verifica subscription toda vez que a aba volta ao foco
-// Impede acesso ao app por histórico do browser após abandono do paywall
+// Re-verifica subscription quando a aba volta ao foco
 document.addEventListener('visibilitychange', async()=>{
-  if(document.visibilityState==='visible' && _user && _appRunning){
+  if(document.visibilityState!=='visible' || !_user) return;
+  if(_appRunning){
+    // App a correr — verifica se subscrição ainda é válida
     const {data}=await _supa.from('profiles').select('subscribed').eq('user_id',_user.id).single();
     if(data && !data.subscribed){_appRunning=false;showPaywall();}
+    return;
+  }
+  // Utilizador no paywall — verifica se acabou de pagar (vinda da aba Stripe)
+  const paywallVisible=document.getElementById('paywallScreen')?.style.display==='flex';
+  if(paywallVisible){
+    const {data}=await _supa.from('profiles').select('subscribed').eq('user_id',_user.id).single();
+    if(data?.subscribed){
+      clearInterval(_paywallPollInterval);_paywallPollInterval=null;
+      _showLoading();
+      await checkSubAndLaunch(false);
+    }
   }
 });
 
@@ -6481,7 +6509,7 @@ async function saveDrawerStartDate(){
   rebuild();
 }
 
-function obFinish(){
+async function obFinish(){
   if(_user) localStorage.setItem('ob_done_v2_'+_user.id,'1');
   const displayName=(document.getElementById('obDisplayName')||{value:''}).value.trim();
   const estadoCivil=window._obEstadoCivil||'solteiro';
@@ -6504,7 +6532,8 @@ function obFinish(){
       objetivo_conjuge:estadoCivil==='casado'?(objetivosConjuge||null):null,
       objetivo_conjuge_outro:estadoCivil==='casado'&&(window._obObjetivosConjuge||[]).includes('outro')?objetivoConjugeOutro:null
     };
-    _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
+    const {error} = await _supa.from('profiles').upsert({user_id:_user.id,...profileData},{onConflict:'user_id'});
+    if(error) console.error('[obFinish] erro ao salvar perfil:',error);
     window._profile=Object.assign(window._profile||{},profileData);
   }
   document.getElementById('onboardingScreen').style.display='none';
