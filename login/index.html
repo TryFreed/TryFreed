@@ -5183,6 +5183,7 @@ function buildRelatorio(){
     </div>`;
 
   if(typeof Chart==='undefined') return;
+  if(!document.getElementById('tab-relatorio')?.classList.contains('on')) return;
   // destroy old charts
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
   const cc=chartColors();
@@ -5455,10 +5456,14 @@ function showTab(tabId){
   if(tabId==='home'){
     try{buildHomeDashboard();}catch(e){console.error('[home]',e);}
   }
-  if(tabId==='relatorio' && typeof Chart==='undefined'){
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
-      .then(()=>buildRelatorio())
-      .catch(()=>_showToast(lang==='en'?'Failed to load charts':'Erro ao carregar gráficos'));
+  if(tabId==='relatorio'){
+    if(typeof Chart==='undefined'){
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js')
+        .then(()=>buildRelatorio())
+        .catch(()=>_showToast(lang==='en'?'Failed to load charts':'Erro ao carregar gráficos'));
+    } else {
+      buildRelatorio();
+    }
   }
 }
 
