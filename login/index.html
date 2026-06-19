@@ -2064,6 +2064,35 @@ body.dark .theme-pill-dark{color:#fff}
 
   <div class="dr-body">
 
+    <!-- Minha Conta -->
+    <div class="dr-card">
+      <div class="dr-item" onclick="drToggle('drAccountExpand',this)">
+        <div class="dr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <span class="dr-label" id="drawerAccountLabel">Minha conta</span>
+        <svg class="dr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="dr-expand" id="drAccountExpand">
+        <div class="dr-expand-inner" style="gap:8px">
+          <div style="font-size:11px;color:var(--sub);padding:0 2px" id="drawerAccountEmail"></div>
+          <div class="dr-expand-row">
+            <input id="drawerDisplayName" type="text" class="dr-input" placeholder="Seu nome" style="flex:1">
+          </div>
+          <div class="dr-expand-row">
+            <select id="drawerGender" class="dr-input" style="flex:1;color:var(--text)">
+              <option value="" id="drawerGenderPlaceholder">Sexo</option>
+              <option value="M" id="drawerGenderM">Masculino</option>
+              <option value="F" id="drawerGenderF">Feminino</option>
+              <option value="O" id="drawerGenderO">Prefiro não dizer</option>
+            </select>
+          </div>
+          <div class="dr-expand-row">
+            <input id="drawerAge" type="number" class="dr-input" placeholder="Idade" inputmode="numeric" min="1" max="120" style="flex:1">
+          </div>
+          <button onclick="saveAccountInfo()" class="dr-save-btn" style="width:100%;justify-content:center" id="drawerAccountSaveBtn">✓ Salvar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Saldo & Data -->
     <div class="dr-card">
       <div class="dr-item" onclick="drToggle('drIBExpand',this)">
@@ -2840,6 +2869,7 @@ const TRANSLATIONS = {
     bn_cal:'Calendário', bn_metas:'Metas', bn_relatorio:'Relatório',
     // Header / drawer
     theme_light:'Claro', theme_dark:'Escuro',
+    drawer_account:'Minha conta', drawer_gender_ph:'Sexo', drawer_gender_m:'Masculino', drawer_gender_f:'Feminino', drawer_gender_o:'Prefiro não dizer', drawer_age_ph:'Idade', drawer_account_save:'Salvar',
     drawer_appearance:'Aparência / Appearance',
     drawer_initial_balance:'Saldo inicial / Initial balance',
     drawer_ib_hint:'Quanto você já tem guardado hoje?',
@@ -3070,6 +3100,7 @@ const TRANSLATIONS = {
     bn_home:'Home', bn_renda:'Income', bn_bills:'Expenses', bn_semana:'Week',
     bn_cal:'Calendar', bn_metas:'Goals', bn_relatorio:'Report',
     theme_light:'Light', theme_dark:'Dark',
+    drawer_account:'My account', drawer_gender_ph:'Gender', drawer_gender_m:'Male', drawer_gender_f:'Female', drawer_gender_o:'Prefer not to say', drawer_age_ph:'Age', drawer_account_save:'Save',
     drawer_appearance:'Appearance',
     drawer_initial_balance:'Initial balance',
     drawer_ib_hint:'How much do you already have saved today?',
@@ -3412,6 +3443,13 @@ function applyLang(){
   if(dsl[0]) dsl[0].textContent=t('drawer_initial_balance');
   if(dsl[1]) dsl[1].textContent=t('drawer_appearance');
   if(dsl[2]) dsl[2].textContent=t('drawer_lang');
+  const dal=document.getElementById('drawerAccountLabel');if(dal) dal.textContent=t('drawer_account');
+  const dsp=document.getElementById('drawerGenderPlaceholder');if(dsp) dsp.textContent=t('drawer_gender_ph');
+  const dgm=document.getElementById('drawerGenderM');if(dgm) dgm.textContent=t('drawer_gender_m');
+  const dgf=document.getElementById('drawerGenderF');if(dgf) dgf.textContent=t('drawer_gender_f');
+  const dgo=document.getElementById('drawerGenderO');if(dgo) dgo.textContent=t('drawer_gender_o');
+  const dap=document.getElementById('drawerAge');if(dap) dap.placeholder=t('drawer_age_ph');
+  const dasb=document.getElementById('drawerAccountSaveBtn');if(dasb) dasb.textContent='✓ '+t('drawer_account_save');
   const ibHint=document.getElementById('drawerIBhint');
   if(ibHint) ibHint.textContent=t('drawer_ib_hint');
   const dlo=document.querySelector('.drawer-logout');
@@ -3786,7 +3824,7 @@ async function loadFromSupabase(){
       _supa.from('bills').select('*').eq('user_id',_user.id),
       _supa.from('metas').select('*').eq('user_id',_user.id),
       _supa.from('dividas').select('*').eq('user_id',_user.id),
-      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge,objetivo_conjuge_outro').eq('user_id',_user.id).maybeSingle(),
+      _supa.from('profiles').select('*').eq('user_id',_user.id).maybeSingle(),
     ]);
     console.log('[load] todas as queries ok');
   } catch(e) {
@@ -5468,11 +5506,45 @@ function openDrawer(){
     sd.max=`${_today.getFullYear()}-${String(_today.getMonth()+1).padStart(2,'0')}-${String(_today.getDate()).padStart(2,'0')}`;
   }
   const dg=document.getElementById('drawerGreeting');
-  if(dg&&_user) dg.textContent=(lang==='en'?'Hi, ':'Olá, ')+((_user.email||'').split('@')[0]||'')+'!';
+  const p=window._profile||{};
+  const greetName=p.display_name?_capitalize(p.display_name):((_user?.email||'').split('@')[0]||'');
+  if(dg&&_user) dg.textContent=(lang==='en'?'Hi, ':'Olá, ')+greetName+'!';
+  const dae=document.getElementById('drawerAccountEmail');
+  if(dae&&_user) dae.textContent=_user.email;
+  const dn=document.getElementById('drawerDisplayName');
+  if(dn) dn.value=p.display_name||'';
+  const dgn=document.getElementById('drawerGender');
+  if(dgn) dgn.value=p.sexo_user||'';
+  const da=document.getElementById('drawerAge');
+  if(da) da.value=p.age||'';
 }
 function closeDrawer(){
   document.getElementById('drawer').classList.remove('open');
   document.getElementById('drawerOverlay').classList.remove('open');
+}
+async function saveAccountInfo(){
+  if(!_user) return;
+  const name=(document.getElementById('drawerDisplayName')?.value||'').trim();
+  const gender=document.getElementById('drawerGender')?.value||null;
+  const ageVal=document.getElementById('drawerAge')?.value;
+  const age=ageVal?parseInt(ageVal)||null:null;
+  let payload={user_id:_user.id,display_name:name||null,sexo_user:gender,age};
+  let {error}=await _supa.from('profiles').upsert(payload,{onConflict:'user_id'});
+  for(let i=0;error&&(error.code==='42703'||error.code==='PGRST204')&&i<3;i++){
+    const col=error.message?.match(/["']([\w]+)["']/)?.[1];
+    if(!col||!(col in payload))break;
+    payload={...payload};delete payload[col];
+    ({error}=await _supa.from('profiles').upsert(payload,{onConflict:'user_id'}));
+  }
+  if(error){_showToast(lang==='en'?'Error saving':'Erro ao salvar');return;}
+  window._profile=window._profile||{};
+  window._profile.display_name=name||null;
+  window._profile.sexo_user=gender;
+  window._profile.age=age;
+  const dg=document.getElementById('drawerGreeting');
+  const greetName=name||(_user.email||'').split('@')[0]||'';
+  if(dg) dg.textContent=(lang==='en'?'Hi, ':'Olá, ')+_capitalize(greetName)+'!';
+  _showToast(lang==='en'?'Saved!':'Salvo!');
 }
 async function saveInitialBalance(){
   const val=parseFloat(document.getElementById('drawerIB').value)||0;
