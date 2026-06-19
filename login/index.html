@@ -3778,6 +3778,7 @@ async function handleLogout(){
     _appRunning=false;
     _launching=false;
     if(_paywallPollInterval){clearInterval(_paywallPollInterval);_paywallPollInterval=null;}
+    if(_notifCheckTimeout){clearTimeout(_notifCheckTimeout);_notifCheckTimeout=null;}
     localStorage.removeItem('tryfreed_lang');
     ['homeScreen','loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen','paywallScreen','appScreen'].forEach(id=>{
       const el=document.getElementById(id);
@@ -5382,7 +5383,7 @@ async function initNotifications(){
     updateNotifDrawer();return;
   }
   await registerSW();
-  setTimeout(doNotifCheck,3000);
+  _notifCheckTimeout=setTimeout(doNotifCheck,3000);
 }
 
 // DARK MODE
@@ -5587,6 +5588,7 @@ async function fetchProfile(userId){
 }
 
 let _paywallPollInterval=null;
+let _notifCheckTimeout=null;
 function showPaywall(){
   _hideLoading();
   ['loginScreen','resetScreen','onboardingScreen','pinScreen','pinSetupScreen']
