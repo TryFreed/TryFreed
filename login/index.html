@@ -3802,23 +3802,18 @@ async function loadFromSupabase(){
   const uid = _user.id;
   let r,b,m,dv,prof;
   try {
-    const uid = _user.id;
-    console.log('[load] iniciando queries para', uid);
-    const withTimeout = (p, name) => Promise.race([
-      p.then(r => { console.log('[load] ok:', name); return r; }),
-      new Promise((_,rej) => setTimeout(()=>rej(new Error(name+' TIMEOUT 20s')),20000))
-    ]);
+    console.log('[load] iniciando queries para', _user.id);
     [r,b,m,dv,prof] = await Promise.all([
-      withTimeout(_supa.from('rendas').select('*').eq('user_id',uid), 'rendas'),
-      withTimeout(_supa.from('bills').select('*').eq('user_id',uid), 'bills'),
-      withTimeout(_supa.from('metas').select('*').eq('user_id',uid), 'metas'),
-      withTimeout(_supa.from('dividas').select('*').eq('user_id',uid), 'dividas'),
-      withTimeout(_supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge,objetivo_conjuge_outro').eq('user_id',uid).maybeSingle(), 'profiles'),
+      _supa.from('rendas').select('*').eq('user_id',_user.id),
+      _supa.from('bills').select('*').eq('user_id',_user.id),
+      _supa.from('metas').select('*').eq('user_id',_user.id),
+      _supa.from('dividas').select('*').eq('user_id',_user.id),
+      _supa.from('profiles').select('initial_balance,start_date,subscribed,display_name,estado_civil,conjuge_nome,objetivo,objetivo_outro,sexo_user,sexo_conjuge,avatar_color,avatar_color_conjuge,objetivo_conjuge,objetivo_conjuge_outro').eq('user_id',_user.id).maybeSingle(),
     ]);
     console.log('[load] todas as queries ok');
   } catch(e) {
-    console.error('[load] erro ou timeout:', e.message);
-    _showToast('Erro ao carregar: '+e.message);
+    console.error('[load] erro de rede:', e.message);
+    _showToast('Erro ao carregar dados. Tente novamente.');
     return;
   }
   if(r.error||b.error||m.error||dv.error){
