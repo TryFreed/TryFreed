@@ -8526,9 +8526,17 @@ function _aiSystemPrompt(){
     metas: metas.map(m=>({name:m.name,val:m.val,done:m.done})),
     dividas: dividas.map(d=>({name:d.name,total:d.total,remaining:d.remaining,juros:d.juros})),
   };
+  const userName=window._profile?.display_name||_user?.user_metadata?.full_name||'Usuário';
+  const conjugeName=window._profile?.conjuge_nome||null;
+  const isMarried=window._profile?.estado_civil==='casado';
+  const ownerInfo=isMarried&&conjugeName
+    ? `User: "${userName}" (owner="user"), Partner: "${conjugeName}" (owner="conjuge")`
+    : `User: "${userName}" (owner="user")`;
   return `You are a smart financial assistant for TryFreed, a bilingual (PT-BR/EN) personal finance app. Always reply in the same language the user writes in.
 
 Today: ${today}
+
+PROFILE: ${ownerInfo}
 
 USER'S CURRENT FINANCIAL DATA:
 ${JSON.stringify(snap)}
@@ -8544,16 +8552,17 @@ Delete existing (match by name, case-insensitive):  {"op":"delete","table":"<t>"
 Multiple operations → all in actions[].
 
 TABLE SCHEMAS:
-rendas: name, val, type("monthly"|"weekly"|"biweekly"|"once"), day(1-31,99=last), dow(0=Sun…6=Sat for weekly), day2(biweekly 2nd payday)
-bills:  name, val, type("monthly"|"weekly"|"once"), day(1-31), cat("moradia"|"transporte"|"alimentacao"|"educacao"|"viagem"|"assinaturas"|"lazer"|"saude"|"vestuario"|"generosidade"|"outros"), note, month+year(for once)
-metas:  name, val(target $), day, month, year(>=${yr}), descricao
-dividas: name, total, remaining, juros(annual% e.g.18), min_payment, target_date("YYYY-MM-DD"), frequencia("monthly"|"weekly")
+rendas: name, val, type("monthly"|"weekly"|"biweekly"|"once"), day(1-31,99=last), dow(0=Sun…6=Sat for weekly), day2(biweekly 2nd payday), owner("user"|"conjuge")
+bills:  name, val, type("monthly"|"weekly"|"once"), day(1-31), cat("moradia"|"transporte"|"alimentacao"|"educacao"|"viagem"|"assinaturas"|"lazer"|"saude"|"vestuario"|"generosidade"|"outros"), note, month+year(for once), owner("user"|"conjuge")
+metas:  name, val(target $), day, month, year(>=${yr}), descricao, owner("user"|"conjuge")
+dividas: name, total, remaining, juros(annual% e.g.18), min_payment, target_date("YYYY-MM-DD"), frequencia("monthly"|"weekly"), owner("user"|"conjuge")
 
 RULES:
 - For financial analysis/questions: use USER'S CURRENT FINANCIAL DATA above. Give specific, actionable insights with real numbers from their data.
 - cat inference: Netflix/Spotify/streaming→assinaturas, aluguel/rent→moradia, food/comida→alimentacao, gym/academia→saude, car/carro→transporte, viagem/travel→viagem.
 - Default day:1 for monthly if not specified. Default meta year to ${yr+1}.
-- If asked to delete/update something not in the data, explain it wasn't found.`;
+- If asked to delete/update something not in the data, explain it wasn't found.
+- owner field: if the user mentions their own name or "my" income/expense → owner="user". If they mention the partner's name → owner="conjuge". Never use a person's name as the income/expense title — use a descriptive name (e.g. "Salário", "Freelance") instead.`;
 }
 
 // Timeout de segurança: se o app não inicializou em 12s, mostrar botão de reload
