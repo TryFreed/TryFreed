@@ -3790,7 +3790,7 @@ async function handleLogout(){
 // ── Supabase data sync ────────────────────────────────────────────
 // Retorna true e faz logout se o erro for de token expirado/inválido
 async function _handleAuthError(error){
-  if(error?.status===400||error?.message?.includes('JWT')||error?.message?.includes('refresh_token')){
+  if(error?.status===401||error?.code==='PGRST301'||error?.code==='PGRST302'||error?.message?.includes('JWT')||error?.message?.includes('INVALID_JWT')||error?.message?.includes('refresh_token')){
     console.warn('[AUTH] Token inválido ou expirado. Verificando sessão...');
     try{
       const {data:{session}}=await _supa.auth.getSession();
