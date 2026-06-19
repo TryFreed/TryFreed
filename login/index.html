@@ -3891,9 +3891,10 @@ async function saveRenda(r){
   else{_showToast('✓ Renda salva!','#10b981');return true;}
 }
 async function deleteRenda(id){
-  if(!_user) return;
+  if(!_user) return false;
   const {error}=await _supa.from('rendas').delete().eq('id',id).eq('user_id',_user.id);
-  if(error) console.error('deleteRenda error:',error);
+  if(error){console.error('deleteRenda error:',error);return false;}
+  return true;
 }
 async function saveBill(b){
   if(!_user) return;
@@ -3911,9 +3912,10 @@ async function saveBill(b){
   else{_showToast('✓ Despesa salva!','#10b981');return true;}
 }
 async function deleteBill(id){
-  if(!_user) return;
+  if(!_user) return false;
   const {error}=await _supa.from('bills').delete().eq('id',id).eq('user_id',_user.id);
-  if(error) console.error('deleteBill error:',error);
+  if(error){console.error('deleteBill error:',error);return false;}
+  return true;
 }
 async function saveMeta(m){
   if(!_user) return;
@@ -3931,9 +3933,10 @@ async function saveMeta(m){
   else{_showToast('✓ Meta salva!','#10b981');return true;}
 }
 async function deleteMeta(id){
-  if(!_user) return;
+  if(!_user) return false;
   const {error}=await _supa.from('metas').delete().eq('id',id).eq('user_id',_user.id);
-  if(error) console.error('deleteMeta error:',error);
+  if(error){console.error('deleteMeta error:',error);return false;}
+  return true;
 }
 
 function newId(){return crypto.randomUUID();}
@@ -7798,9 +7801,10 @@ async function saveDivida(d){
   else{_showToast('✓ Dívida salva!','#10b981');return true;}
 }
 async function deleteDividaDB(id){
-  if(!_user) return;
+  if(!_user) return false;
   const {error}=await _supa.from('dividas').delete().eq('id',id).eq('user_id',_user.id);
-  if(error) console.error('deleteDivida error:',error);
+  if(error){console.error('deleteDivida error:',error);return false;}
+  return true;
 }
 function buildDividas(){
   const openIds=dividas.filter(d=>document.getElementById('debt-inst-body-'+d.id)?.classList.contains('open')).map(d=>d.id);
