@@ -3814,7 +3814,7 @@ async function loadFromSupabase(){
   } catch(e) {
     console.error('[load] erro de rede:', e.message);
     _showToast('Erro ao carregar dados. Tente novamente.');
-    return;
+    return false;
   }
   if(r.error||b.error||m.error||dv.error){
     const errs=[r.error,b.error,m.error,dv.error].filter(Boolean);
@@ -3864,6 +3864,7 @@ async function loadFromSupabase(){
   // store full profile for dashboard card
   window._profile = prof.data || {};
   _computeFullDirty=true;
+  return true;
 }
 
 function _showToast(msg,color){
@@ -5592,7 +5593,12 @@ function showPaywall(){
 async function checkSubAndLaunch(skipOnboarding=false){
   if(_appRunning){_hideLoading();return;}
   try {
-    await loadFromSupabase(); // single round-trip: data + profile (incl. subscribed)
+    const loaded = await loadFromSupabase(); // single round-trip: data + profile (incl. subscribed)
+    if(!loaded){
+      // Falha de rede — NÃO mostrar paywall, o utilizador é assinante
+      _hideLoading();
+      return;
+    }
     if(_appRunning){_hideLoading();return;}
     if(!window._profile?.subscribed){showPaywall();return;}
     if(!skipOnboarding&&obIsFirstTime()){
@@ -5602,7 +5608,8 @@ async function checkSubAndLaunch(skipOnboarding=false){
     _appRunning=true;
   } catch(e){
     console.error('[checkSubAndLaunch] erro:',e);
-    showPaywall();
+    _hideLoading();
+    _showToast('Erro ao iniciar. Recarregue a página.');
   }
 }
 
