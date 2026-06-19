@@ -5036,7 +5036,7 @@ async function completeMeta(id){
   const m=metas.find(x=>x.id===id);
   if(!m)return;
   m.done=true;
-  if(m.billId){bills=bills.filter(b=>b.id!==m.billId);deleteBill(m.billId);renderBills();}
+  if(m.billId){bills=bills.filter(b=>b.id!==m.billId);await deleteBill(m.billId);renderBills();}
   await saveMeta(m);buildMetas();rebuild();
 }
 function removeMeta(id){
