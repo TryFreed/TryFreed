@@ -3816,8 +3816,8 @@ async function loadFromSupabase(){
     _showToast('Erro ao carregar dados. Tente novamente.');
     return false;
   }
-  if(r.error||b.error||m.error||dv.error){
-    const errs=[r.error,b.error,m.error,dv.error].filter(Boolean);
+  if(r.error||b.error||m.error||dv.error||prof.error){
+    const errs=[r.error,b.error,m.error,dv.error,prof.error].filter(Boolean);
     if(await _handleAuthError(errs[0])) return;
     console.error('[load] ERROS nas queries:',errs);
     _showToast('Erro ao carregar dados: '+errs[0]?.message);
