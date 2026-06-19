@@ -857,12 +857,25 @@ body:not(.dark) .hd-tx-item{border-bottom-color:var(--row-border)}
 .hd-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;margin-left:6px}
 .hd-see-all{font-size:12px;color:#a78bfa;cursor:pointer;text-align:right;margin-top:8px;display:block}
 .hd-see-all:hover{text-decoration:underline}
-.hd-pov-card{background:var(--panel);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px;display:flex;align-items:center;gap:14px}
-body:not(.dark) .hd-pov-card{border-color:var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.hd-pov-stats{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
-.hd-pov-stat{display:flex;flex-direction:column}
-.hd-pov-label{font-size:10px;color:#6b7280;font-weight:500;letter-spacing:.3px}
-.hd-pov-val{font-size:13px;font-weight:700;color:var(--text)}
+.hd-pov-card{border-radius:18px;overflow:hidden;margin-bottom:0;box-shadow:0 2px 16px rgba(0,0,0,0.07)}
+body.dark .hd-pov-card{box-shadow:0 2px 20px rgba(0,0,0,0.3)}
+.hd-pov-head{padding:14px 16px;display:flex;align-items:center;gap:12px}
+.hd-pov-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.hd-pov-name{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
+.hd-pov-sub{font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px}
+.hd-pov-body{background:var(--card);padding:14px 16px}
+body:not(.dark) .hd-pov-body{background:#fff}
+.hd-pov-nums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-bottom:12px}
+.hd-pov-num{display:flex;flex-direction:column;align-items:center;padding:0 4px;border-right:0.5px solid var(--border)}
+.hd-pov-num:last-child{border-right:none}
+.hd-pov-num-label{font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:#9ca3af;margin-bottom:3px}
+.hd-pov-num-val{font-size:14px;font-weight:800;color:var(--text)}
+.hd-pov-bar-bg{height:6px;background:rgba(0,0,0,0.07);border-radius:50px;overflow:hidden;margin-bottom:8px}
+body.dark .hd-pov-bar-bg{background:rgba(255,255,255,0.1)}
+.hd-pov-bar-fill{height:100%;border-radius:50px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.hd-pov-footer{display:flex;gap:8px;flex-wrap:wrap}
+.hd-pov-pill{font-size:10px;font-weight:600;padding:3px 9px;border-radius:50px;background:rgba(0,0,0,0.05);color:#6b7280}
+body.dark .hd-pov-pill{background:rgba(255,255,255,0.07);color:#9ca3af}
 .gcal-btn{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:50px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
 body:not(.dark) .gcal-btn{border-color:var(--border);background:transparent}
 .gcal-btn:hover{background:rgba(124,58,237,0.15);border-color:#7c3aed}
@@ -5924,23 +5937,6 @@ function _povStats(ownerKey){
   return {income,expenses,margin:income-expenses,activeMetas,totalDebt};
 }
 
-function _povDonut(income,expenses){
-  const r=28,cx=36,cy=36,sw=7;
-  const circ=2*Math.PI*r;
-  const pct=income>0?Math.min(1,expenses/income):1;
-  const expArc=circ*pct;
-  const margin=income-expenses;
-  const mc=margin>=0?'#22c55e':'#ef4444';
-  const fmtK=v=>Math.abs(v)>=1000?(Math.round(Math.abs(v)/100)/10)+'k':Math.round(Math.abs(v));
-  return `<svg width="72" height="72" viewBox="0 0 72 72" style="flex-shrink:0">
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e5e7eb" stroke-width="${sw}"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#22c55e" stroke-width="${sw}" stroke-dasharray="${circ}" stroke-dashoffset="0" transform="rotate(-90 ${cx} ${cy})" opacity="0.9"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#ef4444" stroke-width="${sw}" stroke-dasharray="${expArc} ${circ}" stroke-dashoffset="0" transform="rotate(-90 ${cx} ${cy})" opacity="0.9"/>
-    <text x="${cx}" y="${cy-1}" text-anchor="middle" font-size="9" font-weight="800" fill="${mc}">${margin>=0?'+':'−'}$${fmtK(margin)}</text>
-    <text x="${cx}" y="${cy+9}" text-anchor="middle" font-size="7" fill="#9ca3af">${income>0?Math.round(expenses/income*100):0}%</text>
-  </svg>`;
-}
-
 function _buildProfileOverview(isEN){
   const p=window._profile||{};
   const isCasado=p.estado_civil==='casado';
@@ -5950,46 +5946,67 @@ function _buildProfileOverview(isEN){
   const cName=_capitalize(p.conjuge_nome||'');
   const uInit=uName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
   const cInit=cName.split(' ').filter(Boolean).map(w=>w[0]).join('').toUpperCase().slice(0,2)||'?';
-  const lbl=(k)=>({
-    income:isEN?'Monthly income':'Renda mensal',
-    expenses:isEN?'Expenses':'Despesas',
-    margin:isEN?'Margin':'Margem',
-    goals:isEN?'Active goals':'Metas ativas',
-    debt:isEN?'Total debt':'Dívidas',
-    none:isEN?'None':'Nenhuma',
-    both:isEN?'Together':'Juntos',
-    overview:isEN?'Profile Overview':'Visão por Perfil',
-  })[k];
+  const T={
+    income:isEN?'Income':'Renda',expenses:isEN?'Expenses':'Despesas',margin:isEN?'Margin':'Margem',
+    goals:isEN?'goals':'metas',debt:isEN?'in debt':'em dívidas',both:isEN?'Together':'Juntos',
+    overview:isEN?'Financial Overview':'Visão Financeira',noDebt:isEN?'Debt-free':'Sem dívidas',
+    noGoals:isEN?'No goals':'Sem metas',spent:isEN?'of income spent':'da renda comprometida',
+  };
+  const fmtK=v=>{const a=Math.abs(v);return a>=1000?'$'+(Math.round(a/100)/10)+'k':'$'+Math.round(a);};
 
-  function card(ownerKey, color, initials, name, gradient){
+  function card(ownerKey,color,initials,name,gradient){
     const s=_povStats(ownerKey);
+    const pct=s.income>0?Math.min(100,Math.round(s.expenses/s.income*100)):0;
     const mColor=s.margin>=0?'#22c55e':'#ef4444';
-    const fmtS=v=>Math.abs(v)>=1000?(Math.round(Math.abs(v)/100)/10)+'k':'$'+Math.round(Math.abs(v));
-    const avatar=gradient
-      ?`<div style="width:40px;height:40px;border-radius:50%;background:${gradient};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff">&#10084;</div>`
-      :`<div style="width:40px;height:40px;border-radius:50%;background:${color};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff">${initials}</div>`;
+    const barColor=pct<=70?'#22c55e':pct<=90?'#f59e0b':'#ef4444';
+    const headBg=gradient||color;
+    const avatarInner=gradient
+      ?`<span style="font-size:18px">&#10084;</span>`
+      :`<span style="font-weight:800;font-size:16px">${initials}</span>`;
+    const subLabel=ownerKey==='combined'?(isEN?'Combined view':'Visão combinada'):'';
+    const goalPill=s.activeMetas>0?`<span class="hd-pov-pill">🎯 ${s.activeMetas} ${T.goals}</span>`:`<span class="hd-pov-pill">${T.noGoals}</span>`;
+    const debtPill=s.totalDebt>0?`<span class="hd-pov-pill" style="color:#f59e0b">⚠ ${fmtK(s.totalDebt)} ${T.debt}</span>`:`<span class="hd-pov-pill" style="color:#22c55e">✓ ${T.noDebt}</span>`;
     return `<div class="hd-pov-card">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
-        ${avatar}
-        <div style="font-size:10px;font-weight:700;color:var(--text);text-align:center;max-width:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(name)}</div>
-        ${_povDonut(s.income,s.expenses)}
+      <div class="hd-pov-head" style="background:${headBg}">
+        <div class="hd-pov-avatar" style="background:rgba(255,255,255,0.2)">${avatarInner}</div>
+        <div>
+          <div class="hd-pov-name">${esc(name)}</div>
+          ${subLabel?`<div class="hd-pov-sub">${subLabel}</div>`:''}
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:2px">${T.margin}</div>
+          <div style="font-size:18px;font-weight:900;color:#fff">${s.margin>=0?'+':''}${fmtK(s.margin)}</div>
+        </div>
       </div>
-      <div class="hd-pov-stats">
-        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('income')}</span><span class="hd-pov-val" style="color:#22c55e">$${fmtS(s.income)}</span></div>
-        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('expenses')}</span><span class="hd-pov-val" style="color:#ef4444">$${fmtS(s.expenses)}</span></div>
-        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('margin')}</span><span class="hd-pov-val" style="color:${mColor}">${s.margin>=0?'+':'−'}$${fmtS(s.margin)}</span></div>
-        <div class="hd-pov-stat"><span class="hd-pov-label">${lbl('goals')}</span><span class="hd-pov-val">${s.activeMetas||lbl('none')}</span></div>
-        ${s.totalDebt>0?`<div class="hd-pov-stat" style="grid-column:1/-1"><span class="hd-pov-label">${lbl('debt')}</span><span class="hd-pov-val" style="color:#f59e0b">$${fmtS(s.totalDebt)}</span></div>`:''}
+      <div class="hd-pov-body">
+        <div class="hd-pov-nums">
+          <div class="hd-pov-num">
+            <span class="hd-pov-num-label">${T.income}</span>
+            <span class="hd-pov-num-val" style="color:#22c55e">${fmtK(s.income)}</span>
+          </div>
+          <div class="hd-pov-num">
+            <span class="hd-pov-num-label">${T.expenses}</span>
+            <span class="hd-pov-num-val" style="color:#ef4444">${fmtK(s.expenses)}</span>
+          </div>
+          <div class="hd-pov-num">
+            <span class="hd-pov-num-label">${isEN?'Used':'Comprometido'}</span>
+            <span class="hd-pov-num-val" style="color:${barColor}">${pct}%</span>
+          </div>
+        </div>
+        <div class="hd-pov-bar-bg">
+          <div class="hd-pov-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,#22c55e,${barColor})"></div>
+        </div>
+        <div class="hd-pov-footer">${goalPill}${debtPill}</div>
       </div>
     </div>`;
   }
 
   const bothGrad=`linear-gradient(135deg,${uColor},${cColor})`;
-  let html=`<div class="hd-section"><div class="hd-section-title">${lbl('overview')}</div><div style="display:flex;flex-direction:column;gap:10px">`;
+  let html=`<div class="hd-section"><div class="hd-section-title">${T.overview}</div><div style="display:flex;flex-direction:column;gap:12px">`;
   html+=card('user',uColor,uInit,uName,null);
   if(isCasado){
     html+=card('conjuge',cColor,cInit,cName,null);
-    html+=card('combined',null,null,lbl('both'),bothGrad);
+    html+=card('combined',null,null,T.both,bothGrad);
   }
   html+=`</div></div>`;
   return html;
